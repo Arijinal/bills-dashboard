@@ -1,0 +1,293 @@
+/* ═══════════════════════════════════════════════════════
+   PLAYER DOSSIER — Holographic Intel Modal
+   ═══════════════════════════════════════════════════════ */
+
+.dossier-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(2, 4, 8, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.dossier-modal {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: rgba(4, 12, 24, 0.35);
+  backdrop-filter: blur(30px) saturate(1.4);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4);
+  border: 1px solid rgba(0, 229, 255, 0.45);
+  border-radius: 0;
+  padding: 2rem;
+  box-shadow:
+    0 0 2px rgba(0, 229, 255, 0.6),
+    0 0 20px rgba(0, 229, 255, 0.15),
+    0 0 60px rgba(0, 85, 255, 0.08),
+    0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+/* HUD corners */
+.dossier-modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 30px; height: 30px;
+  border-top: 2.5px solid var(--hud-cyan);
+  border-left: 2.5px solid var(--hud-cyan);
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.5));
+}
+.dossier-modal::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 30px; height: 30px;
+  border-bottom: 2.5px solid var(--hud-cyan);
+  border-right: 2.5px solid var(--hud-cyan);
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.5));
+}
+
+.dossier-modal::-webkit-scrollbar { width: 3px; }
+.dossier-modal::-webkit-scrollbar-track { background: transparent; }
+.dossier-modal::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.15); }
+
+.dossier-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  width: 30px; height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+.dossier-close:hover {
+  background: rgba(255, 23, 68, 0.1);
+  border-color: rgba(255, 23, 68, 0.2);
+  color: var(--bills-red-light);
+}
+
+/* ── Header ── */
+.dossier-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+}
+
+.dossier-photo-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.dossier-reticle {
+  position: absolute;
+  inset: -6px;
+  border: 1.5px solid rgba(0, 229, 255, 0.3);
+  border-radius: 50%;
+  animation: reticle-spin 12s linear infinite;
+  /* Dashed effect */
+  border-style: dashed;
+}
+
+.dossier-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  opacity: 0.85;
+  filter: hue-rotate(15deg) brightness(1.1) saturate(0.8);
+}
+
+.dossier-photo-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bills-blue), var(--bills-blue-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-data);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--hud-white);
+  text-shadow: 0 0 10px var(--bills-blue-glow);
+}
+
+.dossier-scan-lines {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 229, 255, 0.04) 2px,
+    rgba(0, 229, 255, 0.04) 4px
+  );
+  pointer-events: none;
+}
+
+.dossier-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dossier-number {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--bills-gold);
+  text-shadow: 0 0 12px var(--bills-gold-glow);
+}
+
+.dossier-name {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--hud-white);
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+}
+
+.dossier-position {
+  width: fit-content;
+  font-size: 0.65rem;
+}
+
+/* ── Bio grid ── */
+.dossier-bio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 229, 255, 0.03);
+  border: 1px solid rgba(0, 229, 255, 0.1);
+}
+
+.dossier-bio-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dossier-bio-label {
+  font-family: var(--font-data);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dossier-bio-value {
+  font-family: var(--font-data);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Sections ── */
+.dossier-section {
+  margin-bottom: 1.5rem;
+}
+
+.dossier-section-title {
+  font-family: var(--font-data);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--hud-cyan);
+  text-shadow: 0 0 10px var(--hud-cyan-glow);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Arc Gauges ── */
+.dossier-gauges {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.arc-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.arc-gauge-label {
+  font-family: var(--font-data);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.arc-gauge-fill {
+  transition: stroke-dashoffset 1.2s ease;
+}
+
+/* ── Career Star Map ── */
+.career-star-map {
+  width: 100%;
+  height: 100px;
+}
+
+/* ── Intel (typewriter) ── */
+.dossier-intel {
+  padding: 1.25rem;
+  background: rgba(0, 85, 255, 0.04);
+  border: 1px solid rgba(0, 85, 255, 0.1);
+}
+
+.dossier-intel-text {
+  font-family: var(--font-data);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.typewriter-text {
+  font-family: var(--font-data);
+}
+
+.typewriter-cursor {
+  color: var(--hud-cyan);
+  animation: data-flicker 1.5s ease-in-out infinite;
+  font-weight: 700;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .dossier-overlay { padding: 1rem; }
+  .dossier-modal { padding: 1.5rem; max-height: 92vh; }
+  .dossier-header { flex-direction: column; text-align: center; }
+  .dossier-identity { align-items: center; }
+  .dossier-bio-grid { grid-template-columns: repeat(2, 1fr); }
+  .dossier-gauges { grid-template-columns: repeat(3, 1fr); }
+  .dossier-name { font-size: 1.8rem; }
+}
