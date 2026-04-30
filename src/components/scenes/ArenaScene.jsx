@@ -1,25 +1,16 @@
 import { useEffect, useState } from 'react';
-import { motion, useTransform } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import { sentiment, socialFeed } from '../../data/mockData';
 
 /**
  * ArenaScene — Chapter XI. Seventy thousand voices.
- * Stadium noise meter (left), floating tweet bubbles (top), trending topics (right).
+ * AUTO-PLAY: stadium image, noise meter (left, always animating),
+ * tweet bubbles, sentiment, trending — cascade in via whileInView.
  */
-export default function ArenaScene() {
-  return (
-    <ChapterScene
-      id="arena"
-      image="/chapter-arena-crowd.png"
-      height="280vh"
-      imageDarken={0.45}
-    >
-      {(progress) => <SceneContent progress={progress} />}
-    </ChapterScene>
-  );
-}
+
+const ease = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, amount: 0.2 };
 
 // --- Animated Noise Meter (vertical equalizer bars) ---------------------
 function NoiseMeter() {
@@ -27,10 +18,7 @@ function NoiseMeter() {
 
   useEffect(() => {
     const id = setInterval(() => {
-      setLevels(prev => prev.map(() => {
-        // pulses simulating crowd roar
-        return 0.3 + Math.random() * 0.7;
-      }));
+      setLevels(prev => prev.map(() => 0.3 + Math.random() * 0.7));
     }, 180);
     return () => clearInterval(id);
   }, []);
@@ -104,8 +92,9 @@ function TweetBubble({ tweet, delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 14, scale: 0.92 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={VIEWPORT}
+      transition={{ duration: 0.4, delay, ease }}
       style={{
         padding: '0.625rem 0.875rem',
         background: 'rgba(8, 12, 22, 0.88)',
@@ -203,187 +192,209 @@ function TrendingRow({ topic, volume, trend, rank }) {
   );
 }
 
-function SceneContent({ progress }) {
-  const titleOpacity = useTransform(progress, [0, 0.06, 0.92, 1], [0, 1, 1, 0]);
-  const titleY = useTransform(progress, [0, 0.1], [30, 0]);
-
-  // Noise meter (left)
-  const meterOp = useTransform(progress, [0.14, 0.26, 0.95, 1], [0, 1, 1, 0]);
-  const meterX = useTransform(progress, [0.14, 0.26], [-30, 0]);
-
-  // Tweets cluster (top center to right)
-  const tweetsOp = useTransform(progress, [0.30, 0.50, 0.95, 1], [0, 1, 1, 0]);
-
-  // Sentiment panel (bottom-center)
-  const sentOp = useTransform(progress, [0.50, 0.62, 0.95, 1], [0, 1, 1, 0]);
-  const sentY = useTransform(progress, [0.50, 0.62], [20, 0]);
-
-  // Trending topics (right)
-  const trendOp = useTransform(progress, [0.66, 0.80, 0.95, 1], [0, 1, 1, 0]);
-  const trendX = useTransform(progress, [0.66, 0.80], [30, 0]);
-
+export default function ArenaScene() {
   const tweets = socialFeed.slice(0, 5);
   const trending = sentiment.trending.slice(0, 6);
 
   return (
-    <>
-      {/* TITLE */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '6%',
-        left: '50%',
-        x: '-50%',
-        opacity: titleOpacity,
-        y: titleY,
-        textAlign: 'center',
-        zIndex: 10,
-        pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.4em',
-          color: 'var(--bills-red-bright)',
-          marginBottom: '0.5rem',
-          textShadow: '0 0 12px rgba(0,0,0,0.95)',
-        }}>CHAPTER XI</div>
-        <h1 style={{
-          fontFamily: "'Dela Gothic One', sans-serif",
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
-          letterSpacing: '0.02em',
-          margin: 0,
-          lineHeight: 0.95,
-        }}>THE ARENA</h1>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '1.125rem',
-          color: 'var(--text-secondary)',
-          marginTop: '0.75rem',
-          textShadow: '0 2px 8px rgba(0,0,0,0.95)',
-        }}>Seventy thousand voices. One heartbeat.</div>
-      </motion.div>
-
-      {/* NOISE METER — left */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '34%',
-        left: '4%',
-        opacity: meterOp,
-        x: meterX,
-        zIndex: 8,
-      }}>
-        <NoiseMeter />
-      </motion.div>
-
-      {/* FLOATING TWEET BUBBLES — top third */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '24%',
-        left: '28%',
-        right: '4%',
-        opacity: tweetsOp,
-        zIndex: 8,
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '0.625rem',
-        maxHeight: '34%',
+    <section
+      id="arena"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        minHeight: 720,
         overflow: 'hidden',
-      }}>
-        {tweets.map((t, i) => (
-          <TweetBubble key={t.id} tweet={t} delay={i * 0.05} />
-        ))}
-      </motion.div>
+      }}
+    >
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/chapter-arena-crowd.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.92,
+        zIndex: 1,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(8,12,20,0.30) 0%, rgba(8,12,20,0.50) 70%, rgba(8,12,20,0.85) 100%)',
+        zIndex: 2,
+        pointerEvents: 'none',
+      }} />
 
-      {/* SENTIMENT PANEL — bottom center */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '6%',
-        left: '4%',
-        opacity: sentOp,
-        y: sentY,
-        zIndex: 8,
-        width: 320,
-      }}>
-        <div style={{
-          padding: '1rem 1.125rem',
-          background: 'rgba(8, 12, 22, 0.85)',
-          border: '1px solid var(--bills-blue-bright)',
-          borderRadius: '3px',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(51,119,255,0.3)',
-        }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, ease }}
+          style={{
+            position: 'absolute',
+            top: '4%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
           <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.625rem',
-            letterSpacing: '0.18em',
-            color: 'var(--bills-blue-bright)',
-            fontWeight: 700,
-            marginBottom: 10,
-          }}>FAN SENTIMENT</div>
-          {/* stacked bar */}
-          <div style={{
-            display: 'flex',
-            height: 12,
-            borderRadius: 2,
-            overflow: 'hidden',
-            marginBottom: 10,
-          }}>
-            <div style={{ width: `${sentiment.current.positive}%`, background: 'var(--signal-positive)' }} />
-            <div style={{ width: `${sentiment.current.neutral}%`, background: 'var(--text-muted)' }} />
-            <div style={{ width: `${sentiment.current.negative}%`, background: 'var(--bills-red)' }} />
-          </div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
             fontFamily: 'var(--font-mono)',
             fontSize: '0.6875rem',
-          }}>
-            <div style={{ color: 'var(--signal-positive)' }}>{sentiment.current.positive}% POS</div>
-            <div style={{ color: 'var(--text-muted)' }}>{sentiment.current.neutral}% NEUT</div>
-            <div style={{ color: 'var(--bills-red)' }}>{sentiment.current.negative}% NEG</div>
-          </div>
-          <div style={{ marginTop: 10 }}>
-            <CoachInsight coachKey="sentiment_pos" compact />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* TRENDING TOPICS — right */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '6%',
-        right: '4%',
-        opacity: trendOp,
-        x: trendX,
-        zIndex: 8,
-        width: 340,
-      }}>
-        <div style={{
-          padding: '0.875rem 1rem',
-          background: 'rgba(8, 12, 22, 0.85)',
-          border: '1px solid var(--bills-red-bright)',
-          borderRadius: '3px',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(255,80,100,0.25)',
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.625rem',
-            letterSpacing: '0.18em',
+            letterSpacing: '0.4em',
             color: 'var(--bills-red-bright)',
-            fontWeight: 700,
-            marginBottom: 8,
-          }}>TRENDING — BILLS MAFIA</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {trending.map((t, i) => (
-              <TrendingRow key={t.topic} {...t} rank={i + 1} />
-            ))}
-          </div>
+            marginBottom: '0.5rem',
+            textShadow: '0 0 12px rgba(0,0,0,0.95)',
+          }}>CHAPTER XI</div>
+          <h1 style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(2.25rem, 5.5vw, 4rem)',
+            color: 'var(--text-primary)',
+            textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
+            letterSpacing: '0.02em',
+            margin: 0,
+            lineHeight: 0.95,
+          }}>THE ARENA</h1>
+          <div style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.5rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+          }}>Seventy thousand voices. One heartbeat.</div>
+        </motion.div>
+
+        {/* NOISE METER — left */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.2, ease }}
+          style={{
+            position: 'absolute',
+            top: '24%',
+            left: '4%',
+            zIndex: 8,
+          }}
+        >
+          <NoiseMeter />
+        </motion.div>
+
+        {/* FLOATING TWEET BUBBLES */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          left: '28%',
+          right: '4%',
+          zIndex: 8,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '0.625rem',
+          maxHeight: '40%',
+          overflow: 'hidden',
+        }}>
+          {tweets.map((t, i) => (
+            <TweetBubble key={t.id} tweet={t} delay={0.35 + i * 0.08} />
+          ))}
         </div>
-      </motion.div>
-    </>
+
+        {/* SENTIMENT PANEL — bottom-left */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.7, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '4%',
+            left: '4%',
+            zIndex: 8,
+            width: 320,
+          }}
+        >
+          <div style={{
+            padding: '1rem 1.125rem',
+            background: 'rgba(8, 12, 22, 0.85)',
+            border: '1px solid var(--bills-blue-bright)',
+            borderRadius: '3px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(51,119,255,0.3)',
+          }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.625rem',
+              letterSpacing: '0.18em',
+              color: 'var(--bills-blue-bright)',
+              fontWeight: 700,
+              marginBottom: 10,
+            }}>FAN SENTIMENT</div>
+            <div style={{
+              display: 'flex',
+              height: 12,
+              borderRadius: 2,
+              overflow: 'hidden',
+              marginBottom: 10,
+            }}>
+              <div style={{ width: `${sentiment.current.positive}%`, background: 'var(--signal-positive)' }} />
+              <div style={{ width: `${sentiment.current.neutral}%`, background: 'var(--text-muted)' }} />
+              <div style={{ width: `${sentiment.current.negative}%`, background: 'var(--bills-red)' }} />
+            </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.6875rem',
+            }}>
+              <div style={{ color: 'var(--signal-positive)' }}>{sentiment.current.positive}% POS</div>
+              <div style={{ color: 'var(--text-muted)' }}>{sentiment.current.neutral}% NEUT</div>
+              <div style={{ color: 'var(--bills-red)' }}>{sentiment.current.negative}% NEG</div>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <CoachInsight coachKey="sentiment_pos" compact />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* TRENDING TOPICS — right */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.85, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '4%',
+            right: '4%',
+            zIndex: 8,
+            width: 340,
+          }}
+        >
+          <div style={{
+            padding: '0.875rem 1rem',
+            background: 'rgba(8, 12, 22, 0.85)',
+            border: '1px solid var(--bills-red-bright)',
+            borderRadius: '3px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(255,80,100,0.25)',
+          }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.625rem',
+              letterSpacing: '0.18em',
+              color: 'var(--bills-red-bright)',
+              fontWeight: 700,
+              marginBottom: 8,
+            }}>TRENDING — BILLS MAFIA</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {trending.map((t, i) => (
+                <TrendingRow key={t.topic} {...t} rank={i + 1} />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

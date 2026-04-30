@@ -1,25 +1,15 @@
 import { useState, useEffect } from 'react';
-import { motion, useTransform } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 
 /**
  * ProphecyScene — Chapter XII. Speak your visions.
- * Score prediction inside the orb. 4 tarot cards at corners as prop predictions.
- * Saves to localStorage with keys `bills-predictions` and `bills-prop-predictions`.
+ * AUTO-PLAY: oracle background. Score prediction orb (center) + 4 tarot cards (corners)
+ * cascade in via whileInView. Saves to localStorage.
  */
-export default function ProphecyScene() {
-  return (
-    <ChapterScene
-      id="prophecy"
-      image="/chapter-prophecy-oracle.png"
-      height="300vh"
-      imageDarken={0.4}
-    >
-      {(progress) => <SceneContent progress={progress} />}
-    </ChapterScene>
-  );
-}
+
+const ease = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, amount: 0.2 };
 
 const PREDICTIONS_KEY = 'bills-predictions';
 const PROPS_KEY = 'bills-prop-predictions';
@@ -74,7 +64,6 @@ function TarotCard({ card, value, onChange }) {
       textAlign: 'center',
       position: 'relative',
     }}>
-      {/* Decorative top border */}
       <div style={{
         height: 3,
         background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`,
@@ -161,29 +150,7 @@ function TarotCard({ card, value, onChange }) {
   );
 }
 
-function SceneContent({ progress }) {
-  const titleOpacity = useTransform(progress, [0, 0.06, 0.92, 1], [0, 1, 1, 0]);
-  const titleY = useTransform(progress, [0, 0.1], [30, 0]);
-
-  // Score prediction inside the orb
-  const orbOp = useTransform(progress, [0.16, 0.30, 0.95, 1], [0, 1, 1, 0]);
-  const orbY = useTransform(progress, [0.16, 0.30], [30, 0]);
-  const orbScale = useTransform(progress, [0.16, 0.30], [0.85, 1]);
-
-  // Tarot cards reveal as scroll progresses
-  const t1Op = useTransform(progress, [0.36, 0.46, 0.95, 1], [0, 1, 1, 0]);
-  const t1Y = useTransform(progress, [0.36, 0.46], [-20, 0]);
-  const t2Op = useTransform(progress, [0.44, 0.54, 0.95, 1], [0, 1, 1, 0]);
-  const t2Y = useTransform(progress, [0.44, 0.54], [-20, 0]);
-  const t3Op = useTransform(progress, [0.54, 0.64, 0.95, 1], [0, 1, 1, 0]);
-  const t3Y = useTransform(progress, [0.54, 0.64], [20, 0]);
-  const t4Op = useTransform(progress, [0.62, 0.72, 0.95, 1], [0, 1, 1, 0]);
-  const t4Y = useTransform(progress, [0.62, 0.72], [20, 0]);
-
-  // Save banner / footer
-  const footerOp = useTransform(progress, [0.78, 0.88, 0.95, 1], [0, 1, 1, 0]);
-
-  // localStorage state
+export default function ProphecyScene() {
   const [predictions, setPredictions] = useState({ billsScore: '', oppScore: '', opponent: '' });
   const [props, setProps] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
@@ -211,247 +178,281 @@ function SceneContent({ progress }) {
   };
 
   return (
-    <>
-      {/* TITLE */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '6%',
-        left: '50%',
-        x: '-50%',
-        opacity: titleOpacity,
-        y: titleY,
-        textAlign: 'center',
-        zIndex: 10,
+    <section
+      id="prophecy"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        minHeight: 720,
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/chapter-prophecy-oracle.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.92,
+        zIndex: 1,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(8,12,20,0.30) 0%, rgba(8,12,20,0.50) 70%, rgba(8,12,20,0.85) 100%)',
+        zIndex: 2,
         pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.4em',
-          color: '#C8A0FF',
-          marginBottom: '0.5rem',
-          textShadow: '0 0 12px rgba(0,0,0,0.95)',
-        }}>CHAPTER XII</div>
-        <h1 style={{
-          fontFamily: "'Dela Gothic One', sans-serif",
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
-          letterSpacing: '0.02em',
-          margin: 0,
-          lineHeight: 0.95,
-        }}>THE PROPHECY</h1>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '1.125rem',
-          color: 'var(--text-secondary)',
-          marginTop: '0.75rem',
-          textShadow: '0 2px 8px rgba(0,0,0,0.95)',
-        }}>Speak your visions.</div>
-      </motion.div>
+      }} />
 
-      {/* ORB — center, score prediction */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '38%',
-        left: '50%',
-        x: '-50%',
-        opacity: orbOp,
-        y: orbY,
-        scale: orbScale,
-        zIndex: 9,
-      }}>
-        <div style={{
-          padding: '1.25rem 1.5rem',
-          background: 'radial-gradient(ellipse at center, rgba(40,20,80,0.85) 0%, rgba(8,4,20,0.92) 100%)',
-          border: '1px solid #C8A0FF',
-          borderRadius: '50%',
-          width: 320,
-          height: 320,
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 0 60px rgba(200,160,255,0.55), inset 0 0 60px rgba(200,160,255,0.2)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.75rem',
-        }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, ease }}
+          style={{
+            position: 'absolute',
+            top: '3%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
           <div style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.5625rem',
-            letterSpacing: '0.24em',
+            fontSize: '0.6875rem',
+            letterSpacing: '0.4em',
             color: '#C8A0FF',
-            fontWeight: 700,
-          }}>NEXT GAME · SCORE PROPHECY</div>
-
-          <input
-            type="text"
-            placeholder="OPPONENT"
-            value={predictions.opponent}
-            onChange={(e) => savePredictions({ ...predictions, opponent: e.target.value.toUpperCase().slice(0, 4) })}
-            style={{
-              width: 110,
-              padding: '0.375rem 0.5rem',
-              background: 'rgba(0,0,0,0.4)',
-              border: '1px solid rgba(200,160,255,0.4)',
-              borderRadius: '2px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              color: 'var(--text-primary)',
-              textAlign: 'center',
-              outline: 'none',
-            }}
-          />
-
+            marginBottom: '0.5rem',
+            textShadow: '0 0 12px rgba(0,0,0,0.95)',
+          }}>CHAPTER XII</div>
+          <h1 style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+            color: 'var(--text-primary)',
+            textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
+            letterSpacing: '0.02em',
+            margin: 0,
+            lineHeight: 0.95,
+          }}>THE PROPHECY</h1>
           <div style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '0.9375rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.5rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+          }}>Speak your visions.</div>
+        </motion.div>
+
+        {/* ORB — center, score prediction */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: 30 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 0.3, ease }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9,
+          }}
+        >
+          <div style={{
+            padding: '1.25rem 1.5rem',
+            background: 'radial-gradient(ellipse at center, rgba(40,20,80,0.85) 0%, rgba(8,4,20,0.92) 100%)',
+            border: '1px solid #C8A0FF',
+            borderRadius: '50%',
+            width: 300,
+            height: 300,
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 0 60px rgba(200,160,255,0.55), inset 0 0 60px rgba(200,160,255,0.2)',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.875rem',
-            marginTop: 2,
+            justifyContent: 'center',
+            gap: '0.625rem',
           }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.5625rem',
-                color: 'var(--bills-blue-bright)',
-                letterSpacing: '0.18em',
-                fontWeight: 700,
-                marginBottom: 4,
-              }}>BUF</div>
-              <input
-                type="number"
-                placeholder="--"
-                value={predictions.billsScore}
-                onChange={(e) => savePredictions({ ...predictions, billsScore: e.target.value })}
-                style={{
-                  width: 80,
-                  padding: '0.5rem',
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--bills-blue-bright)',
-                  borderRadius: '3px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '1.75rem',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  textAlign: 'center',
-                  outline: 'none',
-                  textShadow: '0 0 12px rgba(51,119,255,0.55)',
-                }}
-              />
-            </div>
             <div style={{
-              fontFamily: "'Shippori Mincho', serif",
-              fontStyle: 'italic',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.5625rem',
+              letterSpacing: '0.24em',
               color: '#C8A0FF',
-              fontSize: '1.5rem',
-            }}>vs</div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
+              fontWeight: 700,
+            }}>NEXT GAME · SCORE PROPHECY</div>
+
+            <input
+              type="text"
+              placeholder="OPPONENT"
+              value={predictions.opponent}
+              onChange={(e) => savePredictions({ ...predictions, opponent: e.target.value.toUpperCase().slice(0, 4) })}
+              style={{
+                width: 110,
+                padding: '0.375rem 0.5rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid rgba(200,160,255,0.4)',
+                borderRadius: '2px',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.5625rem',
-                color: 'var(--bills-red)',
-                letterSpacing: '0.18em',
+                fontSize: '0.75rem',
                 fontWeight: 700,
-                marginBottom: 4,
-              }}>OPP</div>
-              <input
-                type="number"
-                placeholder="--"
-                value={predictions.oppScore}
-                onChange={(e) => savePredictions({ ...predictions, oppScore: e.target.value })}
-                style={{
-                  width: 80,
-                  padding: '0.5rem',
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--bills-red)',
-                  borderRadius: '3px',
+                letterSpacing: '0.16em',
+                color: 'var(--text-primary)',
+                textAlign: 'center',
+                outline: 'none',
+              }}
+            />
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.875rem',
+              marginTop: 2,
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '1.75rem',
+                  fontSize: '0.5625rem',
+                  color: 'var(--bills-blue-bright)',
+                  letterSpacing: '0.18em',
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  textAlign: 'center',
-                  outline: 'none',
-                  textShadow: '0 0 12px rgba(198,12,48,0.55)',
-                }}
-              />
+                  marginBottom: 4,
+                }}>BUF</div>
+                <input
+                  type="number"
+                  placeholder="--"
+                  value={predictions.billsScore}
+                  onChange={(e) => savePredictions({ ...predictions, billsScore: e.target.value })}
+                  style={{
+                    width: 80,
+                    padding: '0.5rem',
+                    background: 'rgba(0,0,0,0.5)',
+                    border: '1px solid var(--bills-blue-bright)',
+                    borderRadius: '3px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '1.75rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    textAlign: 'center',
+                    outline: 'none',
+                    textShadow: '0 0 12px rgba(51,119,255,0.55)',
+                  }}
+                />
+              </div>
+              <div style={{
+                fontFamily: "'Shippori Mincho', serif",
+                fontStyle: 'italic',
+                color: '#C8A0FF',
+                fontSize: '1.5rem',
+              }}>vs</div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.5625rem',
+                  color: 'var(--bills-red)',
+                  letterSpacing: '0.18em',
+                  fontWeight: 700,
+                  marginBottom: 4,
+                }}>OPP</div>
+                <input
+                  type="number"
+                  placeholder="--"
+                  value={predictions.oppScore}
+                  onChange={(e) => savePredictions({ ...predictions, oppScore: e.target.value })}
+                  style={{
+                    width: 80,
+                    padding: '0.5rem',
+                    background: 'rgba(0,0,0,0.5)',
+                    border: '1px solid var(--bills-red)',
+                    borderRadius: '3px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '1.75rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    textAlign: 'center',
+                    outline: 'none',
+                    textShadow: '0 0 12px rgba(198,12,48,0.55)',
+                  }}
+                />
+              </div>
             </div>
+
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.625rem',
+              color: savedFlash ? 'var(--signal-positive)' : 'var(--text-muted)',
+              letterSpacing: '0.16em',
+              marginTop: 4,
+              transition: 'color 0.2s',
+            }}>{savedFlash ? '✓ SAVED' : 'AUTOSAVES TO BROWSER'}</div>
           </div>
+        </motion.div>
 
+        {/* TAROT CARDS — corners */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.55, ease }}
+          style={{ position: 'absolute', top: '20%', left: '4%', zIndex: 8 }}
+        >
+          <TarotCard card={TAROT_CARDS[0]} value={props[TAROT_CARDS[0].id]} onChange={(v) => setProp(TAROT_CARDS[0].id, v)} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.65, ease }}
+          style={{ position: 'absolute', top: '20%', right: '4%', zIndex: 8 }}
+        >
+          <TarotCard card={TAROT_CARDS[1]} value={props[TAROT_CARDS[1].id]} onChange={(v) => setProp(TAROT_CARDS[1].id, v)} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.75, ease }}
+          style={{ position: 'absolute', bottom: '8%', left: '4%', zIndex: 8 }}
+        >
+          <TarotCard card={TAROT_CARDS[2]} value={props[TAROT_CARDS[2].id]} onChange={(v) => setProp(TAROT_CARDS[2].id, v)} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.85, ease }}
+          style={{ position: 'absolute', bottom: '8%', right: '4%', zIndex: 8 }}
+        >
+          <TarotCard card={TAROT_CARDS[3]} value={props[TAROT_CARDS[3].id]} onChange={(v) => setProp(TAROT_CARDS[3].id, v)} />
+        </motion.div>
+
+        {/* FOOTER hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 1.1, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '2%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            zIndex: 8,
+            pointerEvents: 'none',
+          }}
+        >
           <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.625rem',
-            color: savedFlash ? 'var(--signal-positive)' : 'var(--text-muted)',
-            letterSpacing: '0.16em',
-            marginTop: 4,
-            transition: 'color 0.2s',
-          }}>{savedFlash ? '✓ SAVED' : 'AUTOSAVES TO BROWSER'}</div>
-        </div>
-      </motion.div>
-
-      {/* TAROT CARDS — corners */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '24%',
-        left: '4%',
-        opacity: t1Op,
-        y: t1Y,
-        zIndex: 8,
-      }}>
-        <TarotCard card={TAROT_CARDS[0]} value={props[TAROT_CARDS[0].id]} onChange={(v) => setProp(TAROT_CARDS[0].id, v)} />
-      </motion.div>
-      <motion.div style={{
-        position: 'absolute',
-        top: '24%',
-        right: '4%',
-        opacity: t2Op,
-        y: t2Y,
-        zIndex: 8,
-      }}>
-        <TarotCard card={TAROT_CARDS[1]} value={props[TAROT_CARDS[1].id]} onChange={(v) => setProp(TAROT_CARDS[1].id, v)} />
-      </motion.div>
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '14%',
-        left: '4%',
-        opacity: t3Op,
-        y: t3Y,
-        zIndex: 8,
-      }}>
-        <TarotCard card={TAROT_CARDS[2]} value={props[TAROT_CARDS[2].id]} onChange={(v) => setProp(TAROT_CARDS[2].id, v)} />
-      </motion.div>
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '14%',
-        right: '4%',
-        opacity: t4Op,
-        y: t4Y,
-        zIndex: 8,
-      }}>
-        <TarotCard card={TAROT_CARDS[3]} value={props[TAROT_CARDS[3].id]} onChange={(v) => setProp(TAROT_CARDS[3].id, v)} />
-      </motion.div>
-
-      {/* FOOTER hint */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '4%',
-        left: '50%',
-        x: '-50%',
-        opacity: footerOp,
-        textAlign: 'center',
-        zIndex: 8,
-        pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '0.875rem',
-          color: '#C8A0FF',
-          textShadow: '0 0 12px rgba(0,0,0,0.95)',
-        }}>The oracle remembers what you wager.</div>
-      </motion.div>
-    </>
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '0.875rem',
+            color: '#C8A0FF',
+            textShadow: '0 0 12px rgba(0,0,0,0.95)',
+          }}>The oracle remembers what you wager.</div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

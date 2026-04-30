@@ -1,32 +1,41 @@
-import { motion, useTransform } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import { teamInfo } from '../../data/mockData';
 
 /**
  * SCENE 1 — The Arrival.
- * Sticky spectral-buffalo hero with cascading stat reveals.
+ * AUTO-PLAY hero. Image + video visible from the start. Stats zoom in immediately.
+ * No scroll required. Plays once on mount.
  */
 
-function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)' }) {
+const ease = [0.16, 1, 0.3, 1];
+
+function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)', delay = 0 }) {
   return (
-    <div style={{
-      padding: '0.875rem 1.125rem',
-      background: 'rgba(8, 12, 22, 0.78)',
-      border: `1px solid ${color}`,
-      borderRadius: '3px',
-      backdropFilter: 'blur(8px)',
-      boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.5rem',
-      maxWidth: 280,
-    }}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.6, filter: 'blur(8px)' }}
+      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 0.6, delay, ease }}
+      whileHover={{ scale: 1.04 }}
+      style={{
+        padding: '0.875rem 1.125rem',
+        background: 'rgba(8, 12, 22, 0.82)',
+        border: `1px solid ${color}`,
+        borderRadius: '3px',
+        backdropFilter: 'blur(8px)',
+        boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 28px ${color}55`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.5rem',
+        maxWidth: 280,
+      }}
+    >
       <div style={{
         fontFamily: 'var(--font-mono)',
         fontSize: '0.625rem',
         letterSpacing: '0.18em',
-        color: color,
+        color,
         fontWeight: 600,
       }}>{label}</div>
       <div style={{
@@ -44,112 +53,154 @@ function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue
         }}>{sublabel}</div>
       )}
       {coachKey && <CoachInsight coachKey={coachKey} compact />}
-    </div>
+    </motion.div>
   );
 }
 
-function ArrivalContent({ progress }) {
-  // 0-12% black overlay fade-out + opening line
-  const blackOverlay = useTransform(progress, [0, 0.12], [1, 0]);
-  const openingLineOpacity = useTransform(progress, [0.02, 0.06, 0.10, 0.14], [0, 1, 1, 0]);
+export default function ArrivalScene() {
+  const [showOpening, setShowOpening] = useState(true);
+  const [phase, setPhase] = useState(0);
 
-  // 12-25% eyebrow + title
-  const eyebrowOpacity = useTransform(progress, [0.12, 0.17, 0.55, 0.62], [0, 1, 1, 0.85]);
-  const eyebrowY = useTransform(progress, [0.12, 0.17], [12, 0]);
-  const titleOpacity = useTransform(progress, [0.16, 0.22, 0.55, 0.62], [0, 1, 1, 0.9]);
-  const titleY = useTransform(progress, [0.16, 0.22], [22, 0]);
-  const titleScale = useTransform(progress, [0.16, 0.22], [0.94, 1]);
-
-  // 25-50% — four cascading stat panels (each starts at successive trigger)
-  const statRecordOpacity = useTransform(progress, [0.25, 0.30], [0, 1]);
-  const statRecordX = useTransform(progress, [0.25, 0.30], [-40, 0]);
-  const statPFPAOpacity = useTransform(progress, [0.30, 0.35], [0, 1]);
-  const statPFPAX = useTransform(progress, [0.30, 0.35], [40, 0]);
-  const statDiffOpacity = useTransform(progress, [0.36, 0.41], [0, 1]);
-  const statDiffX = useTransform(progress, [0.36, 0.41], [-40, 0]);
-  const statPlayoffOpacity = useTransform(progress, [0.42, 0.47], [0, 1]);
-  const statPlayoffX = useTransform(progress, [0.42, 0.47], [40, 0]);
-
-  // 50-75% — buffalo glow brightening + subtle pulse on stat borders via scale
-  const buffaloGlow = useTransform(progress, [0.50, 0.75], [0.35, 1]);
-  const buffaloScale = useTransform(progress, [0.50, 0.75], [1, 1.18]);
-  const statPulse = useTransform(progress, [0.50, 0.62, 0.75], [1, 1.04, 1]);
-
-  // 75-100% — "BEGIN THE SAGA" CTA appears
-  const ctaOpacity = useTransform(progress, [0.75, 0.82], [0, 1]);
-  const ctaY = useTransform(progress, [0.75, 0.82], [16, 0]);
-  const arrowY = useTransform(progress, [0.82, 0.91, 1.0], [0, 8, 0]);
+  useEffect(() => {
+    const t1 = setTimeout(() => setShowOpening(false), 1400); // hide opening line after 1.4s
+    const t2 = setTimeout(() => setPhase(1), 1600);  // reveal hero
+    const t3 = setTimeout(() => setPhase(2), 2400);  // reveal stats
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Spectral buffalo glow overlay (radial, brightens with scroll) */}
+    <section
+      id="arrival"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        minHeight: 720,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Video — atmospheric motion layer in the deep background */}
+      <video
+        src="/saga-hero-bg.mp4"
+        autoPlay loop muted playsInline
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+          opacity: 0.55,
+          filter: 'saturate(1.1)',
+          zIndex: 1,
+        }}
+        onError={(e) => { e.target.style.display = 'none'; }}
+      />
+
+      {/* Dark plate behind the hero so it reads cleanly over the video */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(8, 12, 20, 0.35)',
+        zIndex: 2,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Hero illustration — primary visual, sits on top of video */}
       <motion.div
+        animate={{ scale: [1, 1.04, 1] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url(/hero-highmark-twilight.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.92,
+          zIndex: 3,
+        }}
+      />
+
+      {/* Atmospheric dark overlay for text readability */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(8,12,20,0.30) 0%, rgba(8,12,20,0.18) 40%, rgba(8,12,20,0.50) 70%, rgba(8,12,20,0.85) 100%)',
+        zIndex: 4,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Subtle vignette */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse at center, transparent 35%, rgba(8,12,20,0.65) 100%)',
+        zIndex: 4,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Spectral buffalo glow — always visible, slow pulse */}
+      <motion.div
+        animate={{ opacity: [0.55, 0.9, 0.55], scale: [1, 1.06, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           position: 'absolute',
-          top: '8%',
-          left: '50%',
-          width: '60%',
-          height: '40%',
+          top: '6%', left: '50%',
+          width: '50%', height: '36%',
           transform: 'translateX(-50%)',
-          background: 'radial-gradient(ellipse at center, rgba(120, 180, 255, 0.55) 0%, rgba(80, 140, 230, 0.20) 40%, transparent 70%)',
-          opacity: buffaloGlow,
-          scale: buffaloScale,
+          background: 'radial-gradient(ellipse at center, rgba(120,180,255,0.45) 0%, rgba(80,140,230,0.15) 40%, transparent 70%)',
           mixBlendMode: 'screen',
-          pointerEvents: 'none',
           filter: 'blur(20px)',
+          pointerEvents: 'none',
+          zIndex: 5,
         }}
       />
 
-      {/* 0-12% Black overlay fade-out with opening line */}
-      <motion.div
-        style={{
-          position: 'absolute', inset: 0,
-          background: '#000',
-          opacity: blackOverlay,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 10,
-          pointerEvents: 'none',
-        }}
-      />
-      <motion.div
-        style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          opacity: openingLineOpacity,
-          zIndex: 11,
-          pointerEvents: 'none',
-        }}
-      >
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '1.125rem',
-          letterSpacing: '0.32em',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 20px rgba(51,119,255,0.5)',
-          textTransform: 'uppercase',
-        }}>
-          12-5 &middot; The charge continues.
-        </div>
-      </motion.div>
+      {/* Opening line — fades in then out (1.4s total) */}
+      <AnimatePresence>
+        {showOpening && (
+          <motion.div
+            key="opening"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              position: 'absolute', inset: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 20,
+              pointerEvents: 'none',
+              background: 'rgba(0,0,0,0.55)',
+            }}
+          >
+            <div style={{
+              fontFamily: "'Shippori Mincho', serif",
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.125rem, 2.4vw, 1.625rem)',
+              letterSpacing: '0.04em',
+              color: 'var(--text-primary)',
+              textShadow: '0 0 24px rgba(51,119,255,0.6)',
+              textAlign: 'center',
+              padding: '0 2rem',
+            }}>
+              12 wins. 5 losses. The charge continues.
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Eyebrow + massive title — centered upper third */}
+      {/* Hero title block */}
       <div style={{
         position: 'absolute',
         top: '14%',
         left: 0, right: 0,
         textAlign: 'center',
-        zIndex: 5,
+        zIndex: 10,
         padding: '0 2rem',
       }}>
         <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={phase >= 1 ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease }}
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '0.6875rem',
             letterSpacing: '0.42em',
             color: 'var(--bills-blue-bright)',
             fontWeight: 600,
-            opacity: eyebrowOpacity,
-            y: eyebrowY,
             marginBottom: '0.875rem',
             textShadow: '0 0 12px rgba(51,119,255,0.6)',
           }}
@@ -157,111 +208,92 @@ function ArrivalContent({ progress }) {
           THE CHRONICLE OF THE 2025 BUFFALO BILLS
         </motion.div>
         <motion.h1
+          initial={{ opacity: 0, y: 24, scale: 0.94 }}
+          animate={phase >= 1 ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.9, ease, delay: 0.2 }}
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(3rem, 9vw, 7rem)',
-            fontWeight: 800,
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(3rem, 9vw, 6.5rem)',
+            fontWeight: 700,
             color: 'var(--text-primary)',
             margin: 0,
-            letterSpacing: '0.04em',
+            letterSpacing: '0.02em',
             lineHeight: 0.95,
-            opacity: titleOpacity,
-            y: titleY,
-            scale: titleScale,
-            textShadow: '0 0 40px rgba(51,119,255,0.4), 0 4px 20px rgba(0,0,0,0.8)',
+            textShadow: '0 0 50px rgba(51,119,255,0.4), 0 4px 24px rgba(0,0,0,0.9)',
           }}
         >
           VOLUME XII
         </motion.h1>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={phase >= 1 ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.875rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+          }}
+        >
+          The Saga of the Charging Bull. The 2025-26 season told as it was lived.
+        </motion.div>
       </div>
 
-      {/* Cascading stat panels — positioned around the stadium glow */}
-      {/* RECORD — top-left */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          top: '46%', left: '6%',
-          opacity: statRecordOpacity,
-          x: statRecordX,
-          scale: statPulse,
-          zIndex: 6,
-        }}
-      >
-        <StatPanel
-          label="REGULAR SEASON"
-          value={teamInfo.record}
-          sublabel="Conference 8-4 &middot; Division 4-2"
-          coachKey="record_12_5"
-        />
-      </motion.div>
+      {/* Stat panels — corners, auto-play with stagger */}
+      {phase >= 2 && (
+        <>
+          <div style={{ position: 'absolute', top: '46%', left: '5%', zIndex: 11 }}>
+            <StatPanel
+              label="REGULAR SEASON"
+              value={teamInfo.record}
+              sublabel="Conference 8-4 · Division 4-2"
+              coachKey="record_12_5"
+              delay={0}
+            />
+          </div>
+          <div style={{ position: 'absolute', top: '46%', right: '5%', zIndex: 11 }}>
+            <StatPanel
+              label="POINTS FOR / AGAINST"
+              value={`${teamInfo.pointsFor} / ${teamInfo.pointsAgainst}`}
+              sublabel="28.3 PPG scored · 21.5 PPG allowed"
+              coachKey="pf_pa"
+              delay={0.15}
+            />
+          </div>
+          <div style={{ position: 'absolute', bottom: '20%', left: '7%', zIndex: 11 }}>
+            <StatPanel
+              label="POINT DIFFERENTIAL"
+              value="+116"
+              sublabel="4th-best in the AFC"
+              color="#10D060"
+              delay={0.3}
+            />
+          </div>
+          <div style={{ position: 'absolute', bottom: '20%', right: '7%', zIndex: 11 }}>
+            <StatPanel
+              label="POSTSEASON"
+              value="DIVISIONAL"
+              sublabel="OT loss at Denver, Jan 17"
+              coachKey="divisional_loss"
+              color="#E8B23C"
+              delay={0.45}
+            />
+          </div>
+        </>
+      )}
 
-      {/* PF / PA — top-right */}
+      {/* BEGIN THE SAGA CTA */}
       <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, delay: 1.0, ease }}
         style={{
           position: 'absolute',
-          top: '42%', right: '6%',
-          opacity: statPFPAOpacity,
-          x: statPFPAX,
-          scale: statPulse,
-          zIndex: 6,
-        }}
-      >
-        <StatPanel
-          label="POINTS FOR / AGAINST"
-          value={`${teamInfo.pointsFor} / ${teamInfo.pointsAgainst}`}
-          sublabel="28.3 PPG scored &middot; 21.5 PPG allowed"
-          coachKey="pf_pa"
-        />
-      </motion.div>
-
-      {/* DIFFERENTIAL — bottom-left */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          bottom: '22%', left: '8%',
-          opacity: statDiffOpacity,
-          x: statDiffX,
-          scale: statPulse,
-          zIndex: 6,
-        }}
-      >
-        <StatPanel
-          label="POINT DIFFERENTIAL"
-          value="+116"
-          sublabel="4th-best in the AFC"
-          color="#5BE5A1"
-        />
-      </motion.div>
-
-      {/* PLAYOFF — bottom-right */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          bottom: '22%', right: '8%',
-          opacity: statPlayoffOpacity,
-          x: statPlayoffX,
-          scale: statPulse,
-          zIndex: 6,
-        }}
-      >
-        <StatPanel
-          label="POSTSEASON"
-          value="DIVISIONAL"
-          sublabel="OT loss at Denver, Jan 17"
-          coachKey="divisional_loss"
-          color="#E8B23C"
-        />
-      </motion.div>
-
-      {/* BEGIN THE SAGA — bottom CTA */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          bottom: '5%', left: 0, right: 0,
+          bottom: '4%', left: 0, right: 0,
           textAlign: 'center',
-          opacity: ctaOpacity,
-          y: ctaY,
-          zIndex: 7,
+          zIndex: 12,
         }}
       >
         <div style={{
@@ -276,29 +308,17 @@ function ArrivalContent({ progress }) {
           BEGIN THE SAGA
         </div>
         <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             display: 'inline-block',
             color: 'var(--bills-blue-bright)',
             fontSize: '1.5rem',
-            y: arrowY,
           }}
         >
-          &darr;
+          ↓
         </motion.div>
       </motion.div>
-    </div>
-  );
-}
-
-export default function ArrivalScene() {
-  return (
-    <ChapterScene
-      id="arrival"
-      image="/hero-highmark-twilight.png"
-      height="260vh"
-      imageDarken={0.55}
-    >
-      {(progress) => <ArrivalContent progress={progress} />}
-    </ChapterScene>
+    </section>
   );
 }

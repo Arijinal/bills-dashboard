@@ -1,10 +1,12 @@
 // ═══════════════════════════════════════════════════════
-// 2026 NFL DRAFT — Prospects, History & Needs
+// 2026 NFL DRAFT — Prospects, History, Needs & Recap
+// POST-DRAFT state (draft completed April 23-25, 2026)
 // Mock data for Bills Draft War Room dashboard
 // ═══════════════════════════════════════════════════════
 
 // ── 2026 Draft Prospects ────────────────────────────────
-// 32 prospects with full scouting profiles and combine data
+// 32 prospects with full scouting profiles, combine data,
+// and post-draft `draftedBy` assignments.
 
 export const draftProspects = [
   // ── ROUND 1 TALENTS ───────────────────────────────────
@@ -31,6 +33,7 @@ export const draftProspects = [
     weaknesses: ['Slight build for NFL', 'Limited blocking effort', 'Concentration drops'],
     comparison: 'Tyreek Hill',
     billsFit: 96,
+    draftedBy: { team: 'BUF', round: 1, pick: 26 },
   },
   {
     id: 2,
@@ -55,6 +58,7 @@ export const draftProspects = [
     weaknesses: ['Long speed adequate, not elite', 'Can be passive in routes', 'Release vs. press needs work'],
     comparison: 'A.J. Green',
     billsFit: 88,
+    draftedBy: { team: 'NYG', round: 1, pick: 4 },
   },
   {
     id: 3,
@@ -79,6 +83,7 @@ export const draftProspects = [
     weaknesses: ['Counter moves need refinement', 'Pad level inconsistent', 'Stiffness in space'],
     comparison: 'Myles Garrett (lite)',
     billsFit: 94,
+    draftedBy: { team: 'BUF', round: 2, pick: 57 },
   },
   {
     id: 4,
@@ -103,6 +108,7 @@ export const draftProspects = [
     weaknesses: ['Needs to add functional strength', 'Run defense inconsistent', 'Limited move set'],
     comparison: 'Danielle Hunter',
     billsFit: 92,
+    draftedBy: { team: 'CAR', round: 1, pick: 11 },
   },
   {
     id: 5,
@@ -127,6 +133,7 @@ export const draftProspects = [
     weaknesses: ['Average size for outside CB', 'Can be grabby downfield', 'Tackling effort inconsistent'],
     comparison: 'Jaire Alexander',
     billsFit: 72,
+    draftedBy: { team: 'JAX', round: 1, pick: 6 },
   },
   {
     id: 6,
@@ -151,6 +158,7 @@ export const draftProspects = [
     weaknesses: ['Doesn\'t consistently separate vs. top CBs', 'Average after the catch', 'Injury history (ankle)'],
     comparison: 'Mike Evans',
     billsFit: 90,
+    draftedBy: { team: 'NE', round: 1, pick: 17 },
   },
   {
     id: 7,
@@ -175,6 +183,7 @@ export const draftProspects = [
     weaknesses: ['Not a dynamic YAC threat', 'Can get jammed at the line', 'Average contested-catch rate'],
     comparison: 'Keenan Allen',
     billsFit: 88,
+    draftedBy: { team: 'PIT', round: 1, pick: 21 },
   },
   {
     id: 8,
@@ -199,6 +208,7 @@ export const draftProspects = [
     weaknesses: ['Lacks top-end bend', 'Average athlete for edge', 'One-dimensional pass rush plan'],
     comparison: 'Cameron Jordan',
     billsFit: 85,
+    draftedBy: { team: 'GB', round: 2, pick: 41 },
   },
 
   // ── ROUND 2 TALENTS ───────────────────────────────────
@@ -225,6 +235,7 @@ export const draftProspects = [
     weaknesses: ['Undersized for 3-4 ILB', 'Struggles to shed blocks from OL', 'Missed tackles in space'],
     comparison: 'Lavonte David',
     billsFit: 95,
+    draftedBy: { team: 'BUF', round: 3, pick: 89 },
   },
   {
     id: 10,
@@ -249,6 +260,7 @@ export const draftProspects = [
     weaknesses: ['Speed limitations vs. LBs', 'Can be swallowed by press', 'Drops under duress'],
     comparison: 'Mark Andrews',
     billsFit: 65,
+    draftedBy: { team: 'CHI', round: 2, pick: 39 },
   },
   {
     id: 11,
@@ -273,6 +285,7 @@ export const draftProspects = [
     weaknesses: ['Limited lateral mobility', 'Gets washed out of gap', 'Conditioning concerns'],
     comparison: 'Javon Hargrave',
     billsFit: 82,
+    draftedBy: { team: 'TEN', round: 2, pick: 45 },
   },
   {
     id: 12,
@@ -297,6 +310,7 @@ export const draftProspects = [
     weaknesses: ['Stiff hips limit bend', 'One-speed rusher', 'Gets stuck on blocks'],
     comparison: 'Trey Hendrickson',
     billsFit: 80,
+    draftedBy: { team: 'CIN', round: 2, pick: 49 },
   },
   {
     id: 13,
@@ -321,6 +335,7 @@ export const draftProspects = [
     weaknesses: ['Limited pass rush upside', 'Stamina on long drives', 'Doesn\'t create TFLs consistently'],
     comparison: 'Grady Jarrett',
     billsFit: 78,
+    draftedBy: { team: 'IND', round: 2, pick: 47 },
   },
   {
     id: 14,
@@ -345,6 +360,7 @@ export const draftProspects = [
     weaknesses: ['Below-average athlete', 'Lateral slide limited', 'Penalties — false starts'],
     comparison: 'Zack Martin',
     billsFit: 84,
+    draftedBy: { team: 'BUF', round: 4, pick: 122 },
   },
   {
     id: 15,
@@ -369,6 +385,7 @@ export const draftProspects = [
     weaknesses: ['Overly aggressive in pursuit', 'Can lose leverage on ball carriers', 'Durability questions'],
     comparison: 'Tyrann Mathieu',
     billsFit: 86,
+    draftedBy: { team: 'BAL', round: 1, pick: 27 },
   },
 
   // ── ROUND 3 TALENTS ───────────────────────────────────
@@ -395,6 +412,7 @@ export const draftProspects = [
     weaknesses: ['FCS competition level', 'Stiff in pass pro at guard', 'Average foot quickness'],
     comparison: 'Brandon Scherff',
     billsFit: 82,
+    draftedBy: { team: 'LAR', round: 3, pick: 76 },
   },
   {
     id: 17,
@@ -419,6 +437,7 @@ export const draftProspects = [
     weaknesses: ['Raw technique', 'Loses focus on double moves', 'Inconsistent tackling'],
     comparison: 'Sauce Gardner (raw)',
     billsFit: 70,
+    draftedBy: { team: 'SEA', round: 3, pick: 79 },
   },
   {
     id: 18,
@@ -443,6 +462,7 @@ export const draftProspects = [
     weaknesses: ['Blocking needs refinement', 'Not a traditional inline TE', 'Tweener body type'],
     comparison: 'Kyle Pitts',
     billsFit: 60,
+    draftedBy: { team: 'LV', round: 1, pick: 29 },
   },
   {
     id: 19,
@@ -467,6 +487,7 @@ export const draftProspects = [
     weaknesses: ['Limited pass rush upside', 'Conditioning red flag', 'Gets pushed upfield on reach blocks'],
     comparison: 'Vita Vea',
     billsFit: 74,
+    draftedBy: { team: 'NYJ', round: 1, pick: 7 },
   },
   {
     id: 20,
@@ -491,6 +512,7 @@ export const draftProspects = [
     weaknesses: ['Undersized for box safety role', 'Gets washed in run support', 'Can be baited by play action'],
     comparison: 'Antoine Winfield Jr.',
     billsFit: 88,
+    draftedBy: { team: 'BUF', round: 5, pick: 156 },
   },
 
   // ── MID-ROUND TARGETS ─────────────────────────────────
@@ -517,6 +539,7 @@ export const draftProspects = [
     weaknesses: ['Route tree needs expansion', 'Average separation ability', 'Disappears in games'],
     comparison: 'DeVante Parker',
     billsFit: 78,
+    draftedBy: null,
   },
   {
     id: 22,
@@ -541,6 +564,7 @@ export const draftProspects = [
     weaknesses: ['Coverage technique is raw', 'Hip stiffness in transitions', 'Overruns the ball in space'],
     comparison: 'Kam Chancellor',
     billsFit: 84,
+    draftedBy: { team: 'MIA', round: 2, pick: 53 },
   },
   {
     id: 23,
@@ -565,6 +589,7 @@ export const draftProspects = [
     weaknesses: ['Inconsistent effort', 'Gets controlled by double teams', 'Leverage issues'],
     comparison: 'Christian Wilkins',
     billsFit: 76,
+    draftedBy: { team: 'DAL', round: 3, pick: 81 },
   },
   {
     id: 24,
@@ -589,6 +614,7 @@ export const draftProspects = [
     weaknesses: ['Undersized for OLB', 'Gets pushed around by NFL tackles', 'Limited length'],
     comparison: 'Haason Reddick',
     billsFit: 86,
+    draftedBy: { team: 'PHI', round: 2, pick: 51 },
   },
   {
     id: 25,
@@ -613,6 +639,7 @@ export const draftProspects = [
     weaknesses: ['Tweener body type — OLB or ILB?', 'Coverage limitations', 'Takes false steps in run fits'],
     comparison: 'Micah Parsons',
     billsFit: 90,
+    draftedBy: { team: 'WAS', round: 1, pick: 13 },
   },
 
   // ── DAY 3 DEPTH TARGETS ───────────────────────────────
@@ -639,6 +666,7 @@ export const draftProspects = [
     weaknesses: ['Lacks ideal size for press', 'Average run support', 'Gets lost in traffic'],
     comparison: 'Desmond Trufant',
     billsFit: 68,
+    draftedBy: null,
   },
   {
     id: 27,
@@ -663,6 +691,7 @@ export const draftProspects = [
     weaknesses: ['Turnover prone in 2024', 'Knee injury recovery', 'Mobility limitations', 'Decision-making under pressure'],
     comparison: 'Matthew Stafford',
     billsFit: 30,
+    draftedBy: null,
   },
   {
     id: 28,
@@ -687,6 +716,7 @@ export const draftProspects = [
     weaknesses: ['Hasn\'t lived up to ranking yet', 'Effort wanes', 'Leverage concerns'],
     comparison: 'Akiem Hicks',
     billsFit: 72,
+    draftedBy: { team: 'HOU', round: 2, pick: 56 },
   },
   {
     id: 29,
@@ -711,6 +741,7 @@ export const draftProspects = [
     weaknesses: ['Lacks ideal size', 'Gets blocked by TEs', 'Limited box safety usage'],
     comparison: 'Marcus Williams',
     billsFit: 85,
+    draftedBy: { team: 'DEN', round: 2, pick: 60 },
   },
   {
     id: 30,
@@ -735,6 +766,7 @@ export const draftProspects = [
     weaknesses: ['Arm length questions', 'Anchor vs. power rushers', 'Run blocking needs more punch'],
     comparison: 'Trent Williams',
     billsFit: 55,
+    draftedBy: { team: 'TEN', round: 1, pick: 1 },
   },
   {
     id: 31,
@@ -759,6 +791,7 @@ export const draftProspects = [
     weaknesses: ['Doesn\'t create big plays', 'Vision in zone concepts', 'Fumble history'],
     comparison: 'David Montgomery',
     billsFit: 35,
+    draftedBy: { team: 'BUF', round: 7, pick: 221 },
   },
   {
     id: 32,
@@ -783,17 +816,161 @@ export const draftProspects = [
     weaknesses: ['Slight frame', 'Limited contested-catch ability', 'Route running is developing'],
     comparison: 'Marquise Brown',
     billsFit: 80,
+    draftedBy: { team: 'BUF', round: 6, pick: 189 },
   },
 ];
 
-// ── Bills Draft History (2021-2025) ─────────────────────
+// ── Bills 2026 Draft Class (POST-DRAFT) ─────────────────
+// What the Bills actually selected April 23-25, 2026.
+// Pulled from `draftProspects` — the seven players whose
+// `draftedBy.team` is 'BUF' — but stored here in pick order
+// with extra reporting fields (expectedRole, fitScore, scout report).
+
+export const billsDraft2026 = [
+  {
+    round: 1,
+    pick: 26,
+    name: 'Omar Cooper Jr.',
+    position: 'WR',
+    school: 'Indiana',
+    ageOnDraftDay: 22,
+    height: '6\'1"',
+    weight: 190,
+    fortyYard: 4.39,
+    scoutingReport: 'Field-stretching X-receiver with 4.39 wheels and contested-catch chops. Bills finally land a true WR1 to pair with Khalil Shakir in the slot.',
+    expectedRole: 'Day 1 starter at X / WR1, immediate target share north of 22%',
+    fitScore: 96,
+  },
+  {
+    round: 2,
+    pick: 57,
+    name: 'Keldric Faulk',
+    position: 'EDGE',
+    school: 'Auburn',
+    ageOnDraftDay: 22,
+    height: '6\'4"',
+    weight: 265,
+    fortyYard: 4.58,
+    scoutingReport: 'Round 1 grade who slid 31 picks because of a banged-up combine workout. Power-to-speed convert ideal for Leonhard\'s 3-4 fronts.',
+    expectedRole: 'Sub-package pass rusher Year 1, projected starter at OLB by Week 8',
+    fitScore: 94,
+  },
+  {
+    round: 3,
+    pick: 89,
+    name: 'Jacob Rodriguez',
+    position: 'LB',
+    school: 'Texas Tech',
+    ageOnDraftDay: 23,
+    height: '6\'2"',
+    weight: 235,
+    fortyYard: 4.48,
+    scoutingReport: 'Sideline-to-sideline range with the coverage chops to match TEs. Plug-and-play replacement plan if Matt Milano walks in free agency.',
+    expectedRole: 'Three-down WILL backer, opens as core ST + nickel package LB',
+    fitScore: 95,
+  },
+  {
+    round: 4,
+    pick: 122,
+    name: 'Marcus Mbow',
+    position: 'IOL',
+    school: 'Purdue',
+    ageOnDraftDay: 24,
+    height: '6\'4"',
+    weight: 318,
+    fortyYard: 5.08,
+    scoutingReport: 'Road-grader with a nasty streak and starter tape at both guard and center. Direct successor plan for Connor McGovern at center.',
+    expectedRole: 'Swing IOL backup, one injury away from starting at LG',
+    fitScore: 84,
+  },
+  {
+    round: 5,
+    pick: 156,
+    name: 'Jaylen Reed',
+    position: 'S',
+    school: 'Penn State',
+    ageOnDraftDay: 23,
+    height: '5\'11"',
+    weight: 198,
+    fortyYard: 4.44,
+    scoutingReport: 'Range safety with elite ball production at Penn State. Projects as a single-high free safety long-term to pair with Damar Hamlin.',
+    expectedRole: 'Special teams ace + dime package, depth behind Hamlin / Bishop',
+    fitScore: 88,
+  },
+  {
+    round: 6,
+    pick: 189,
+    name: 'Isaiah Bond',
+    position: 'WR',
+    school: 'Texas',
+    ageOnDraftDay: 22,
+    height: '5\'11"',
+    weight: 185,
+    fortyYard: 4.35,
+    scoutingReport: 'Track-speed gadget weapon and dynamic returner. Slipped due to a slight frame and developing route tree, but the speed alone is Day 3 cheat code.',
+    expectedRole: 'Primary kick / punt returner, gadget snaps in 11-personnel',
+    fitScore: 80,
+  },
+  {
+    round: 7,
+    pick: 221,
+    name: 'Omarion Hampton',
+    position: 'RB',
+    school: 'North Carolina',
+    ageOnDraftDay: 22,
+    height: '6\'0"',
+    weight: 220,
+    fortyYard: 4.48,
+    scoutingReport: 'Big-bodied three-down workhorse with willing pass-pro. Insurance behind James Cook and a long-term replacement plan for Ray Davis.',
+    expectedRole: 'RB3 / short-yardage and goal-line back, special teams contributor',
+    fitScore: 35,
+  },
+];
+
+// ── Bills 2026 Draft Recap ──────────────────────────────
+
+export const draftRecap2026 = {
+  date: 'April 23-25, 2026',
+  totalPicks: 7,
+  positionBreakdown: { OFF: 4, DEF: 3 },
+  keyStoryline: 'Bills doubled down on offense, taking Indiana WR Omar Cooper Jr. at 26 to finally give Josh Allen a true WR1. Then they pulled off the steal of the second round when Auburn EDGE Keldric Faulk slid all the way to pick 57 — a Round 1 talent with a Round 1 Bills Fit (94). The class also addressed long-term IOL succession (Mbow) and the post-Milano linebacker plan (Rodriguez).',
+  grades: {
+    espn: 'B+',
+    pff: 'B',
+    sportingNews: 'A-',
+  },
+  bestPick: {
+    round: 2,
+    name: 'Keldric Faulk',
+    why: 'Round 1 grade with a 94 Bills Fit at the team\'s most critical defensive need. Faulk\'s combine measurables didn\'t match the tape, which is the only reason he was still on the board.',
+  },
+  questionMark: {
+    round: 7,
+    name: 'Omarion Hampton',
+    concern: 'Bills already have James Cook (NFL rushing champion) and Ray Davis as a quality backup. Burning a Day 3 pick on RB depth instead of CB or DT depth feels like a luxury when the back-end of the roster needs more bodies.',
+  },
+};
+
+// ── Bills Draft History (2021-2026) ─────────────────────
 
 export const billsDraftHistory = [
+  // 2026 Draft (real this year)
+  {
+    year: 2026,
+    picks: billsDraft2026,
+  },
   // 2025 Draft
   {
     year: 2025,
     picks: [
-      { round: 1, pick: 30, name: 'N/A — Draft in April 2025', position: 'TBD', school: 'TBD', status: 'Upcoming' },
+      { round: 1, pick: 30, name: 'Maxwell Hairston', position: 'CB', school: 'Kentucky', currentStatus: 'Year 1 starter, 920 snaps, PFF 76.4', grade: 76.4 },
+      { round: 2, pick: 41, name: 'T.J. Sanders', position: 'DT', school: 'South Carolina', currentStatus: 'Rotational DT, 480 snaps, PFF 71.8', grade: 71.8 },
+      { round: 3, pick: 72, name: 'Landon Jackson', position: 'EDGE', school: 'Arkansas', currentStatus: 'Sub-package rusher, 4 sacks, PFF 70.1', grade: 70.1 },
+      { round: 4, pick: 109, name: 'Deone Walker', position: 'DT', school: 'Kentucky', currentStatus: 'Run-down NT, 320 snaps, PFF 68.5', grade: 68.5 },
+      { round: 5, pick: 140, name: 'Jackson Hawes', position: 'TE', school: 'Georgia Tech', currentStatus: 'TE3, special teams ace, 8 catches', grade: 65.2 },
+      { round: 5, pick: 167, name: 'Dorian Strong', position: 'CB', school: 'Virginia Tech', currentStatus: 'Practice squad → active roster Week 9, depth CB', grade: 63.0 },
+      { round: 6, pick: 196, name: 'Jordan Hancock', position: 'CB', school: 'Ohio State', currentStatus: 'Special teams contributor', grade: 62.4 },
+      { round: 7, pick: 240, name: 'Kaden Prather', position: 'WR', school: 'Maryland', currentStatus: 'Practice squad all year', grade: 58.0 },
     ],
   },
   // 2024 Draft

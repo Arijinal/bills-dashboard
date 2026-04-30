@@ -1,19 +1,14 @@
-import { motion, useTransform } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import { capSpace, injuries } from '../../data/mockData';
 
 /**
  * CostOfWarScene — Chapter VIII. Every battle leaves its mark.
- * No background image — dark warm-red atmospheric background.
+ * AUTO-PLAY: procedural warm-red bg, viewport-triggered cascade.
  */
-export default function CostOfWarScene() {
-  return (
-    <ChapterScene id="cost-of-war" height="280vh" imageDarken={0}>
-      {(progress) => <SceneContent progress={progress} />}
-    </ChapterScene>
-  );
-}
+
+const ease = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, amount: 0.2 };
 
 // --- Procedural warm-red bg ---------------------------------------------
 function ProceduralBg() {
@@ -28,8 +23,8 @@ function ProceduralBg() {
         linear-gradient(180deg, #0E0608 0%, #1A0810 50%, #0A0408 100%)
       `,
       pointerEvents: 'none',
+      zIndex: 1,
     }}>
-      {/* faint smoke wisps */}
       <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100"
         style={{ position: 'absolute', inset: 0, opacity: 0.08, mixBlendMode: 'screen' }}>
         <path d="M0 70 Q 20 60, 40 68 T 80 65 T 100 70" stroke="#C60C30" strokeWidth="0.4" fill="none" />
@@ -40,11 +35,10 @@ function ProceduralBg() {
   );
 }
 
-// --- Cap Gauge: horizontal bar with green→red zones ---------------------
+// --- Cap Gauge ----------------------------------------------------------
 function CapGauge({ availableCap, totalCap }) {
-  // available is negative (over cap). Convert to a meter where 0 = fully used.
   const overCap = availableCap < 0;
-  const usedAbs = totalCap - availableCap; // when avail is negative, used > total
+  const usedAbs = totalCap - availableCap;
   const pct = Math.min(120, (usedAbs / totalCap) * 100);
   const fillPct = Math.min(100, pct);
 
@@ -58,7 +52,7 @@ function CapGauge({ availableCap, totalCap }) {
       borderRadius: '3px',
       backdropFilter: 'blur(8px)',
       boxShadow: '0 4px 28px rgba(0,0,0,0.7), 0 0 32px rgba(198,12,48,0.35)',
-      width: 460,
+      width: 440,
       maxWidth: '85vw',
     }}>
       <div style={{
@@ -80,7 +74,6 @@ function CapGauge({ availableCap, totalCap }) {
           color: 'var(--text-secondary)',
         }}>{fmt(usedAbs)} / {fmt(totalCap)}</div>
       </div>
-      {/* gauge */}
       <div style={{
         position: 'relative',
         height: 18,
@@ -88,13 +81,11 @@ function CapGauge({ availableCap, totalCap }) {
         borderRadius: 3,
         overflow: 'hidden',
       }}>
-        {/* zone gradient */}
         <div style={{
           position: 'absolute',
           inset: 0,
           background: 'linear-gradient(90deg, rgba(34,197,94,0.18) 0%, rgba(232,178,60,0.18) 65%, rgba(198,12,48,0.25) 90%, rgba(198,12,48,0.4) 100%)',
         }} />
-        {/* fill */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -107,12 +98,11 @@ function CapGauge({ availableCap, totalCap }) {
           boxShadow: '0 0 12px rgba(198,12,48,0.6)',
           transition: 'width 0.7s ease',
         }} />
-        {/* cap line marker at 100% */}
         <div style={{
           position: 'absolute',
           top: -2,
           bottom: -2,
-          left: '83.33%', // 100/120 * 100
+          left: '83.33%',
           width: 2,
           background: '#fff',
           opacity: 0.9,
@@ -188,212 +178,221 @@ function InjuryRow({ player, position, injury, status, gamesMissed }) {
   );
 }
 
-function SceneContent({ progress }) {
-  const titleOpacity = useTransform(progress, [0, 0.06, 0.92, 1], [0, 1, 1, 0]);
-  const titleY = useTransform(progress, [0, 0.1], [30, 0]);
-
-  // Cap gauge — left center
-  const capOpacity = useTransform(progress, [0.18, 0.32, 0.95, 1], [0, 1, 1, 0]);
-  const capY = useTransform(progress, [0.18, 0.32], [30, 0]);
-  const capScale = useTransform(progress, [0.18, 0.32], [0.92, 1]);
-
-  // Injury list — right
-  const listOpacity = useTransform(progress, [0.42, 0.55, 0.95, 1], [0, 1, 1, 0]);
-  const listY = useTransform(progress, [0.42, 0.55], [30, 0]);
-
-  // Top contracts callout — bottom-left
-  const contractsOp = useTransform(progress, [0.66, 0.78, 0.95, 1], [0, 1, 1, 0]);
-  const contractsY = useTransform(progress, [0.66, 0.78], [20, 0]);
-
-  // Dead money — bottom-right
-  const deadMoneyOp = useTransform(progress, [0.74, 0.86, 0.95, 1], [0, 1, 1, 0]);
-  const deadMoneyY = useTransform(progress, [0.74, 0.86], [20, 0]);
-
+export default function CostOfWarScene() {
   const top5Injuries = injuries.timeline.slice(0, 5);
 
   return (
-    <>
+    <section
+      id="cost-of-war"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        minHeight: 720,
+        overflow: 'hidden',
+      }}
+    >
       <ProceduralBg />
 
-      {/* TITLE */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '8%',
-        left: '50%',
-        x: '-50%',
-        opacity: titleOpacity,
-        y: titleY,
-        textAlign: 'center',
-        zIndex: 10,
-        pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.4em',
-          color: 'var(--bills-red)',
-          marginBottom: '0.5rem',
-        }}>CHAPTER VIII</div>
-        <h1 style={{
-          fontFamily: "'Dela Gothic One', sans-serif",
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 30px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.9)',
-          letterSpacing: '0.02em',
-          margin: 0,
-          lineHeight: 0.95,
-        }}>THE COST OF WAR</h1>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '1.125rem',
-          color: 'var(--text-secondary)',
-          marginTop: '0.75rem',
-          textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-        }}>Every battle leaves its mark.</div>
-      </motion.div>
-
-      {/* CAP GAUGE — left center */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '32%',
-        left: '5%',
-        opacity: capOpacity,
-        y: capY,
-        scale: capScale,
-        zIndex: 8,
-      }}>
-        <CapGauge availableCap={capSpace.availableCap} totalCap={capSpace.totalCap} />
-      </motion.div>
-
-      {/* INJURY LIST — right */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '24%',
-        right: '5%',
-        opacity: listOpacity,
-        y: listY,
-        zIndex: 8,
-        width: 380,
-        maxWidth: '40vw',
-      }}>
-        <div style={{
-          padding: '1rem 1.125rem',
-          background: 'rgba(8, 6, 10, 0.85)',
-          border: '1px solid var(--bills-red)',
-          borderRadius: '3px',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(198,12,48,0.25)',
-        }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, ease }}
+          style={{
+            position: 'absolute',
+            top: '5%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
           <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-            marginBottom: 12,
-            paddingBottom: 10,
-            borderBottom: '1px solid rgba(198,12,48,0.25)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6875rem',
+            letterSpacing: '0.4em',
+            color: 'var(--bills-red)',
+            marginBottom: '0.5rem',
+          }}>CHAPTER VIII</div>
+          <h1 style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(2.25rem, 5.5vw, 4rem)',
+            color: 'var(--text-primary)',
+            textShadow: '0 0 30px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.9)',
+            letterSpacing: '0.02em',
+            margin: 0,
+            lineHeight: 0.95,
+          }}>THE COST OF WAR</h1>
+          <div style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.5rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+          }}>Every battle leaves its mark.</div>
+        </motion.div>
+
+        {/* CAP GAUGE — left center */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 30 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 0.2, ease }}
+          style={{
+            position: 'absolute',
+            top: '28%',
+            left: '4%',
+            zIndex: 8,
+          }}
+        >
+          <CapGauge availableCap={capSpace.availableCap} totalCap={capSpace.totalCap} />
+        </motion.div>
+
+        {/* INJURY LIST — right */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 0.35, ease }}
+          style={{
+            position: 'absolute',
+            top: '22%',
+            right: '4%',
+            zIndex: 8,
+            width: 360,
+            maxWidth: '40vw',
+          }}
+        >
+          <div style={{
+            padding: '1rem 1.125rem',
+            background: 'rgba(8, 6, 10, 0.85)',
+            border: '1px solid var(--bills-red)',
+            borderRadius: '3px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(198,12,48,0.25)',
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              marginBottom: 12,
+              paddingBottom: 10,
+              borderBottom: '1px solid rgba(198,12,48,0.25)',
+            }}>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.6875rem',
+                letterSpacing: '0.18em',
+                color: 'var(--bills-red)',
+                fontWeight: 700,
+              }}>THE FALLEN — TOP 5</div>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.625rem',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.1em',
+              }}>SEASON</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {top5Injuries.map((inj, i) => (
+                <InjuryRow key={i} {...inj} />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* TOP CONTRACT — bottom-left */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.5, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '4%',
+            left: '4%',
+            zIndex: 8,
+          }}
+        >
+          <div style={{
+            padding: '0.875rem 1.125rem',
+            background: 'rgba(8, 12, 22, 0.85)',
+            border: '1px solid var(--signal-warning)',
+            borderRadius: '3px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 18px rgba(0,0,0,0.6), 0 0 22px rgba(232,178,60,0.25)',
+            maxWidth: 320,
           }}>
             <div style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.6875rem',
+              fontSize: '0.625rem',
               letterSpacing: '0.18em',
-              color: 'var(--bills-red)',
+              color: 'var(--signal-warning)',
               fontWeight: 700,
-            }}>THE FALLEN — TOP 5</div>
+            }}>TOP CONTRACT</div>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginTop: 4,
+            }}>$56.0M</div>
+            <div style={{
+              fontSize: '0.75rem',
+              color: 'var(--text-secondary)',
+              marginTop: 4,
+            }}>Josh Allen, QB · cap hit 2026</div>
+          </div>
+        </motion.div>
+
+        {/* DEAD MONEY — bottom-right */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.5, delay: 0.6, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '4%',
+            right: '4%',
+            zIndex: 8,
+          }}
+        >
+          <div style={{
+            padding: '0.875rem 1.125rem',
+            background: 'rgba(8, 12, 22, 0.85)',
+            border: '1px solid var(--bills-red)',
+            borderRadius: '3px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 4px 18px rgba(0,0,0,0.6), 0 0 22px rgba(198,12,48,0.25)',
+            maxWidth: 320,
+          }}>
             <div style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.625rem',
-              color: 'var(--text-muted)',
-              letterSpacing: '0.1em',
-            }}>SEASON</div>
+              letterSpacing: '0.18em',
+              color: 'var(--bills-red)',
+              fontWeight: 700,
+            }}>DEAD MONEY</div>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginTop: 4,
+            }}>${(capSpace.deadMoney / 1_000_000).toFixed(1)}M</div>
+            <div style={{
+              fontSize: '0.75rem',
+              color: 'var(--text-secondary)',
+              marginTop: 4,
+            }}>Sunk cap — past mistakes still on the books</div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {top5Injuries.map((inj, i) => (
-              <InjuryRow key={i} {...inj} />
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* TOP CONTRACT — bottom-left */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '6%',
-        left: '5%',
-        opacity: contractsOp,
-        y: contractsY,
-        zIndex: 8,
-      }}>
-        <div style={{
-          padding: '0.875rem 1.125rem',
-          background: 'rgba(8, 12, 22, 0.85)',
-          border: '1px solid var(--signal-warning)',
-          borderRadius: '3px',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 18px rgba(0,0,0,0.6), 0 0 22px rgba(232,178,60,0.25)',
-          maxWidth: 320,
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.625rem',
-            letterSpacing: '0.18em',
-            color: 'var(--signal-warning)',
-            fontWeight: 700,
-          }}>TOP CONTRACT</div>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginTop: 4,
-          }}>$56.0M</div>
-          <div style={{
-            fontSize: '0.75rem',
-            color: 'var(--text-secondary)',
-            marginTop: 4,
-          }}>Josh Allen, QB · cap hit 2026</div>
-        </div>
-      </motion.div>
-
-      {/* DEAD MONEY — bottom-right */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '6%',
-        right: '5%',
-        opacity: deadMoneyOp,
-        y: deadMoneyY,
-        zIndex: 8,
-      }}>
-        <div style={{
-          padding: '0.875rem 1.125rem',
-          background: 'rgba(8, 12, 22, 0.85)',
-          border: '1px solid var(--bills-red)',
-          borderRadius: '3px',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 18px rgba(0,0,0,0.6), 0 0 22px rgba(198,12,48,0.25)',
-          maxWidth: 320,
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.625rem',
-            letterSpacing: '0.18em',
-            color: 'var(--bills-red)',
-            fontWeight: 700,
-          }}>DEAD MONEY</div>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '1.5rem',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginTop: 4,
-          }}>${(capSpace.deadMoney / 1_000_000).toFixed(1)}M</div>
-          <div style={{
-            fontSize: '0.75rem',
-            color: 'var(--text-secondary)',
-            marginTop: 4,
-          }}>Sunk cap — past mistakes still on the books</div>
-        </div>
-      </motion.div>
-    </>
+        </motion.div>
+      </div>
+    </section>
   );
 }

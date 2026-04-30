@@ -1,26 +1,15 @@
-import { motion, useTransform } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import { news } from '../../data/mockData';
 
 /**
  * ChroniclesScene — Chapter X. Pages from the Book of Bills.
- * Parchment background, news as illuminated manuscript entries.
+ * AUTO-PLAY: parchment background, news cards cascade in via whileInView.
  */
-export default function ChroniclesScene() {
-  return (
-    <ChapterScene
-      id="chronicles"
-      image="/chapter-chronicles-parchment.png"
-      height="320vh"
-      imageDarken={0.35}
-    >
-      {(progress) => <SceneContent progress={progress} />}
-    </ChapterScene>
-  );
-}
 
-// Coach key picker for each article
+const ease = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, amount: 0.2 };
+
 function pickCoachKey(article) {
   const t = article.title.toLowerCase();
   if (t.includes('cap') || t.includes('cuts')) return 'cap_space';
@@ -31,14 +20,14 @@ function pickCoachKey(article) {
   return 'pf_pa';
 }
 
-// --- Article card (illuminated manuscript style) ------------------------
+// --- Article card ------------------------------------------------------
 function ArticleCard({ article, lead = false, accentColor = '#8B4513' }) {
   const dropCap = lead && article.title ? article.title[0] : null;
   const titleRest = lead && article.title ? article.title.slice(1) : article.title;
 
   return (
     <div style={{
-      padding: lead ? '1.25rem 1.5rem' : '0.875rem 1.125rem',
+      padding: lead ? '1rem 1.25rem' : '0.75rem 1rem',
       background: 'rgba(245, 232, 198, 0.92)',
       border: `1px solid ${accentColor}`,
       borderLeft: `4px solid ${accentColor}`,
@@ -50,7 +39,7 @@ function ArticleCard({ article, lead = false, accentColor = '#8B4513' }) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'baseline',
-        marginBottom: 8,
+        marginBottom: 6,
       }}>
         <div style={{
           fontFamily: 'var(--font-mono)',
@@ -68,9 +57,9 @@ function ArticleCard({ article, lead = false, accentColor = '#8B4513' }) {
         }}>{article.date.toUpperCase()}</div>
       </div>
       <h3 style={{
-        fontFamily: lead ? "'Shippori Mincho', serif" : "'Shippori Mincho', serif",
+        fontFamily: "'Shippori Mincho', serif",
         fontWeight: 700,
-        fontSize: lead ? '1.5rem' : '1rem',
+        fontSize: lead ? '1.25rem' : '0.9375rem',
         color: '#1F1108',
         margin: 0,
         lineHeight: 1.2,
@@ -80,7 +69,7 @@ function ArticleCard({ article, lead = false, accentColor = '#8B4513' }) {
           <span style={{
             float: 'left',
             fontFamily: "'Dela Gothic One', sans-serif",
-            fontSize: '3rem',
+            fontSize: '2.5rem',
             lineHeight: 0.85,
             marginRight: '0.4rem',
             marginTop: '0.1rem',
@@ -92,174 +81,123 @@ function ArticleCard({ article, lead = false, accentColor = '#8B4513' }) {
       </h3>
       <p style={{
         fontFamily: "'Shippori Mincho', serif",
-        fontSize: lead ? '0.9375rem' : '0.8125rem',
+        fontSize: lead ? '0.8125rem' : '0.75rem',
         color: '#3A2410',
-        lineHeight: 1.55,
-        margin: '0.625rem 0 0 0',
+        lineHeight: 1.5,
+        margin: '0.5rem 0 0 0',
       }}>{article.excerpt}</p>
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 8 }}>
         <CoachInsight coachKey={pickCoachKey(article)} compact />
       </div>
     </div>
   );
 }
 
-function SceneContent({ progress }) {
-  const titleOpacity = useTransform(progress, [0, 0.06, 0.92, 1], [0, 1, 1, 0]);
-  const titleY = useTransform(progress, [0, 0.1], [30, 0]);
-
-  // Lead — early reveal
-  const leadOp = useTransform(progress, [0.10, 0.22, 0.95, 1], [0, 1, 1, 0]);
-  const leadY = useTransform(progress, [0.10, 0.22], [30, 0]);
-
-  // Article 2-3 (left column)
-  const a2Op = useTransform(progress, [0.30, 0.42, 0.95, 1], [0, 1, 1, 0]);
-  const a2Y = useTransform(progress, [0.30, 0.42], [20, 0]);
-  const a3Op = useTransform(progress, [0.40, 0.52, 0.95, 1], [0, 1, 1, 0]);
-  const a3Y = useTransform(progress, [0.40, 0.52], [20, 0]);
-
-  // Article 4-5 (right column)
-  const a4Op = useTransform(progress, [0.50, 0.62, 0.95, 1], [0, 1, 1, 0]);
-  const a4Y = useTransform(progress, [0.50, 0.62], [20, 0]);
-  const a5Op = useTransform(progress, [0.60, 0.72, 0.95, 1], [0, 1, 1, 0]);
-  const a5Y = useTransform(progress, [0.60, 0.72], [20, 0]);
-
-  // Article 6 (bottom-center)
-  const a6Op = useTransform(progress, [0.72, 0.84, 0.95, 1], [0, 1, 1, 0]);
-  const a6Y = useTransform(progress, [0.72, 0.84], [20, 0]);
-
+export default function ChroniclesScene() {
   const articles = news.current || [];
   const lead = articles[0];
   const rest = articles.slice(1);
 
   return (
-    <>
-      {/* TITLE */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '4%',
-        left: '50%',
-        x: '-50%',
-        opacity: titleOpacity,
-        y: titleY,
-        textAlign: 'center',
-        zIndex: 10,
+    <section
+      id="chronicles"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/chapter-chronicles-parchment.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.92,
+        zIndex: 1,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(8,12,20,0.30) 0%, rgba(8,12,20,0.50) 70%, rgba(8,12,20,0.85) 100%)',
+        zIndex: 2,
         pointerEvents: 'none',
-      }}>
+      }} />
+
+      <div style={{ position: 'relative', width: '100%', zIndex: 5, padding: '2rem' }}>
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, ease }}
+          style={{
+            textAlign: 'center',
+            marginBottom: '1.5rem',
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6875rem',
+            letterSpacing: '0.4em',
+            color: '#E8B23C',
+            marginBottom: '0.5rem',
+            textShadow: '0 0 12px rgba(0,0,0,0.95)',
+          }}>CHAPTER X</div>
+          <h1 style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(2.25rem, 5.5vw, 4rem)',
+            color: 'var(--text-primary)',
+            textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
+            letterSpacing: '0.02em',
+            margin: 0,
+            lineHeight: 0.95,
+          }}>THE CHRONICLES</h1>
+          <div style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.5rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+          }}>Pages from the Book of Bills.</div>
+        </motion.div>
+
+        {/* GRID layout for articles */}
         <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.4em',
-          color: '#E8B23C',
-          marginBottom: '0.5rem',
-          textShadow: '0 0 12px rgba(0,0,0,0.95)',
-        }}>CHAPTER X</div>
-        <h1 style={{
-          fontFamily: "'Dela Gothic One', sans-serif",
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
-          letterSpacing: '0.02em',
-          margin: 0,
-          lineHeight: 0.95,
-        }}>THE CHRONICLES</h1>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '1.125rem',
-          color: 'var(--text-secondary)',
-          marginTop: '0.75rem',
-          textShadow: '0 2px 8px rgba(0,0,0,0.95)',
-        }}>Pages from the Book of Bills.</div>
-      </motion.div>
+          maxWidth: 1200,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '1rem',
+          alignItems: 'start',
+        }}>
+          {/* LEAD spans 2 columns when wide */}
+          {lead && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              transition={{ duration: 0.5, delay: 0.2, ease }}
+              style={{ gridColumn: '1 / -1', maxWidth: 720, justifySelf: 'center', width: '100%' }}
+            >
+              <ArticleCard article={lead} lead accentColor="#8B4513" />
+            </motion.div>
+          )}
 
-      {/* LEAD — top center, large */}
-      {lead && (
-        <motion.div style={{
-          position: 'absolute',
-          top: '20%',
-          left: '50%',
-          x: '-50%',
-          opacity: leadOp,
-          y: leadY,
-          width: 'min(640px, 75vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={lead} lead accentColor="#8B4513" />
-        </motion.div>
-      )}
-
-      {/* LEFT COLUMN: articles 2 & 3 */}
-      {rest[0] && (
-        <motion.div style={{
-          position: 'absolute',
-          top: '54%',
-          left: '4%',
-          opacity: a2Op,
-          y: a2Y,
-          width: 'min(360px, 28vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={rest[0]} accentColor="#8B4513" />
-        </motion.div>
-      )}
-      {rest[1] && (
-        <motion.div style={{
-          position: 'absolute',
-          top: '78%',
-          left: '4%',
-          opacity: a3Op,
-          y: a3Y,
-          width: 'min(360px, 28vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={rest[1]} accentColor="#6B4513" />
-        </motion.div>
-      )}
-
-      {/* RIGHT COLUMN: articles 4 & 5 */}
-      {rest[2] && (
-        <motion.div style={{
-          position: 'absolute',
-          top: '54%',
-          right: '4%',
-          opacity: a4Op,
-          y: a4Y,
-          width: 'min(360px, 28vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={rest[2]} accentColor="#8B4513" />
-        </motion.div>
-      )}
-      {rest[3] && (
-        <motion.div style={{
-          position: 'absolute',
-          top: '78%',
-          right: '4%',
-          opacity: a5Op,
-          y: a5Y,
-          width: 'min(360px, 28vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={rest[3]} accentColor="#6B4513" />
-        </motion.div>
-      )}
-
-      {/* CENTER BOTTOM: article 6 */}
-      {rest[4] && (
-        <motion.div style={{
-          position: 'absolute',
-          bottom: '4%',
-          left: '50%',
-          x: '-50%',
-          opacity: a6Op,
-          y: a6Y,
-          width: 'min(440px, 36vw)',
-          zIndex: 8,
-        }}>
-          <ArticleCard article={rest[4]} accentColor="#A0522D" />
-        </motion.div>
-      )}
-    </>
+          {rest.slice(0, 5).map((article, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              transition={{ duration: 0.5, delay: 0.35 + i * 0.1, ease }}
+            >
+              <ArticleCard article={article} accentColor={i % 2 === 0 ? '#8B4513' : '#6B4513'} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

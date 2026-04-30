@@ -1,23 +1,14 @@
 import { useState } from 'react';
-import { motion, useTransform, AnimatePresence } from 'framer-motion';
-import ChapterScene from '../ChapterScene';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * UniverseScene — Chapter XIV. From Highmark to every corner.
- * Constellation hotspots over the image. Click to expand a card with links.
+ * AUTO-PLAY: constellation background. Hotspots fade in via cascade,
+ * always pulse. Click to open expanded card with links.
  */
-export default function UniverseScene() {
-  return (
-    <ChapterScene
-      id="universe"
-      image="/chapter-universe-constellation.png"
-      height="280vh"
-      imageDarken={0.45}
-    >
-      {(progress) => <SceneContent progress={progress} />}
-    </ChapterScene>
-  );
-}
+
+const ease = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, amount: 0.2 };
 
 const CONSTELLATIONS = [
   {
@@ -101,10 +92,14 @@ const CONSTELLATIONS = [
 ];
 
 // --- Hotspot ------------------------------------------------------------
-function Hotspot({ constellation, active, onClick }) {
+function Hotspot({ constellation, active, onClick, delay }) {
   const { pos, color, name } = constellation;
   return (
-    <button
+    <motion.button
+      initial={{ opacity: 0, scale: 0.5 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={VIEWPORT}
+      transition={{ duration: 0.5, delay, ease }}
       onClick={onClick}
       style={{
         position: 'absolute',
@@ -161,21 +156,20 @@ function Hotspot({ constellation, active, onClick }) {
         textShadow: '0 0 8px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,1)',
         marginTop: 2,
       }}>{name}</div>
-    </button>
+    </motion.button>
   );
 }
 
 // --- Expanded Card ------------------------------------------------------
 function ExpandedCard({ constellation, onClose }) {
   const { name, color, description, links, pos } = constellation;
-  // Position card adjacent to hotspot; clamp to viewport sides.
   const leftSide = pos.x > 60;
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.92, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.92, y: 10 }}
-      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.22, ease }}
       style={{
         position: 'absolute',
         top: `${Math.min(70, Math.max(10, pos.y + 6))}%`,
@@ -258,105 +252,128 @@ function ExpandedCard({ constellation, onClose }) {
   );
 }
 
-function SceneContent({ progress }) {
-  const titleOpacity = useTransform(progress, [0, 0.06, 0.92, 1], [0, 1, 1, 0]);
-  const titleY = useTransform(progress, [0, 0.1], [30, 0]);
-
-  // Hotspots fade in as you scroll
-  const hotspotOp = useTransform(progress, [0.10, 0.30, 0.95, 1], [0, 1, 1, 0]);
-
-  // Hint banner
-  const hintOp = useTransform(progress, [0.20, 0.36, 0.85, 0.95], [0, 1, 1, 0]);
-
+export default function UniverseScene() {
   const [activeId, setActiveId] = useState(null);
   const active = CONSTELLATIONS.find(c => c.id === activeId);
 
   return (
-    <>
-      {/* TITLE */}
-      <motion.div style={{
-        position: 'absolute',
-        top: '6%',
-        left: '50%',
-        x: '-50%',
-        opacity: titleOpacity,
-        y: titleY,
-        textAlign: 'center',
-        zIndex: 10,
+    <section
+      id="universe"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100vh',
+        minHeight: 720,
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/chapter-universe-constellation.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.92,
+        zIndex: 1,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(8,12,20,0.30) 0%, rgba(8,12,20,0.50) 70%, rgba(8,12,20,0.85) 100%)',
+        zIndex: 2,
         pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.4em',
-          color: '#C8A0FF',
-          marginBottom: '0.5rem',
-          textShadow: '0 0 12px rgba(0,0,0,0.95)',
-        }}>CHAPTER XIV</div>
-        <h1 style={{
-          fontFamily: "'Dela Gothic One', sans-serif",
-          fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-          color: 'var(--text-primary)',
-          textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
-          letterSpacing: '0.02em',
-          margin: 0,
-          lineHeight: 0.95,
-        }}>THE UNIVERSE</h1>
-        <div style={{
-          fontFamily: "'Shippori Mincho', serif",
-          fontStyle: 'italic',
-          fontSize: '1.125rem',
-          color: 'var(--text-secondary)',
-          marginTop: '0.75rem',
-          textShadow: '0 2px 8px rgba(0,0,0,0.95)',
-        }}>From Highmark to every corner.</div>
-      </motion.div>
+      }} />
 
-      {/* HOTSPOTS */}
-      <motion.div style={{
-        position: 'absolute',
-        inset: 0,
-        opacity: hotspotOp,
-      }}>
-        {CONSTELLATIONS.map(c => (
-          <Hotspot
-            key={c.id}
-            constellation={c}
-            active={activeId === c.id}
-            onClick={() => setActiveId(activeId === c.id ? null : c.id)}
-          />
-        ))}
-        <AnimatePresence>
-          {active && (
-            <ExpandedCard constellation={active} onClose={() => setActiveId(null)} />
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, ease }}
+          style={{
+            position: 'absolute',
+            top: '4%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6875rem',
+            letterSpacing: '0.4em',
+            color: '#C8A0FF',
+            marginBottom: '0.5rem',
+            textShadow: '0 0 12px rgba(0,0,0,0.95)',
+          }}>CHAPTER XIV</div>
+          <h1 style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: 'clamp(2.25rem, 5.5vw, 4rem)',
+            color: 'var(--text-primary)',
+            textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 12px rgba(0,0,0,0.95)',
+            letterSpacing: '0.02em',
+            margin: 0,
+            lineHeight: 0.95,
+          }}>THE UNIVERSE</h1>
+          <div style={{
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '1rem',
+            color: 'var(--text-secondary)',
+            marginTop: '0.5rem',
+            textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+          }}>From Highmark to every corner.</div>
+        </motion.div>
 
-      {/* HINT */}
-      <motion.div style={{
-        position: 'absolute',
-        bottom: '6%',
-        left: '50%',
-        x: '-50%',
-        opacity: hintOp,
-        textAlign: 'center',
-        zIndex: 8,
-        pointerEvents: 'none',
-      }}>
-        <div style={{
-          padding: '0.5rem 0.875rem',
-          background: 'rgba(8, 12, 22, 0.78)',
-          border: '1px solid rgba(200,160,255,0.4)',
-          borderRadius: '20px',
-          backdropFilter: 'blur(6px)',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6875rem',
-          letterSpacing: '0.18em',
-          color: '#C8A0FF',
-          fontWeight: 600,
-        }}>· TAP A STAR ·</div>
-      </motion.div>
-    </>
+        {/* HOTSPOTS */}
+        <div style={{ position: 'absolute', inset: 0 }}>
+          {CONSTELLATIONS.map((c, i) => (
+            <Hotspot
+              key={c.id}
+              constellation={c}
+              active={activeId === c.id}
+              onClick={() => setActiveId(activeId === c.id ? null : c.id)}
+              delay={0.25 + i * 0.08}
+            />
+          ))}
+          <AnimatePresence>
+            {active && (
+              <ExpandedCard constellation={active} onClose={() => setActiveId(null)} />
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* HINT */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 1.0, ease }}
+          style={{
+            position: 'absolute',
+            bottom: '4%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            textAlign: 'center',
+            zIndex: 8,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            padding: '0.5rem 0.875rem',
+            background: 'rgba(8, 12, 22, 0.78)',
+            border: '1px solid rgba(200,160,255,0.4)',
+            borderRadius: '20px',
+            backdropFilter: 'blur(6px)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6875rem',
+            letterSpacing: '0.18em',
+            color: '#C8A0FF',
+            fontWeight: 600,
+          }}>· TAP A STAR ·</div>
+        </motion.div>
+      </div>
+    </section>
   );
 }
