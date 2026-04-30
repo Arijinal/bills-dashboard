@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiTrophyLine, RiHistoryLine, RiTeamLine, RiFootballLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import PropheticOracle from '../components/PropheticOracle';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -164,16 +162,7 @@ export default function PredictionsPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="prophecy-gateway"
-        chapter="XII"
-        title="THE PROPHECY"
-        subtitle="Speak your visions. The oracle records every prediction."
-        backgroundImage="/chapter-prophecy-oracle.png"
-      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* Prophetic Oracle — interactive prediction surface */}
-      <PropheticOracle />
       {/* Header */}
       <motion.div {...fade(0)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

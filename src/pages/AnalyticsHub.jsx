@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiBarChart2Fill, RiExternalLinkLine } from 'react-icons/ri';
 import { Panel, GradeRing, SectionHeader, PercentileBar, DataTable } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
 import { teamGrades, playerGrades, weeklyGrades, positionGroupGrades } from '../data/analyticsData';
 
 const fade = (i = 0) => ({
@@ -145,13 +144,6 @@ export default function AnalyticsHub() {
 
   return (
     <>
-      <ChapterGateway
-        id="war-room-gateway"
-        chapter="III"
-        title="THE WAR ROOM"
-        subtitle="Strategic intelligence. Every snap measured. Every trend mapped."
-        backgroundImage="/chapter-sunday-reckoning.png"
-      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

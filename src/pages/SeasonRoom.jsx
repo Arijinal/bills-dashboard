@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiShieldStarLine, RiExchangeLine, RiBarChartBoxLine, RiCalendarLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import SundayReckoningTableau from '../components/SundayReckoningTableau';
 import { teamInfo, lastGame, teamStats } from '../data/mockData';
 import { weeklyGrades } from '../data/analyticsData';
 
@@ -44,14 +42,6 @@ export default function SeasonRoom() {
 
   return (
     <>
-      <ChapterGateway
-        id="sunday-reckoning-gateway"
-        chapter="I"
-        title="THE SUNDAY RECKONING"
-        subtitle="Where every play is judged. Where the season is written."
-        backgroundImage="/chapter-sunday-reckoning.png"
-      />
-      <SundayReckoningTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Header */}
         <motion.div {...fade}>

@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import { RiHeartLine, RiMegaphoneLine, RiGroupLine, RiCalendarEventLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import FellowshipTableau from '../components/FellowshipTableau';
 import { mafiaContent, gamedayInfo } from '../data/communityData';
 
 const fade = (i = 0) => ({
@@ -63,15 +61,6 @@ export default function MafiaCorner() {
 
   return (
     <>
-      <ChapterGateway
-        id="fellowship-gateway"
-        chapter="XIII"
-        title="THE FELLOWSHIP OF THE MAFIA"
-        subtitle="Through four heartbreaks. Through every winter. Bills Mafia stands together."
-        backgroundImage="/chapter-fellowship-mafia.png"
-        accentColor="var(--bills-red-bright)"
-      />
-      <FellowshipTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

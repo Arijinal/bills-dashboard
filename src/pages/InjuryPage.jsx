@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiHeartPulseLine, RiAlertLine } from 'react-icons/ri';
 import { Panel, StatusDot, DataCell, SectionHeader, DataTable } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
 import { injuries } from '../data/mockData';
 
 const fade = (i = 0) => ({
@@ -103,13 +102,6 @@ export default function InjuryPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="cost-of-war-gateway"
-        chapter="VIII"
-        title="THE COST OF WAR"
-        subtitle="Every battle leaves its mark. The fallen, and those who carry on."
-        accentColor="var(--bills-red)"
-      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

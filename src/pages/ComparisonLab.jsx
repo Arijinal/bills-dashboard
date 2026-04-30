@@ -2,8 +2,6 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiUserSearchLine } from 'react-icons/ri';
 import { Panel, GradeRing, PercentileBar, DataTable, SectionHeader, DataCell } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import ChampionsDuelTableau from '../components/ChampionsDuelTableau';
 import { playerGrades } from '../data/analyticsData';
 import { players } from '../data/mockData';
 
@@ -112,13 +110,6 @@ export default function ComparisonLab() {
 
   return (
     <>
-      <ChapterGateway
-        id="champions-duel-gateway"
-        chapter="V"
-        title="THE CHAMPION'S DUEL"
-        subtitle="Two warriors. Side by side. Whose legend is greater?"
-      />
-      <ChampionsDuelTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <motion.div {...fade}>

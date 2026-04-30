@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiSunLine, RiCloudyLine, RiSnowyLine, RiWindyLine, RiTempColdLine, RiDropLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader, DataTable, StatusDot } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import StormTableau from '../components/StormTableau';
 import { weatherImpact, teamInfo } from '../data/mockData';
 
 const fade = (i = 0) => ({
@@ -176,13 +174,6 @@ export default function WeatherPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="storm-gateway"
-        chapter="IX"
-        title="THE STORM"
-        subtitle="Buffalo's most loyal ally. The blizzard takes no sides — except ours."
-      />
-      <StormTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

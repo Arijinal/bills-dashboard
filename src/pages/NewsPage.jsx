@@ -2,8 +2,6 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiFireLine, RiDraftLine, RiRunLine, RiTimeLine } from 'react-icons/ri';
 import { Panel, StatusDot, SectionHeader } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import ChroniclesTableau from '../components/ChroniclesTableau';
 import { news } from '../data/mockData';
 
 const fade = (i = 0) => ({
@@ -29,15 +27,6 @@ export default function NewsPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="chronicles-gateway"
-        chapter="X"
-        title="THE CHRONICLES"
-        subtitle="The week's intel. Pages from the Book of Bills."
-        backgroundImage="/chapter-chronicles-parchment.png"
-        accentColor="var(--signal-warning)"
-      />
-      <ChroniclesTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

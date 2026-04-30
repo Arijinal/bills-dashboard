@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiUser3Fill } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader, PercentileBar, DataTable } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import FranchiseTableau from '../components/FranchiseTableau';
 import { joshAllen } from '../data/mockData';
 import { weeklyGrades } from '../data/analyticsData';
 
@@ -195,14 +193,6 @@ export default function AllenCenter() {
 
   return (
     <>
-      <ChapterGateway
-        id="franchise-gateway"
-        chapter="II"
-        title="THE FRANCHISE"
-        subtitle="Number 17. The arm. The legacy."
-        backgroundImage="/chapter-franchise-allen.png"
-      />
-      <FranchiseTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

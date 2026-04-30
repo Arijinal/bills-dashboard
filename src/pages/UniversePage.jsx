@@ -18,8 +18,6 @@ import {
   RiLockLine,
 } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import UniverseConstellation from '../components/UniverseConstellation';
 import {
   officialLinks,
   socialMedia,
@@ -92,14 +90,6 @@ const socialAccentMap = {
 export default function UniversePage() {
   return (
     <>
-      <ChapterGateway
-        id="universe-gateway"
-        chapter="XIV"
-        title="THE UNIVERSE BEYOND"
-        subtitle="The Bills are everywhere. From Highmark to every corner of the Mafia."
-        backgroundImage="/chapter-universe-constellation.png"
-      />
-      <UniverseConstellation />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

@@ -8,8 +8,6 @@ import {
   RiHashtag, RiHeartLine, RiChat3Line, RiRepeatLine,
 } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader, StatusDot } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import ArenaTableau from '../components/ArenaTableau';
 import { sentiment, socialFeed } from '../data/mockData';
 import { socialMedia, fanCommunities } from '../data/ecosystemData';
 
@@ -100,15 +98,6 @@ export default function SocialPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="arena-gateway"
-        chapter="XI"
-        title="THE ARENA"
-        subtitle="Seventy thousand voices. One heartbeat. Bills Mafia rises."
-        backgroundImage="/chapter-arena-crowd.png"
-        accentColor="var(--bills-red-bright)"
-      />
-      <ArenaTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Header */}
       <motion.div {...fade(0)}>

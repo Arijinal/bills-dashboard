@@ -2,8 +2,6 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiDraftLine, RiListOrdered, RiHistoryLine, RiGridLine } from 'react-icons/ri';
 import { Panel, StatusDot, DataTable, GradeRing, SectionHeader, DataCell } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import ForgeTableau from '../components/ForgeTableau';
 import { draftProspects, billsDraftHistory, billsNeeds } from '../data/draftData';
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
@@ -153,14 +151,6 @@ export default function DraftCenter() {
 
   return (
     <>
-      <ChapterGateway
-        id="forge-gateway"
-        chapter="VI"
-        title="THE FORGE"
-        subtitle="Where the next generation of Bills are chosen and shaped."
-        backgroundImage="/chapter-forge-torii.png"
-      />
-      <ForgeTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <motion.div {...fade}>

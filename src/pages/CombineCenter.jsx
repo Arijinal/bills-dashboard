@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiRunLine, RiRadarLine, RiCrosshair2Line } from 'react-icons/ri';
 import { Panel, PercentileBar, SectionHeader, DataCell } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import ProvingGroundsTableau from '../components/ProvingGroundsTableau';
 import { draftProspects } from '../data/draftData';
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
@@ -111,14 +109,6 @@ export default function CombineCenter() {
 
   return (
     <>
-      <ChapterGateway
-        id="proving-grounds-gateway"
-        chapter="VII"
-        title="THE PROVING GROUNDS"
-        subtitle="Speed. Power. Endurance. The crucible of the Combine."
-        backgroundImage="/chapter-proving-grounds-arena.png"
-      />
-      <ProvingGroundsTableau />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <motion.div {...fade}>

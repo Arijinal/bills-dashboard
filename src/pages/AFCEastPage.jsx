@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiShieldStarLine, RiSwordLine } from 'react-icons/ri';
 import { Panel, StatusDot, DataCell, SectionHeader, DataTable } from '../components/ui';
-import ChapterGateway from '../components/ChapterGateway';
-import FourKingdomsMap from '../components/FourKingdomsMap';
 import { afcEast, teamInfo } from '../data/mockData';
 
 const fade = (i = 0) => ({
@@ -164,19 +162,7 @@ export default function AFCEastPage() {
 
   return (
     <>
-      <ChapterGateway
-        id="four-kingdoms-gateway"
-        chapter="IV"
-        title="THE FOUR KINGDOMS"
-        subtitle="Four teams. One throne. Buffalo defends the north."
-        backgroundImage="/chapter-four-kingdoms-map.png"
-      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* Four Kingdoms interactive tableau */}
-      <motion.div {...fade(0)}>
-        <FourKingdomsMap />
-      </motion.div>
-
       {/* Header */}
       <motion.div {...fade(0)}>
         <SectionHeader
