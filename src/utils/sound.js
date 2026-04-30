@@ -19,15 +19,16 @@ export function playClickSound() {
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.08);
+    // Soft tap: triangle wave, gentle high-to-mid sweep
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05);
 
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
 
     osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.08);
+    osc.stop(ctx.currentTime + 0.05);
   } catch {
     // Silently fail if audio is blocked
   }

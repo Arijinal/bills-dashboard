@@ -30,12 +30,14 @@ const LABEL_RADIUS = 630;
 
 const SECTOR_ORDER = ['OL', 'LB', 'WR', 'S', 'DL', 'TE', 'CB', 'RB', 'ST', 'QB'];
 
-// Per-player orbit speeds (radians/second) — ring 3 is counter-clockwise
+// Each ring: different direction, different speed — unmistakable
 const ORBIT_SPEED = {
-  1: [0.045, 0.065],
-  2: [0.038, 0.058],
-  3: [-0.075, -0.050],
+  1: [0.050, 0.062],     // clockwise, moderate
+  2: [-0.085, -0.100],   // counter-clockwise, FAST — 2x ring 1
+  3: [-0.0675, -0.045],  // counter-clockwise, fast (slowed 10%)
 };
+// Version bump forces statesRef reinit on hot reload
+const ORBIT_VERSION = 8;
 
 const ZOOM_LEVELS = [1, 1.4, 1.9];
 
@@ -152,11 +154,13 @@ export default function OrbitalDepthChart() {
 
   // Animation refs
   const statesRef = useRef(null);
+  const versionRef = useRef(null);
   const nodesRef = useRef({});
   const labelRefs = useRef({});
 
-  // Initialize physics state once
-  if (!statesRef.current) {
+  // Initialize physics state — reinit when ORBIT_VERSION changes (hot reload safe)
+  if (!statesRef.current || versionRef.current !== ORBIT_VERSION) {
+    versionRef.current = ORBIT_VERSION;
     statesRef.current = allPlayers.map(p => ({
       angle: p.angle,
       baseSpeed: p.orbitSpeed,

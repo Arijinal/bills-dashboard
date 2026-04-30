@@ -1,182 +1,140 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useTheme } from './contexts/ThemeContext';
-import { PlayerDossierProvider } from './contexts/PlayerDossierContext';
-import Header from './components/Header';
-import GameAnalysis from './components/GameAnalysis';
-import JoshAllenCenter from './components/JoshAllenCenter';
-import TeamStats from './components/TeamStats';
-import AFCEast from './components/AFCEast';
-import CapSpace from './components/CapSpace';
-import PlayerComparison from './components/PlayerComparison';
-import DriveEfficiency from './components/DriveEfficiency';
-import InjuryTimeline from './components/InjuryTimeline';
-import WeatherImpact from './components/WeatherImpact';
-import NewsHub from './components/NewsHub';
-import SentimentPulse from './components/SentimentPulse';
-import SocialFeed from './components/SocialFeed';
-import Roster from './components/Roster';
-import StarField from './components/StarField';
-import WarpOverlay from './components/WarpOverlay';
-import MissionControl from './components/MissionControl';
-import PlayerDossier from './components/PlayerDossier';
-import { playClickSound } from './utils/sound';
-import './App.css';
+import { Suspense, lazy } from 'react';
+import { ScrollOrchestratorProvider } from './components/ScrollOrchestrator';
+import QuestLog from './components/QuestLog';
+import SectionContainer from './components/SectionContainer';
+import ChapterDivider from './components/ChapterDivider';
 
-const navItems = [
-  { id: 'game-analysis', label: 'GAME', nebula: 'game' },
-  { id: 'josh-allen', label: 'ALLEN', nebula: 'allen' },
-  { id: 'team-stats', label: 'STATS', nebula: 'stats' },
-  { id: 'afc-east', label: 'AFC EAST', nebula: 'afc' },
-  { id: 'cap-space', label: 'CAP', nebula: 'cap' },
-  { id: 'player-compare', label: 'COMPARE', nebula: 'compare' },
-  { id: 'drive-efficiency', label: 'DRIVES', nebula: 'drives' },
-  { id: 'injuries', label: 'INJURIES', nebula: 'injuries' },
-  { id: 'weather', label: 'WEATHER', nebula: 'weather' },
-  { id: 'news', label: 'NEWS', nebula: 'news' },
-  { id: 'sentiment', label: 'SENTIMENT', nebula: 'sentiment' },
-  { id: 'social', label: 'SOCIAL', nebula: 'social' },
-  { id: 'roster', label: 'ROSTER', nebula: 'roster' },
+// Lazy-load each section page (these will be turned into scroll sections)
+const Dashboard = lazy(() => import('./pages/Dashboard'));         // → SECTION 1: The Arrival
+const SeasonRoom = lazy(() => import('./pages/SeasonRoom'));       // → SECTION 2: The Sunday Reckoning
+const AllenCenter = lazy(() => import('./pages/AllenCenter'));     // → SECTION 3: The Franchise
+const AnalyticsHub = lazy(() => import('./pages/AnalyticsHub'));   // → SECTION 4: The War Room (PFF + stats + efficiency)
+const TeamStatsPage = lazy(() => import('./pages/TeamStatsPage')); // → SECTION 4: The War Room
+const EfficiencyPage = lazy(() => import('./pages/EfficiencyPage'));
+const AFCEastPage = lazy(() => import('./pages/AFCEastPage'));     // → SECTION 5: Four Kingdoms
+const ComparisonLab = lazy(() => import('./pages/ComparisonLab')); // → SECTION 6: Champion's Duel
+const DraftCenter = lazy(() => import('./pages/DraftCenter'));     // → SECTION 7: The Forge
+const CombineCenter = lazy(() => import('./pages/CombineCenter')); // → SECTION 8: Proving Grounds
+const RosterOps = lazy(() => import('./pages/RosterOps'));         // → SECTION 9: Cost of War (with Injuries)
+const InjuryPage = lazy(() => import('./pages/InjuryPage'));
+const WeatherPage = lazy(() => import('./pages/WeatherPage'));     // → SECTION 10: The Storm
+const NewsPage = lazy(() => import('./pages/NewsPage'));           // → SECTION 11: The Chronicles
+const SocialPage = lazy(() => import('./pages/SocialPage'));       // → SECTION 12: The Arena
+const PredictionsPage = lazy(() => import('./pages/PredictionsPage')); // → SECTION 13: The Prophecy
+const PollsPage = lazy(() => import('./pages/PollsPage'));
+const MafiaCorner = lazy(() => import('./pages/MafiaCorner'));     // → SECTION 14: The Fellowship
+const UniversePage = lazy(() => import('./pages/UniversePage'));   // → SECTION 15: Universe Beyond
+
+const SECTION_IDS = [
+  'arrival', 'sunday-reckoning', 'franchise', 'war-room', 'four-kingdoms',
+  'champions-duel', 'forge', 'proving-grounds', 'cost-of-war', 'storm',
+  'chronicles', 'arena', 'prophecy', 'fellowship', 'universe'
 ];
 
+const SectionFallback = () => (
+  <div style={{
+    minHeight: '50vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text-muted)',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '0.75rem',
+    letterSpacing: '0.2em',
+  }}>
+    LOADING...
+  </div>
+);
+
 export default function App() {
-  const [activeSection, setActiveSection] = useState('');
-  const [scrolled, setScrolled] = useState(false);
-  const [warpActive, setWarpActive] = useState(false);
-  const [warpTarget, setWarpTarget] = useState(null);
-  const { isCosmos, toggleTheme } = useTheme();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 100);
-
-      const sections = navItems.map(n => ({
-        id: n.id,
-        el: document.getElementById(n.id)
-      })).filter(s => s.el);
-
-      const scrollPos = window.scrollY + 180;
-      let current = '';
-      for (const section of sections) {
-        if (section.el.offsetTop <= scrollPos) {
-          current = section.id;
-        }
-      }
-      setActiveSection(current);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollTo = useCallback((id) => {
-    playClickSound();
-    if (isCosmos && !warpActive) {
-      setWarpTarget(id);
-      setWarpActive(true);
-    } else {
-      const el = document.getElementById(id);
-      if (el) {
-        window.scrollTo({ top: el.offsetTop - 140, behavior: 'smooth' });
-      }
-    }
-  }, [isCosmos, warpActive]);
-
-  const handleWarpComplete = useCallback(() => {
-    setWarpActive(false);
-    if (warpTarget) {
-      const el = document.getElementById(warpTarget);
-      if (el) {
-        window.scrollTo({ top: el.offsetTop - 140, behavior: 'smooth' });
-      }
-      setWarpTarget(null);
-    }
-  }, [warpTarget]);
-
   return (
-    <PlayerDossierProvider>
-      <div className="app">
-        {/* Cosmos features */}
-        {isCosmos && <StarField />}
-        {isCosmos && <WarpOverlay active={warpActive} onComplete={handleWarpComplete} />}
+    <ScrollOrchestratorProvider sectionIds={SECTION_IDS}>
+      <QuestLog />
+      <main style={{ position: 'relative' }}>
+        <SectionContainer id="arrival" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><Dashboard /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        <Header />
+        <SectionContainer id="sunday-reckoning" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><SeasonRoom /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        {/* Sticky Navigation */}
-        <nav className={`main-nav ${scrolled ? 'scrolled' : ''}`}>
-          <div className="nav-inner">
-            <div className="nav-brand">
-              <svg viewBox="0 0 30 30" width="30" height="30">
-                <circle cx="15" cy="15" r="13" fill="#002288" stroke="#00e5ff" strokeWidth="1" opacity="0.9"/>
-                <text x="15" y="19" textAnchor="middle" fill="#ffd740" fontSize="9" fontFamily="Teko" fontWeight="700">BUF</text>
-              </svg>
-            </div>
-            <div className="nav-links">
-              {navItems.map(item => (
-                <button
-                  key={item.id}
-                  className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
-                  onClick={() => scrollTo(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-            <button className="theme-toggle" onClick={() => { playClickSound(); toggleTheme(); }}>
-              {isCosmos ? '★ COSMOS' : '◆ CLASSIC'}
-            </button>
-          </div>
-        </nav>
+        <SectionContainer id="franchise" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><AllenCenter /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        {/* Sections with nebula attributes */}
-        <main className="main-content">
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="game"><GameAnalysis /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="allen"><JoshAllenCenter /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="stats"><TeamStats /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="afc"><AFCEast /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="cap"><CapSpace /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="compare"><PlayerComparison /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="drives"><DriveEfficiency /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="injuries"><InjuryTimeline /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="weather"><WeatherImpact /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="news"><NewsHub /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="sentiment"><SentimentPulse /></div>
-          <div className="section-divider" />
-          <div className="nebula-section" data-nebula="social"><SocialFeed /></div>
-          <div className="section-divider" />
-          <Roster />
-        </main>
+        <SectionContainer id="war-room" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}>
+            <AnalyticsHub />
+            <TeamStatsPage />
+            <EfficiencyPage />
+          </Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        {/* Mission Control */}
-        {isCosmos && <MissionControl />}
+        <SectionContainer id="four-kingdoms" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><AFCEastPage /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        {/* Player Dossier modal */}
-        <PlayerDossier />
+        <SectionContainer id="champions-duel" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><ComparisonLab /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
 
-        {/* Footer */}
-        <footer className="app-footer">
-          <div className="footer-content">
-            <div className="footer-brand">
-              <span className="footer-title">BUFFALO BILLS // PRIMETIME ANALYTICS</span>
-              <span className="footer-sub">2025–2026 Season Dashboard — Updated Feb 25, 2026</span>
-            </div>
-            <div className="footer-meta">
-              <span>Built by Static Play Holdings LLC</span>
-              <span>Data is for demonstration purposes</span>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </PlayerDossierProvider>
+        <SectionContainer id="forge" accentTone="warm">
+          <Suspense fallback={<SectionFallback />}><DraftCenter /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="proving-grounds" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><CombineCenter /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="cost-of-war" accentTone="fire">
+          <Suspense fallback={<SectionFallback />}>
+            <InjuryPage />
+            <RosterOps />
+          </Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="storm" accentTone="cool">
+          <Suspense fallback={<SectionFallback />}><WeatherPage /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="chronicles" accentTone="warm">
+          <Suspense fallback={<SectionFallback />}><NewsPage /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="arena" accentTone="warm">
+          <Suspense fallback={<SectionFallback />}><SocialPage /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="prophecy" accentTone="mystical">
+          <Suspense fallback={<SectionFallback />}>
+            <PredictionsPage />
+            <PollsPage />
+          </Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="fellowship" accentTone="fire">
+          <Suspense fallback={<SectionFallback />}><MafiaCorner /></Suspense>
+        </SectionContainer>
+        <ChapterDivider />
+
+        <SectionContainer id="universe" accentTone="mystical">
+          <Suspense fallback={<SectionFallback />}><UniversePage /></Suspense>
+        </SectionContainer>
+      </main>
+    </ScrollOrchestratorProvider>
   );
 }

@@ -1,29 +1,36 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
+const THEMES = ['command', 'gameday', 'classic'];
+const THEME_LABELS = { command: 'COMMAND', gameday: 'GAMEDAY', classic: 'CLASSIC' };
+
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     try {
-      return localStorage.getItem('bills-theme') || 'cosmos';
+      const saved = localStorage.getItem('bills-theme');
+      return THEMES.includes(saved) ? saved : 'command';
     } catch {
-      return 'cosmos';
+      return 'command';
     }
   });
 
   useEffect(() => {
-    document.body.classList.remove('theme-classic', 'theme-cosmos');
-    document.body.classList.add(`theme-${theme}`);
+    document.documentElement.setAttribute('data-theme', theme);
     try {
       localStorage.setItem('bills-theme', theme);
     } catch { /* noop */ }
   }, [theme]);
 
-  const toggleTheme = () => setTheme(t => t === 'cosmos' ? 'classic' : 'cosmos');
-  const isCosmos = theme === 'cosmos';
+  const cycleTheme = () => {
+    setTheme(t => {
+      const idx = THEMES.indexOf(t);
+      return THEMES[(idx + 1) % THEMES.length];
+    });
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isCosmos }}>
+    <ThemeContext.Provider value={{ theme, cycleTheme, themeLabel: THEME_LABELS[theme] }}>
       {children}
     </ThemeContext.Provider>
   );

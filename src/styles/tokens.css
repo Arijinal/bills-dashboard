@@ -1,0 +1,63 @@
+/* ============================================================
+   Design Tokens — Bills Command Center
+   Anime Action Hero + Storybook Epic aesthetic
+   ============================================================ */
+
+:root {
+  /* --- Backgrounds (semi-transparent for background art bleed) --- */
+  --bg-base: #080C14;
+  --bg-surface: rgba(15, 21, 32, 0.88);
+  --bg-surface-solid: #0F1520;
+  --bg-elevated: rgba(22, 30, 44, 0.92);
+  --bg-elevated-solid: #161E2C;
+  --bg-recessed: rgba(6, 10, 16, 0.9);
+
+  /* --- Brand (vibrant, anime-grade saturation) --- */
+  --bills-blue: #0044CC;
+  --bills-blue-bright: #3377FF;
+  --bills-blue-muted: #0A1A40;
+  --bills-red: #C41230;
+  --bills-red-bright: #E8253D;
+  --bills-red-muted: #2A0A10;
+
+  /* --- Text (warmer, more readable) --- */
+  --text-primary: #D4DCE8;
+  --text-secondary: #7B8FA6;
+  --text-muted: #3A4A5C;
+  --text-data: #B0C8E8;
+
+  /* --- Signals (vibrant) --- */
+  --signal-positive: #10D060;
+  --signal-warning: #E8A010;
+  --signal-negative: #E82040;
+  --signal-info: #3377FF;
+
+  /* --- Energy Accents (anime-inspired) --- */
+  --energy-blue: rgba(51, 119, 255, 0.15);
+  --energy-blue-strong: rgba(51, 119, 255, 0.3);
+  --energy-glow: 0 0 12px rgba(51, 119, 255, 0.25);
+  --energy-glow-strong: 0 0 20px rgba(51, 119, 255, 0.35), 0 0 40px rgba(51, 119, 255, 0.1);
+  --energy-red: rgba(200, 18, 48, 0.15);
+  --energy-gradient: linear-gradient(90deg, transparent, rgba(51, 119, 255, 0.4), transparent);
+
+  /* --- Borders (slightly more visible for panel definition) --- */
+  --border-default: rgba(75, 100, 130, 0.18);
+  --border-hover: rgba(75, 100, 130, 0.3);
+  --border-active: var(--bills-blue-bright);
+  --border-divider: rgba(75, 100, 130, 0.1);
+
+  /* --- Typography --- */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  /* --- Spacing (more breathing room) --- */
+  --section-gap: 2.5rem;
+  --card-padding: 1.25rem;
+  --card-radius: 3px;
+
+  /* --- Motion --- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.8s;
+}
