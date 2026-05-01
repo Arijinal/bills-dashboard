@@ -19,9 +19,11 @@ const TERRITORIES = [
 ];
 
 const BATTLE_LINES = [
-  { from: 'BUF', to: 'NE' },
-  { from: 'BUF', to: 'MIA' },
-  { from: 'BUF', to: 'NYJ' },
+  // Bills lines GLOW with traveling color beams (rivalry signal)
+  { from: 'BUF', to: 'NE', glow: true, beamDelay: 0 },
+  { from: 'BUF', to: 'MIA', glow: true, beamDelay: 1.2 },
+  { from: 'BUF', to: 'NYJ', glow: true, beamDelay: 2.4 },
+  // Other intra-division lines stay quiet
   { from: 'NE', to: 'MIA' },
   { from: 'NE', to: 'NYJ' },
   { from: 'MIA', to: 'NYJ' },
@@ -120,9 +122,15 @@ function Territory({ t, delay }) {
   );
 }
 
-function BattleLine({ from, to, delay }) {
+function BattleLine({ from, to, delay, glow = false, beamDelay = 0 }) {
   const fromT = TERRITORIES.find(t => t.key === from);
   const toT = TERRITORIES.find(t => t.key === to);
+
+  // Quiet line: dashed white-blue. Glow line: dashed in source team's color.
+  const lineStroke = glow ? fromT.color : 'rgba(180, 210, 255, 0.85)';
+  const lineDropShadow = glow
+    ? `drop-shadow(0 0 6px ${fromT.glow})`
+    : 'drop-shadow(0 0 4px rgba(120,180,255,0.7))';
 
   return (
     <svg
@@ -135,20 +143,81 @@ function BattleLine({ from, to, delay }) {
         pointerEvents: 'none',
       }}
     >
+      {/* The connection line */}
       <motion.line
         x1={`${fromT.x}%`}
         y1={`${fromT.y}%`}
         x2={`${toT.x}%`}
         y2={`${toT.y}%`}
-        stroke="rgba(180, 210, 255, 0.85)"
-        strokeWidth="1"
+        stroke={lineStroke}
+        strokeWidth={glow ? '1.4' : '1'}
         strokeDasharray="4 6"
         initial={{ pathLength: 0, opacity: 0 }}
-        whileInView={{ pathLength: 1, opacity: 0.65 }}
+        whileInView={{ pathLength: 1, opacity: glow ? 0.85 : 0.65 }}
         viewport={VIEWPORT}
         transition={{ duration: 0.9, delay, ease }}
-        style={{ filter: 'drop-shadow(0 0 4px rgba(120,180,255,0.7))' }}
+        style={{ filter: lineDropShadow }}
       />
+
+      {/* Traveling beams — only on glow lines, two beams crossing in opposite directions */}
+      {glow && (
+        <>
+          {/* Outbound beam: from → to, in source team's color */}
+          <motion.circle
+            r={4}
+            fill={fromT.color}
+            initial={{ cx: `${fromT.x}%`, cy: `${fromT.y}%`, opacity: 0 }}
+            animate={{
+              cx: [`${fromT.x}%`, `${toT.x}%`, `${fromT.x}%`],
+              cy: [`${fromT.y}%`, `${toT.y}%`, `${fromT.y}%`],
+              opacity: [0, 1, 1, 0.95, 0],
+            }}
+            transition={{
+              duration: 4.2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: beamDelay,
+            }}
+            style={{ filter: `drop-shadow(0 0 12px ${fromT.glow}) drop-shadow(0 0 4px ${fromT.glow})` }}
+          />
+          {/* Inbound beam: to → from, in destination team's color, offset by half-cycle */}
+          <motion.circle
+            r={4}
+            fill={toT.color}
+            initial={{ cx: `${toT.x}%`, cy: `${toT.y}%`, opacity: 0 }}
+            animate={{
+              cx: [`${toT.x}%`, `${fromT.x}%`, `${toT.x}%`],
+              cy: [`${toT.y}%`, `${fromT.y}%`, `${toT.y}%`],
+              opacity: [0, 1, 1, 0.95, 0],
+            }}
+            transition={{
+              duration: 4.2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: beamDelay + 2.1,
+            }}
+            style={{ filter: `drop-shadow(0 0 12px ${toT.glow}) drop-shadow(0 0 4px ${toT.glow})` }}
+          />
+          {/* Trailing afterglow — fades behind each outbound beam */}
+          <motion.circle
+            r={2}
+            fill={fromT.color}
+            initial={{ cx: `${fromT.x}%`, cy: `${fromT.y}%`, opacity: 0 }}
+            animate={{
+              cx: [`${fromT.x}%`, `${toT.x}%`, `${fromT.x}%`],
+              cy: [`${fromT.y}%`, `${toT.y}%`, `${fromT.y}%`],
+              opacity: [0, 0.55, 0],
+            }}
+            transition={{
+              duration: 4.2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: beamDelay + 0.18,
+            }}
+            style={{ filter: `drop-shadow(0 0 8px ${fromT.glow})` }}
+          />
+        </>
+      )}
     </svg>
   );
 }
@@ -181,9 +250,16 @@ export default function FourKingdomsScene() {
       }} />
 
       <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
-        {/* Battle lines (drawn behind dots) */}
+        {/* Battle lines (drawn behind dots) — Bills lines glow with traveling beams */}
         {BATTLE_LINES.map((b, i) => (
-          <BattleLine key={`${b.from}-${b.to}`} from={b.from} to={b.to} delay={0.6 + i * 0.05} />
+          <BattleLine
+            key={`${b.from}-${b.to}`}
+            from={b.from}
+            to={b.to}
+            delay={0.6 + i * 0.05}
+            glow={b.glow}
+            beamDelay={b.beamDelay}
+          />
         ))}
 
         {/* Territories */}

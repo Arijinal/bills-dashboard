@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import StatDetailModal from '../StatDetailModal';
-import { draftProspects, billsNeeds } from '../../data/draftData';
+import { billsDraft2026 } from '../../data/draftData';
 
 /**
  * ForgeScene — Chapter VI.
@@ -44,13 +44,13 @@ function GradeRing({ value, color }) {
   );
 }
 
-// ── Gacha hero card with gold corner ornaments ────────────────────
+// ── Gacha hero card with gold corner ornaments — Bills 2026 pick ──
 function ProspectCard({ p, onClick }) {
-  const elite = p.grade >= 92;
+  const elite = p.fitScore >= 92;
   const accent = elite ? '#E8B23C' : 'var(--bills-blue-bright)';
   const accentRGBA = elite ? 'rgba(232,178,60,0.4)' : 'rgba(51,119,255,0.3)';
-  const ringColor = p.grade >= 90 ? '#37D67A' : p.grade >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
-  const fitColor = p.billsFit >= 90 ? '#37D67A' : p.billsFit >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
+  const ringColor = p.fitScore >= 90 ? '#37D67A' : p.fitScore >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
+  const fitColor = p.fitScore >= 90 ? '#37D67A' : p.fitScore >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
 
   const Corner = ({ position }) => {
     const styles = {
@@ -73,11 +73,11 @@ function ProspectCard({ p, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label={`${p.name} ${p.position} from ${p.school} — tap for full scouting report`}
+      aria-label={`Round ${p.round} pick ${p.pick} — ${p.name}, ${p.position} from ${p.school}. Tap for full scouting report.`}
       className="ember-host anvil-glow stat-clickable"
       style={{
-        width: 168,
-        padding: '0.75rem',
+        width: 156,
+        padding: '0.625rem 0.75rem',
         background: 'linear-gradient(135deg, rgba(8, 12, 22, 0.92), rgba(10, 26, 64, 0.85))',
         border: `2px solid ${accent}`,
         borderRadius: '3px',
@@ -90,6 +90,16 @@ function ProspectCard({ p, onClick }) {
       <Corner position="tr" />
       <Corner position="bl" />
       <Corner position="br" />
+
+      {/* Round/pick badge */}
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.5rem',
+        letterSpacing: '0.16em',
+        color: accent,
+        fontWeight: 700,
+        marginBottom: 4,
+      }}>R{p.round} · #{p.pick}</div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{
@@ -109,13 +119,13 @@ function ProspectCard({ p, onClick }) {
             letterSpacing: '0.15em',
             color: '#E8B23C',
             fontWeight: 700,
-          }}>★ ELITE</div>
+          }}>★ ELITE FIT</div>
         )}
       </div>
 
       <div style={{
         fontWeight: 700,
-        fontSize: '0.9375rem',
+        fontSize: '0.875rem',
         color: '#fff',
         marginTop: 6,
         textShadow: '0 0 8px rgba(0,0,0,0.9)',
@@ -133,80 +143,83 @@ function ProspectCard({ p, onClick }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        margin: '0.5rem 0',
+        margin: '0.4rem 0',
       }}>
-        <GradeRing value={p.grade} color={ringColor} />
+        <GradeRing value={p.fitScore} color={ringColor} />
       </div>
 
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.5625rem',
+        fontSize: '0.5rem',
         letterSpacing: '0.1em',
         color: 'var(--text-muted)',
         textAlign: 'center',
-        marginBottom: 4,
-      }}>BILLS FIT · {p.billsFit}</div>
+        marginBottom: 3,
+      }}>BILLS FIT · {p.fitScore}</div>
       <div style={{
-        height: 5,
+        height: 4,
         background: 'rgba(255,255,255,0.08)',
         borderRadius: 2,
         overflow: 'hidden',
       }}>
         <div style={{
-          width: `${p.billsFit}%`,
+          width: `${p.fitScore}%`,
           height: '100%',
           background: fitColor,
           boxShadow: `0 0 8px ${fitColor}`,
         }} />
       </div>
 
-      <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
-        <CoachInsight coachKey="bills_fit" compact />
+      {/* 40-yard time + height/weight */}
+      <div style={{
+        marginTop: 6,
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: 4,
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.5rem',
+        letterSpacing: '0.04em',
+        color: 'var(--text-secondary)',
+      }}>
+        <span>{p.height} · {p.weight}lb</span>
+        <span style={{ color: '#5BE5A1' }}>{p.fortyYard}</span>
       </div>
     </button>
   );
 }
 
-// Map a prospect to the StatDetailModal schema (Forge-flavored)
-function prospectToStat(p) {
+// Map a Bills 2026 pick to the StatDetailModal schema — full scout card
+function pickToStat(p) {
   if (!p) return null;
-  const dwayneTakes = {
-    'Travis Hunter': "Unc, the kid plays both ways like Deion did. Yards-per-route-run was 2.94 — top 5%.",
-    'Carson Beck': "Beck's clean-pocket numbers are clean — the question is what happens when the pocket folds.",
-    'Jalon Walker': "Walker's bend off the edge is real. Won't last past pick 12.",
-    'Will Johnson': "Tape's so smooth he ain't even reachin' for receivers. Mirror corner.",
-  };
-  const uncleTake = dwayneTakes[p.name]
-    || `Dwayne sent me 12 minutes of cut-ups on this kid. ${p.position} who plays bigger than his measurables — Bills fit ${p.billsFit}, that's no coincidence.`;
+  const c = p.combine || {};
   return {
-    label: `${p.position} · ${p.school.toUpperCase()}`,
+    label: `R${p.round} · PICK #${p.pick} · ${p.position} · ${p.school.toUpperCase()}`,
     value: p.name,
-    sublabel: `Grade ${p.grade} · Bills Fit ${p.billsFit} · Projected Round ${p.projectedRound}`,
-    verdict: p.grade >= 92 ? 'ELITE' : p.grade >= 88 ? 'TOP-TIER' : 'STARTER GRADE',
-    color: p.grade >= 92 ? '#E8B23C' : p.grade >= 88 ? '#37D67A' : 'var(--bills-blue-bright)',
+    sublabel: `${p.height} · ${p.weight}lb · Age ${p.ageOnDraftDay} · Bills Fit ${p.fitScore}`,
+    verdict: p.fitScore >= 92 ? 'ELITE FIT' : p.fitScore >= 85 ? 'STRONG FIT' : p.fitScore >= 75 ? 'SOLID FIT' : 'PROJECT / DEPTH',
+    color: p.fitScore >= 92 ? '#E8B23C' : p.fitScore >= 85 ? '#37D67A' : p.fitScore >= 75 ? 'var(--bills-blue-bright)' : '#E8A010',
     breakdown: [
-      { label: 'GRADE', value: p.grade.toString() },
-      { label: 'BILLS FIT', value: p.billsFit.toString() },
-      { label: 'PROJ. ROUND', value: `Rd ${p.projectedRound}` },
-      { label: 'COMP', value: p.comparison || '—', note: 'Pro player comparison' },
-      ...(p.draftedBy ? [{ label: 'DRAFTED BY', value: p.draftedBy }] : []),
-    ].filter(r => r.value !== '—' || r.label === 'COMP'),
-    impact: `${p.position} prospect with a ${p.grade} scouting grade and a ${p.billsFit} Bills-fit score. ${p.billsFit >= 90 ? 'Plug-and-play scheme match — would step into a starting role.' : p.billsFit >= 80 ? 'Strong scheme fit. Day-one rotation candidate.' : 'Rotational fit. Would need development.'} Comp is ${p.comparison || 'still being scouted'}.`,
-    uncleJrTake: uncleTake,
+      { label: '40-YARD', value: `${c.fortyYard ?? p.fortyYard}s`, note: c.fortyYard < 4.4 ? 'Elite speed' : c.fortyYard < 4.55 ? 'Above average' : 'Functional' },
+      ...(c.vertical ? [{ label: 'VERTICAL', value: `${c.vertical}"`, note: c.vertical >= 38 ? 'Top-tier explosion' : 'Solid' }] : []),
+      ...(c.broadJump ? [{ label: 'BROAD JUMP', value: c.broadJump }] : []),
+      ...(c.benchPress ? [{ label: 'BENCH (225lb)', value: `${c.benchPress} reps` }] : []),
+      ...(c.shortShuttle ? [{ label: 'SHORT SHUTTLE', value: `${c.shortShuttle}s` }] : []),
+      ...(c.threeCone ? [{ label: '3-CONE', value: `${c.threeCone}s` }] : []),
+      ...(c.handSize ? [{ label: 'HAND SIZE', value: c.handSize }] : []),
+      ...(c.armLength ? [{ label: 'ARM LENGTH', value: c.armLength }] : []),
+      { label: 'BILLS FIT SCORE', value: `${p.fitScore} / 100`, color: p.fitScore >= 90 ? '#5BE5A1' : 'var(--text-primary)' },
+      { label: 'PROJECTED ROLE', value: 'See below', note: p.expectedRole },
+      ...(Array.isArray(p.awards) ? [{ label: 'AWARDS / RESUME', value: `${p.awards.length} listed`, note: p.awards.join(' · ') }] : []),
+      ...(Array.isArray(p.funFacts) ? [{ label: 'FUN FACTS', value: `${p.funFacts.length} listed`, note: p.funFacts.join(' · ') }] : []),
+    ],
+    impact: p.scoutingReport,
+    uncleJrTake: p.uncleJrTake || `Dwayne sent me 12 minutes of cut-ups on this kid. ${p.position} who plays bigger than his measurables — Bills fit ${p.fitScore}, that's no coincidence.`,
   };
 }
 
 export default function ForgeScene() {
   const [activeStat, setActiveStat] = useState(null);
-  const top3Needs = billsNeeds.slice(0, 3);
-  const topFour = [...draftProspects].sort((a, b) => b.billsFit - a.billsFit).slice(0, 4);
-
-  const cornerPositions = [
-    { left: '5%', top: '20%' },
-    { right: '5%', top: '20%' },
-    { left: '5%', bottom: '14%' },
-    { right: '5%', bottom: '14%' },
-  ];
+  const picks = [...billsDraft2026].sort((a, b) => a.pick - b.pick);
 
   return (
     <section
@@ -275,124 +288,37 @@ export default function ForgeScene() {
             color: 'var(--text-secondary)',
             marginTop: '0.5rem',
             textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-          }}>Where the next generation is chosen.</div>
+          }}>The 2026 Bills draft class — tap any card for the full scout report.</div>
         </motion.div>
 
-        {/* NEEDS BANNER (top-left of title row, just below) */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={VIEWPORT}
-          transition={{ duration: 0.5, delay: 0.2, ease }}
-          style={{
-            position: 'absolute',
-            top: '4%',
-            left: '4%',
-            zIndex: 9,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.375rem',
-            maxWidth: 200,
-          }}
-        >
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.5625rem',
-            letterSpacing: '0.22em',
-            color: 'var(--bills-blue-bright)',
-            fontWeight: 700,
-            marginBottom: '0.25rem',
-            textShadow: '0 0 8px rgba(0,0,0,0.9)',
-          }}>BILLS NEEDS</div>
-          {top3Needs.map(n => (
-            <div key={n.position} style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.375rem 0.625rem',
-              background: 'rgba(8,12,22,0.85)',
-              border: `1px solid ${PRIORITY_COLOR[n.priority]}`,
-              borderRadius: '2px',
-              backdropFilter: 'blur(6px)',
-              boxShadow: `0 0 12px ${PRIORITY_COLOR[n.priority]}40`,
-            }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: PRIORITY_COLOR[n.priority],
-                boxShadow: `0 0 6px ${PRIORITY_COLOR[n.priority]}`,
-              }} />
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                letterSpacing: '0.05em',
-              }}>{n.position}</span>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.5625rem',
-                letterSpacing: '0.15em',
-                color: PRIORITY_COLOR[n.priority],
-                fontWeight: 700,
-                marginLeft: 'auto',
-              }}>{n.priority.toUpperCase()}</span>
-            </div>
+        {/* THE 7-PICK GRID — 4 on top, 3 on bottom, all centered */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '92%',
+          maxWidth: 1200,
+          zIndex: 8,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          justifyContent: 'center',
+        }}>
+          {picks.map((p, i) => (
+            <motion.div
+              key={`${p.round}-${p.pick}`}
+              initial={{ opacity: 0, scale: 0.7, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              viewport={VIEWPORT}
+              transition={{ duration: 0.55, delay: 0.2 + i * 0.08, ease }}
+            >
+              <ProspectCard p={p} onClick={() => setActiveStat(pickToStat(p))} />
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* CORNER PROSPECT CARDS */}
-        {cornerPositions.map((pos, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.7, filter: 'blur(8px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-            viewport={VIEWPORT}
-            transition={{ duration: 0.6, delay: 0.3 + i * 0.1, ease }}
-            style={{
-              position: 'absolute',
-              ...pos,
-              zIndex: 8,
-            }}
-          >
-            <ProspectCard p={topFour[i]} onClick={() => setActiveStat(prospectToStat(topFour[i]))} />
-          </motion.div>
-        ))}
-
-        {/* PROPHECY (center, below gate) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 25 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={VIEWPORT}
-          transition={{ duration: 0.6, delay: 0.8, ease }}
-          style={{
-            position: 'absolute',
-            top: '60%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9,
-            textAlign: 'center',
-            maxWidth: 480,
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{
-            fontFamily: "'Dela Gothic One', sans-serif",
-            fontSize: 'clamp(1.125rem, 2.4vw, 1.625rem)',
-            color: '#E8B23C',
-            letterSpacing: '0.08em',
-            textShadow: '0 0 24px rgba(232,178,60,0.7), 0 0 8px rgba(0,0,0,0.95)',
-            marginBottom: '0.5rem',
-          }}>THE NEXT WARRIOR APPROACHES</div>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.75rem',
-            letterSpacing: '0.25em',
-            color: 'var(--bills-blue-bright)',
-            textShadow: '0 0 12px rgba(0,0,0,0.95)',
-          }}>2026 NFL DRAFT · BILLS HOLD 7 PICKS</div>
-        </motion.div>
-
-        {/* PICK BADGE (bottom-center) */}
+        {/* CLASS GRADE BADGE (bottom-center) */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -407,29 +333,47 @@ export default function ForgeScene() {
           }}
         >
           <div style={{
-            padding: '0.625rem 1rem',
+            padding: '0.625rem 1.25rem',
             background: 'rgba(8,12,22,0.92)',
             border: '2px solid #E8B23C',
             borderRadius: '3px',
             boxShadow: '0 0 24px rgba(232,178,60,0.5), 0 8px 20px rgba(0,0,0,0.7)',
             backdropFilter: 'blur(8px)',
             textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1.25rem',
           }}>
+            <div>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.5625rem',
+                letterSpacing: '0.25em',
+                color: '#E8B23C',
+                fontWeight: 700,
+                marginBottom: 4,
+              }}>BILLS · 2026 CLASS</div>
+              <div style={{
+                fontFamily: "'Dela Gothic One', sans-serif",
+                fontSize: '1.125rem',
+                color: '#fff',
+                letterSpacing: '0.05em',
+                textShadow: '0 0 12px rgba(232,178,60,0.5)',
+              }}>7 PICKS · OFF 4 / DEF 3</div>
+            </div>
             <div style={{
+              borderLeft: '1px solid rgba(232,178,60,0.4)',
+              paddingLeft: '1rem',
+              display: 'flex',
+              gap: '0.75rem',
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.5625rem',
-              letterSpacing: '0.25em',
-              color: '#E8B23C',
+              fontSize: '0.6875rem',
               fontWeight: 700,
-              marginBottom: 4,
-            }}>BILLS · 2026</div>
-            <div style={{
-              fontFamily: "'Dela Gothic One', sans-serif",
-              fontSize: '1.125rem',
-              color: '#fff',
-              letterSpacing: '0.05em',
-              textShadow: '0 0 12px rgba(232,178,60,0.5)',
-            }}>ROUND 1 · PICK 26</div>
+            }}>
+              <span><span style={{ color: 'var(--text-muted)' }}>ESPN</span> <span style={{ color: '#5BE5A1' }}>B+</span></span>
+              <span><span style={{ color: 'var(--text-muted)' }}>PFF</span> <span style={{ color: 'var(--bills-blue-bright)' }}>B</span></span>
+              <span><span style={{ color: 'var(--text-muted)' }}>SN</span> <span style={{ color: '#E8B23C' }}>A−</span></span>
+            </div>
           </div>
         </motion.div>
       </div>

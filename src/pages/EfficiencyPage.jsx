@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiPulseLine, RiShieldLine, RiDashboard3Line, RiAlarmWarningLine } from 'react-icons/ri';
 import { Panel, PercentileBar, SectionHeader, DataCell } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
 import { advancedMetrics, snapCountSummary } from '../data/analyticsData';
+import { getStat } from '../data/statContext';
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
 const stagger = (i) => ({ ...fade, transition: { duration: 0.4, delay: i * 0.06 } });
@@ -11,28 +14,31 @@ const mono = { fontFamily: 'var(--font-mono)' };
 const muted = { color: 'var(--text-muted)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 };
 
 const offenseMetrics = [
-  { label: 'EPA / Play', key: 'epaPerPlay', value: advancedMetrics.offense.epaPerPlay, display: advancedMetrics.offense.epaPerPlay.toFixed(3), max: 0.2, rank: '6th', good: true },
-  { label: 'Success Rate', key: 'successRate', value: advancedMetrics.offense.successRate, display: `${(advancedMetrics.offense.successRate * 100).toFixed(1)}%`, max: 1, rank: '9th', good: true },
-  { label: 'Explosive Play Rate', key: 'explosivePlayRate', value: advancedMetrics.offense.explosivePlayRate, display: `${(advancedMetrics.offense.explosivePlayRate * 100).toFixed(1)}%`, max: 0.2, rank: '4th', good: true },
-  { label: 'Red Zone TD Rate', key: 'redZoneTdRate', value: advancedMetrics.offense.redZoneTdRate, display: `${(advancedMetrics.offense.redZoneTdRate * 100).toFixed(1)}%`, max: 1, rank: '14th', good: true },
-  { label: '3rd Down Conv. Rate', key: 'thirdDownRate', value: advancedMetrics.offense.thirdDownRate, display: `${(advancedMetrics.offense.thirdDownRate * 100).toFixed(1)}%`, max: 1, rank: '8th', good: true },
-  { label: 'Pressure Rate', key: 'pressureRate', value: advancedMetrics.offense.pressureRate, display: `${(advancedMetrics.offense.pressureRate * 100).toFixed(1)}%`, max: 1, rank: '26th', good: false },
-  { label: 'Blitz Pickup Rate', key: 'blitzPickupRate', value: advancedMetrics.offense.blitzPickupRate, display: `${(advancedMetrics.offense.blitzPickupRate * 100).toFixed(1)}%`, max: 1, rank: '22nd', good: false },
-  { label: 'Stuffed Run Rate', key: 'stuffedRunRate', value: advancedMetrics.offense.stuffedRunRate, display: `${(advancedMetrics.offense.stuffedRunRate * 100).toFixed(1)}%`, max: 0.3, rank: '18th', good: false },
+  { label: 'EPA / Play', key: 'epaPerPlay', statId: 'offEpaPerPlay', value: advancedMetrics.offense.epaPerPlay, display: advancedMetrics.offense.epaPerPlay.toFixed(3), max: 0.2, rank: '6th', good: true },
+  { label: 'Success Rate', key: 'successRate', statId: 'offSuccessRate', value: advancedMetrics.offense.successRate, display: `${(advancedMetrics.offense.successRate * 100).toFixed(1)}%`, max: 1, rank: '9th', good: true },
+  { label: 'Explosive Play Rate', key: 'explosivePlayRate', statId: 'offExplosiveRate', value: advancedMetrics.offense.explosivePlayRate, display: `${(advancedMetrics.offense.explosivePlayRate * 100).toFixed(1)}%`, max: 0.2, rank: '4th', good: true },
+  { label: 'Red Zone TD Rate', key: 'redZoneTdRate', statId: 'offRedZoneTd', value: advancedMetrics.offense.redZoneTdRate, display: `${(advancedMetrics.offense.redZoneTdRate * 100).toFixed(1)}%`, max: 1, rank: '14th', good: true },
+  { label: '3rd Down Conv. Rate', key: 'thirdDownRate', statId: 'offThirdDown', value: advancedMetrics.offense.thirdDownRate, display: `${(advancedMetrics.offense.thirdDownRate * 100).toFixed(1)}%`, max: 1, rank: '8th', good: true },
+  { label: 'Pressure Rate', key: 'pressureRate', statId: 'offPressureRate', value: advancedMetrics.offense.pressureRate, display: `${(advancedMetrics.offense.pressureRate * 100).toFixed(1)}%`, max: 1, rank: '26th', good: false },
+  { label: 'Blitz Pickup Rate', key: 'blitzPickupRate', statId: 'offBlitzPickup', value: advancedMetrics.offense.blitzPickupRate, display: `${(advancedMetrics.offense.blitzPickupRate * 100).toFixed(1)}%`, max: 1, rank: '22nd', good: false },
+  { label: 'Stuffed Run Rate', key: 'stuffedRunRate', statId: 'offStuffedRun', value: advancedMetrics.offense.stuffedRunRate, display: `${(advancedMetrics.offense.stuffedRunRate * 100).toFixed(1)}%`, max: 0.3, rank: '18th', good: false },
 ];
 
 const defenseMetrics = [
-  { label: 'EPA / Play', key: 'epaPerPlay', value: Math.abs(advancedMetrics.defense.epaPerPlay), display: advancedMetrics.defense.epaPerPlay.toFixed(3), max: 0.15, rank: '7th', good: true },
-  { label: 'Success Rate Allowed', key: 'successRate', value: 1 - advancedMetrics.defense.successRate, display: `${(advancedMetrics.defense.successRate * 100).toFixed(1)}%`, max: 1, rank: '5th', good: true },
-  { label: 'Explosive Play Rate', key: 'explosivePlayRate', value: 1 - (advancedMetrics.defense.explosivePlayRate * 5), display: `${(advancedMetrics.defense.explosivePlayRate * 100).toFixed(1)}%`, max: 1, rank: '4th', good: true },
-  { label: 'Red Zone TD Rate Allowed', key: 'redZoneTdRate', value: 1 - advancedMetrics.defense.redZoneTdRate, display: `${(advancedMetrics.defense.redZoneTdRate * 100).toFixed(1)}%`, max: 1, rank: '9th', good: true },
-  { label: '3rd Down Rate Allowed', key: 'thirdDownRate', value: 1 - advancedMetrics.defense.thirdDownRate, display: `${(advancedMetrics.defense.thirdDownRate * 100).toFixed(1)}%`, max: 1, rank: '10th', good: true },
-  { label: 'Pressure Rate', key: 'pressureRate', value: advancedMetrics.defense.pressureRate, display: `${(advancedMetrics.defense.pressureRate * 100).toFixed(1)}%`, max: 0.5, rank: '11th', good: true },
-  { label: 'Blitz Rate', key: 'blitzRate', value: advancedMetrics.defense.blitzRate, display: `${(advancedMetrics.defense.blitzRate * 100).toFixed(1)}%`, max: 0.5, rank: '14th', good: null },
-  { label: 'Stuffed Run Rate', key: 'stuffedRunRate', value: advancedMetrics.defense.stuffedRunRate, display: `${(advancedMetrics.defense.stuffedRunRate * 100).toFixed(1)}%`, max: 0.35, rank: '12th', good: true },
+  { label: 'EPA / Play', key: 'epaPerPlay', statId: 'defEpaPerPlay', value: Math.abs(advancedMetrics.defense.epaPerPlay), display: advancedMetrics.defense.epaPerPlay.toFixed(3), max: 0.15, rank: '7th', good: true },
+  { label: 'Success Rate Allowed', key: 'successRate', statId: 'defSuccessRate', value: 1 - advancedMetrics.defense.successRate, display: `${(advancedMetrics.defense.successRate * 100).toFixed(1)}%`, max: 1, rank: '5th', good: true },
+  { label: 'Explosive Play Rate', key: 'explosivePlayRate', statId: 'defExplosiveRate', value: 1 - (advancedMetrics.defense.explosivePlayRate * 5), display: `${(advancedMetrics.defense.explosivePlayRate * 100).toFixed(1)}%`, max: 1, rank: '4th', good: true },
+  { label: 'Red Zone TD Rate Allowed', key: 'redZoneTdRate', statId: 'defRedZoneAllowed', value: 1 - advancedMetrics.defense.redZoneTdRate, display: `${(advancedMetrics.defense.redZoneTdRate * 100).toFixed(1)}%`, max: 1, rank: '9th', good: true },
+  { label: '3rd Down Rate Allowed', key: 'thirdDownRate', statId: 'defThirdDownAllowed', value: 1 - advancedMetrics.defense.thirdDownRate, display: `${(advancedMetrics.defense.thirdDownRate * 100).toFixed(1)}%`, max: 1, rank: '10th', good: true },
+  { label: 'Pressure Rate', key: 'pressureRate', statId: 'defPressureRate', value: advancedMetrics.defense.pressureRate, display: `${(advancedMetrics.defense.pressureRate * 100).toFixed(1)}%`, max: 0.5, rank: '11th', good: true },
+  { label: 'Blitz Rate', key: 'blitzRate', statId: 'defBlitzRate', value: advancedMetrics.defense.blitzRate, display: `${(advancedMetrics.defense.blitzRate * 100).toFixed(1)}%`, max: 0.5, rank: '14th', good: null },
+  { label: 'Stuffed Run Rate', key: 'stuffedRunRate', statId: 'defStuffedRun', value: advancedMetrics.defense.stuffedRunRate, display: `${(advancedMetrics.defense.stuffedRunRate * 100).toFixed(1)}%`, max: 0.35, rank: '12th', good: true },
 ];
 
 export default function EfficiencyPage() {
+  const [activeStat, setActiveStat] = useState(null);
+  const open = (id) => setActiveStat(getStat('efficiency', id));
+
   const shotgunPct = snapCountSummary.offense.shotgunRate;
   const underCenterPct = snapCountSummary.offense.underCenterRate;
 
@@ -64,7 +70,20 @@ export default function EfficiencyPage() {
             />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {offenseMetrics.map(m => (
-                <div key={m.key + m.label}>
+                <button
+                  type="button"
+                  key={m.key + m.label}
+                  onClick={() => open(m.statId)}
+                  className="stat-clickable"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid transparent',
+                    borderRadius: '3px',
+                    padding: '0.375rem 0.5rem',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
+                >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{m.label}</span>
                     <span style={{
@@ -83,7 +102,7 @@ export default function EfficiencyPage() {
                     height={6}
                     color={m.good ? undefined : 'var(--signal-negative)'}
                   />
-                </div>
+                </button>
               ))}
             </div>
           </Panel>
@@ -100,7 +119,20 @@ export default function EfficiencyPage() {
             />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {defenseMetrics.map(m => (
-                <div key={m.key + m.label}>
+                <button
+                  type="button"
+                  key={m.key + m.label}
+                  onClick={() => open(m.statId)}
+                  className="stat-clickable"
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid transparent',
+                    borderRadius: '3px',
+                    padding: '0.375rem 0.5rem',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
+                >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{m.label}</span>
                     <span style={{
@@ -119,7 +151,7 @@ export default function EfficiencyPage() {
                     height={6}
                     color={m.good === false ? 'var(--signal-negative)' : undefined}
                   />
-                </div>
+                </button>
               ))}
             </div>
           </Panel>
@@ -279,10 +311,18 @@ export default function EfficiencyPage() {
         <Panel>
           <SectionHeader title="Overall Team Advanced Metrics" subtitle="Aggregate season-level efficiency indicators" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
-            <DataCell label="SRS Rating" value={advancedMetrics.overall.srsRating.toFixed(1)} sub="Simple Rating System" size="large" />
-            <DataCell label="DVOA" value={`${advancedMetrics.overall.dvoa.toFixed(1)}%`} sub="Defense-adjusted Value Over Avg" size="large" />
-            <DataCell label="Wins Over Expected" value={`+${advancedMetrics.overall.winProbabilityAdded.toFixed(1)}`} sub="Win probability added" size="large" />
-            <DataCell label="Pythagorean Wins" value={advancedMetrics.overall.pythagoreanWins.toFixed(1)} sub="Expected from point differential" size="large" />
+            <button type="button" onClick={() => open('srs')} className="stat-clickable" style={{ background: 'transparent', border: '1px solid transparent', borderRadius: '3px', padding: '0.5rem', cursor: 'pointer', textAlign: 'left' }}>
+              <DataCell label="SRS Rating" value={advancedMetrics.overall.srsRating.toFixed(1)} sub="Simple Rating System" size="large" />
+            </button>
+            <button type="button" onClick={() => open('dvoa')} className="stat-clickable" style={{ background: 'transparent', border: '1px solid transparent', borderRadius: '3px', padding: '0.5rem', cursor: 'pointer', textAlign: 'left' }}>
+              <DataCell label="DVOA" value={`${advancedMetrics.overall.dvoa.toFixed(1)}%`} sub="Defense-adjusted Value Over Avg" size="large" />
+            </button>
+            <button type="button" onClick={() => open('wpa')} className="stat-clickable" style={{ background: 'transparent', border: '1px solid transparent', borderRadius: '3px', padding: '0.5rem', cursor: 'pointer', textAlign: 'left' }}>
+              <DataCell label="Wins Over Expected" value={`+${advancedMetrics.overall.winProbabilityAdded.toFixed(1)}`} sub="Win probability added" size="large" />
+            </button>
+            <button type="button" onClick={() => open('pythagorean')} className="stat-clickable" style={{ background: 'transparent', border: '1px solid transparent', borderRadius: '3px', padding: '0.5rem', cursor: 'pointer', textAlign: 'left' }}>
+              <DataCell label="Pythagorean Wins" value={advancedMetrics.overall.pythagoreanWins.toFixed(1)} sub="Expected from point differential" size="large" />
+            </button>
           </div>
         </Panel>
       </motion.div>
@@ -310,6 +350,7 @@ export default function EfficiencyPage() {
           </div>
         </Panel>
       </motion.div>
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
     </div>
   );
 }
