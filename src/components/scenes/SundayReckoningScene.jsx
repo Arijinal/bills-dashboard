@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
+import StatDetailModal from '../StatDetailModal';
+import GameRecapModal from '../GameRecapModal';
 import { lastGame, teamInfo } from '../../data/mockData';
 import { weeklyGrades } from '../../data/analyticsData';
+import { getStat } from '../../data/statContext';
+import { getRecapByWeek, postseasonRecaps } from '../../data/gameRecaps';
 
 /**
  * SCENE 2 — The Sunday Reckoning.
@@ -53,8 +58,8 @@ function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue
   );
 }
 
-// One vertical "footprint" cell for the 17-week timeline
-function Footprint({ week, delay }) {
+// One vertical "footprint" cell for the 17-week timeline — clickable
+function Footprint({ week, delay, onClick }) {
   const isWin = week.result.startsWith('W');
   const color = isWin ? '#5BE5A1' : '#FF4D4D';
 
@@ -79,21 +84,28 @@ function Footprint({ week, delay }) {
         color: 'var(--text-muted)',
         letterSpacing: '0.06em',
       }}>W{week.week}</div>
-      <div style={{
-        width: '100%',
-        height: 32,
-        background: isWin ? 'rgba(91, 229, 161, 0.18)' : 'rgba(255, 77, 77, 0.18)',
-        border: `1px solid ${color}`,
-        borderRadius: '2px',
-        boxShadow: `0 0 10px ${color}55`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.625rem',
-        fontWeight: 700,
-        color: color,
-      }}>{isWin ? 'W' : 'L'}</div>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`Week ${week.week} vs ${week.opponent} — ${week.result}`}
+        className="stat-clickable"
+        style={{
+          width: '100%',
+          height: 32,
+          background: isWin ? 'rgba(91, 229, 161, 0.18)' : 'rgba(255, 77, 77, 0.18)',
+          border: `1px solid ${color}`,
+          borderRadius: '2px',
+          boxShadow: `0 0 10px ${color}55`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.625rem',
+          fontWeight: 700,
+          color: color,
+          padding: 0,
+        }}
+      >{isWin ? 'W' : 'L'}</button>
       <div style={{
         fontFamily: 'var(--font-mono)',
         fontSize: '0.5rem',
@@ -109,8 +121,8 @@ function Footprint({ week, delay }) {
   );
 }
 
-// One horizontal battle bar — Bills vs opponent on a single stat
-function BattleBar({ label, billsVal, oppVal, delay, format = (v) => v }) {
+// One horizontal battle bar — Bills vs opponent on a single stat (clickable)
+function BattleBar({ label, billsVal, oppVal, delay, format = (v) => v, onClick }) {
   const numeric = (v) => {
     if (typeof v === 'number') return v;
     if (typeof v === 'string' && v.includes(':')) {
@@ -132,7 +144,11 @@ function BattleBar({ label, billsVal, oppVal, delay, format = (v) => v }) {
   const oppColor = !billsWinning ? '#FF4D4D' : 'rgba(255,255,255,0.35)';
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
+      onClick={onClick}
+      aria-label={`${label} — Bills ${billsVal}, opponent ${oppVal}. Tap for breakdown.`}
+      className="stat-clickable"
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={VIEWPORT}
@@ -141,6 +157,12 @@ function BattleBar({ label, billsVal, oppVal, delay, format = (v) => v }) {
         display: 'flex',
         flexDirection: 'column',
         gap: '0.3rem',
+        background: 'transparent',
+        border: '1px solid transparent',
+        padding: '0.25rem 0.375rem',
+        borderRadius: '2px',
+        textAlign: 'left',
+        margin: '-0.25rem -0.375rem',
       }}
     >
       <div style={{
@@ -175,18 +197,25 @@ function BattleBar({ label, billsVal, oppVal, delay, format = (v) => v }) {
           background: oppColor,
         }} />
       </div>
-    </motion.div>
+    </motion.button>
   );
 }
 
 export default function SundayReckoningScene() {
+  const [activeStat, setActiveStat] = useState(null);
+  const [activeGame, setActiveGame] = useState(null);
+
   const battleStats = [
-    { label: 'TOTAL YDS', bills: lastGame.stats.totalYards.bills, opp: lastGame.stats.totalYards.opponent },
-    { label: 'PASSING', bills: lastGame.stats.passingYards.bills, opp: lastGame.stats.passingYards.opponent },
-    { label: 'RUSHING', bills: lastGame.stats.rushingYards.bills, opp: lastGame.stats.rushingYards.opponent },
-    { label: 'TURNOVERS', bills: lastGame.stats.turnovers.bills, opp: lastGame.stats.turnovers.opponent },
-    { label: 'TIME OF POSS', bills: lastGame.stats.timeOfPossession.bills, opp: lastGame.stats.timeOfPossession.opponent },
+    { id: 'totalYards', label: 'TOTAL YDS', bills: lastGame.stats.totalYards.bills, opp: lastGame.stats.totalYards.opponent },
+    { id: 'passingYards', label: 'PASSING', bills: lastGame.stats.passingYards.bills, opp: lastGame.stats.passingYards.opponent },
+    { id: 'rushingYards', label: 'RUSHING', bills: lastGame.stats.rushingYards.bills, opp: lastGame.stats.rushingYards.opponent },
+    { id: 'turnovers', label: 'TURNOVERS', bills: lastGame.stats.turnovers.bills, opp: lastGame.stats.turnovers.opponent },
+    { id: 'timeOfPossession', label: 'TIME OF POSS', bills: lastGame.stats.timeOfPossession.bills, opp: lastGame.stats.timeOfPossession.opponent },
   ];
+
+  const handleStatClick = (id) => setActiveStat(getStat('sunday-reckoning', id));
+  const handleScoreClick = () => setActiveGame(postseasonRecaps.divisional);
+  const handleFootprintClick = (week) => setActiveGame(getRecapByWeek(week.week));
 
   return (
     <section
@@ -254,8 +283,12 @@ export default function SundayReckoningScene() {
           </h2>
         </motion.div>
 
-        {/* Score reveal — right side */}
-        <motion.div
+        {/* Score reveal — right side, clickable to open game recap */}
+        <motion.button
+          type="button"
+          onClick={handleScoreClick}
+          aria-label="Open Divisional Round game recap"
+          className="stat-clickable"
           initial={{ opacity: 0, scale: 0.6, x: 40 }}
           whileInView={{ opacity: 1, scale: 1, x: 0 }}
           viewport={VIEWPORT}
@@ -265,6 +298,10 @@ export default function SundayReckoningScene() {
             top: '24%',
             right: '5%',
             textAlign: 'right',
+            background: 'transparent',
+            border: '1px solid transparent',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '4px',
           }}
         >
           <div style={{
@@ -274,7 +311,7 @@ export default function SundayReckoningScene() {
             color: 'var(--text-muted)',
             marginBottom: '0.5rem',
           }}>{lastGame.type}</div>
-          <div style={{
+          <div className="flicker" style={{
             fontFamily: 'var(--font-mono)',
             fontWeight: 800,
             fontSize: 'clamp(3.5rem, 9vw, 7.5rem)',
@@ -296,9 +333,9 @@ export default function SundayReckoningScene() {
             textShadow: '0 0 12px rgba(255,77,77,0.6)',
             fontWeight: 600,
           }}>
-            @ DENVER &middot; OT
+            @ DENVER &middot; OT &middot; <span style={{ opacity: 0.7 }}>tap for recap →</span>
           </div>
-        </motion.div>
+        </motion.button>
 
         {/* Battle bars — left side */}
         <div style={{
@@ -324,16 +361,18 @@ export default function SundayReckoningScene() {
           >
             BUF &middot; vs &middot; DEN
           </motion.div>
-          <div style={{
+          <div className="scan-host pulse-border" style={{
             padding: '1rem 1.125rem',
             background: 'rgba(8, 12, 22, 0.78)',
             border: '1px solid rgba(51,119,255,0.4)',
             borderRadius: '3px',
             backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
             display: 'flex',
             flexDirection: 'column',
             gap: '0.875rem',
+            ['--pulse-color']: 'rgba(51, 119, 255, 0.35)',
+            ['--pulse-color-edge']: 'rgba(51, 119, 255, 0.4)',
+            ['--pulse-color-bright']: 'rgba(51, 119, 255, 0.85)',
           }}>
             {battleStats.map((s, i) => (
               <BattleBar
@@ -342,6 +381,7 @@ export default function SundayReckoningScene() {
                 billsVal={s.bills}
                 oppVal={s.opp}
                 delay={0.4 + i * 0.08}
+                onClick={() => handleStatClick(s.id)}
               />
             ))}
           </div>
@@ -381,7 +421,7 @@ export default function SundayReckoningScene() {
               color: 'var(--text-muted)',
             }}>{teamInfo.record} &middot; +116 DIFF</div>
           </motion.div>
-          <div style={{
+          <div className="scan-host" style={{
             display: 'flex',
             gap: '0.375rem',
             width: '100%',
@@ -396,6 +436,7 @@ export default function SundayReckoningScene() {
                 key={wk.week}
                 week={wk}
                 delay={0.6 + i * 0.03}
+                onClick={() => handleFootprintClick(wk)}
               />
             ))}
           </div>
@@ -437,8 +478,29 @@ export default function SundayReckoningScene() {
             Twelve wins, five losses, +116 differential. Two AFC East crowns away from the throne.
             The walk ended in Denver overtime &mdash; five turnovers, one yard short of forever.
           </div>
+          <div style={{
+            marginTop: '0.625rem',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.5625rem',
+            letterSpacing: '0.18em',
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+          }}>
+            Tap any stat or week to hear what Uncle Jr. saw →
+          </div>
         </motion.div>
       </div>
+
+      <StatDetailModal
+        open={!!activeStat}
+        onClose={() => setActiveStat(null)}
+        stat={activeStat}
+      />
+      <GameRecapModal
+        open={!!activeGame}
+        onClose={() => setActiveGame(null)}
+        game={activeGame}
+      />
     </section>
   );
 }

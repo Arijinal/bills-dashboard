@@ -3,8 +3,12 @@ import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiShieldStarLine, RiExchangeLine, RiBarChartBoxLine, RiCalendarLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
+import GameRecapModal from '../components/GameRecapModal';
 import { teamInfo, lastGame, teamStats } from '../data/mockData';
 import { weeklyGrades } from '../data/analyticsData';
+import { getStat } from '../data/statContext';
+import { getRecapByWeek, postseasonRecaps } from '../data/gameRecaps';
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
 const stagger = (i) => ({ ...fade, transition: { duration: 0.4, delay: i * 0.06 } });
@@ -20,18 +24,28 @@ function parseScore(result) {
 }
 
 export default function SeasonRoom() {
+  const [activeStat, setActiveStat] = useState(null);
+  const [activeGame, setActiveGame] = useState(null);
+
   const quarters = ['Q1', 'Q2', 'Q3', 'Q4', 'OT'];
   const statKeys = [
-    { label: 'Total Yards', key: 'totalYards' },
-    { label: 'Passing Yards', key: 'passingYards' },
-    { label: 'Rushing Yards', key: 'rushingYards' },
-    { label: 'First Downs', key: 'firstDowns' },
-    { label: 'Time of Poss.', key: 'timeOfPossession' },
-    { label: '3rd Down', key: 'thirdDown' },
-    { label: 'Turnovers', key: 'turnovers' },
-    { label: 'Sacks', key: 'sacks' },
-    { label: 'Penalties', key: 'penalties' },
+    { label: 'Total Yards', key: 'totalYards', statId: 'totalYards' },
+    { label: 'Passing Yards', key: 'passingYards', statId: 'passingYards' },
+    { label: 'Rushing Yards', key: 'rushingYards', statId: 'rushingYards' },
+    { label: 'First Downs', key: 'firstDowns', statId: null },
+    { label: 'Time of Poss.', key: 'timeOfPossession', statId: 'timeOfPossession' },
+    { label: '3rd Down', key: 'thirdDown', statId: null },
+    { label: 'Turnovers', key: 'turnovers', statId: 'turnovers' },
+    { label: 'Sacks', key: 'sacks', statId: null },
+    { label: 'Penalties', key: 'penalties', statId: null },
   ];
+
+  const handleStatClick = (statId) => {
+    if (!statId) return;
+    setActiveStat(getStat('sunday-reckoning', statId));
+  };
+  const handleScoreClick = () => setActiveGame(postseasonRecaps.divisional);
+  const handleWeekClick = (week) => setActiveGame(getRecapByWeek(week.week));
 
   const weeklyPoints = teamStats.weeklyPoints;
   const pointsSeries = weeklyPoints.map(w => w.scored);
@@ -65,15 +79,26 @@ export default function SeasonRoom() {
               right={<RiShieldStarLine size={18} style={{ color: 'var(--text-muted)' }} />}
             />
 
-            {/* Final Score */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem',
-              padding: '1rem 0', marginBottom: '1rem',
-              borderBottom: '1px solid var(--border-divider)',
-            }}>
+            {/* Final Score — clickable for full recap */}
+            <button
+              type="button"
+              onClick={handleScoreClick}
+              aria-label="Open Divisional Round recap"
+              className="stat-clickable"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem',
+                padding: '1rem 0', marginBottom: '1rem',
+                borderTop: '1px solid transparent',
+                borderBottom: '1px solid var(--border-divider)',
+                borderLeft: '1px solid transparent',
+                borderRight: '1px solid transparent',
+                background: 'transparent',
+                width: '100%',
+              }}
+            >
               <div style={{ textAlign: 'center' }}>
                 <div style={{ ...muted, marginBottom: '0.25rem' }}>BILLS</div>
-                <div style={{
+                <div className="flicker" style={{
                   ...mono, fontSize: '2.5rem', fontWeight: 700,
                   color: lastGame.result === 'W' ? 'var(--signal-positive)' : 'var(--signal-negative)',
                 }}>{lastGame.score.bills}</div>
@@ -88,12 +113,12 @@ export default function SeasonRoom() {
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ ...muted, marginBottom: '0.25rem' }}>{lastGame.opponent.toUpperCase()}</div>
-                <div style={{
+                <div className="flicker" style={{
                   ...mono, fontSize: '2.5rem', fontWeight: 700,
                   color: lastGame.result === 'W' ? 'var(--text-muted)' : 'var(--signal-positive)',
                 }}>{lastGame.score.opponent}</div>
               </div>
-            </div>
+            </button>
 
             {/* Quarter-by-Quarter */}
             <div style={{ marginBottom: '1rem' }}>
@@ -127,10 +152,10 @@ export default function SeasonRoom() {
               </table>
             </div>
 
-            {/* Key Stat Comparison — paired horizontal bars */}
-            <div style={{ ...muted, marginBottom: '0.5rem' }}>KEY STAT COMPARISON</div>
+            {/* Key Stat Comparison — paired horizontal bars (rows clickable for context) */}
+            <div className="live-underline" style={{ ...muted, marginBottom: '0.5rem', display: 'inline-block' }}>KEY STAT COMPARISON</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {statKeys.map(({ label: statLabel, key }) => {
+              {statKeys.map(({ label: statLabel, key, statId }) => {
                 const bVal = lastGame.stats[key]?.bills ?? lastGame.stats[key];
                 const oVal = lastGame.stats[key]?.opponent ?? lastGame.stats[key];
                 const bNum = typeof bVal === 'string' ? parseInt(bVal) : bVal;
@@ -144,8 +169,25 @@ export default function SeasonRoom() {
                   ? (oNum <= bNum ? 'var(--signal-positive)' : 'var(--signal-negative)')
                   : (oNum >= bNum ? 'var(--signal-positive)' : 'var(--signal-negative)');
 
+                const rowProps = statId
+                  ? { className: 'stat-clickable', onClick: () => handleStatClick(statId), role: 'button', tabIndex: 0,
+                      onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleStatClick(statId); } } }
+                  : {};
+
                 return (
-                  <div key={key} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr 5.5rem 1fr 3rem', alignItems: 'center', gap: '0.375rem' }}>
+                  <div
+                    key={key}
+                    {...rowProps}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '3rem 1fr 5.5rem 1fr 3rem',
+                      alignItems: 'center',
+                      gap: '0.375rem',
+                      padding: '0.25rem 0.375rem',
+                      border: '1px solid transparent',
+                      borderRadius: '2px',
+                    }}
+                  >
                     <span style={{ ...mono, fontSize: '0.75rem', color: 'var(--text-data)', textAlign: 'right' }}>{typeof bVal === 'string' ? bVal : bVal}</span>
                     <div style={{ height: 5, background: 'var(--bg-recessed)', borderRadius: '1px', overflow: 'hidden', direction: 'rtl' }}>
                       <div style={{ height: '100%', width: `${(bNum / maxVal) * 100}%`, background: bColor, borderRadius: '1px', transition: 'width 0.6s ease' }} />
@@ -158,6 +200,16 @@ export default function SeasonRoom() {
                   </div>
                 );
               })}
+            </div>
+            <div style={{
+              marginTop: '0.625rem',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.5625rem',
+              letterSpacing: '0.18em',
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+            }}>
+              Tap any highlighted row for Uncle Jr.'s breakdown →
             </div>
           </Panel>
         </motion.div>
@@ -173,17 +225,24 @@ export default function SeasonRoom() {
                 context="A visual timeline of every game this season. Green means a win, red means a loss. The opponent abbreviation and score are shown for each week."
                 right={<RiCalendarLine size={18} style={{ color: 'var(--text-muted)' }} />}
               />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(17, 1fr)', gap: '4px' }}>
+              <div className="scan-host" style={{ display: 'grid', gridTemplateColumns: 'repeat(17, 1fr)', gap: '4px', padding: '0.25rem', borderRadius: '2px' }}>
                 {weeklyGrades.map((wk, i) => {
                   const parsed = parseScore(wk.result);
                   return (
-                    <div key={wk.week} style={{
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
-                      padding: '0.375rem 0.125rem',
-                      background: parsed.win ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                      border: `1px solid ${parsed.win ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
-                      borderRadius: '2px',
-                    }}>
+                    <button
+                      type="button"
+                      key={wk.week}
+                      onClick={() => handleWeekClick(wk)}
+                      aria-label={`Week ${wk.week} ${wk.opponent} — ${wk.result}. Tap for recap.`}
+                      className="stat-clickable"
+                      style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                        padding: '0.375rem 0.125rem',
+                        background: parsed.win ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                        border: `1px solid ${parsed.win ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                        borderRadius: '2px',
+                      }}
+                    >
                       <span style={{ ...muted, fontSize: '0.5rem' }}>W{wk.week}</span>
                       <span style={{
                         ...mono, fontSize: '0.625rem', fontWeight: 700,
@@ -193,7 +252,7 @@ export default function SeasonRoom() {
                       <span style={{ ...mono, fontSize: '0.5rem', color: 'var(--text-secondary)' }}>
                         {parsed.scored}-{parsed.allowed}
                       </span>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -219,20 +278,43 @@ export default function SeasonRoom() {
                 right={<RiExchangeLine size={18} style={{ color: 'var(--signal-negative)' }} />}
               />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                <Panel recessed style={{ padding: '1rem', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => handleStatClick('turnovers')}
+                  aria-label="Bills turnovers — tap for breakdown"
+                  className="stat-clickable pulse-border"
+                  style={{
+                    padding: '1rem', textAlign: 'center', borderRadius: '3px',
+                    background: 'var(--bg-recessed)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    ['--pulse-color']: 'rgba(239, 68, 68, 0.35)',
+                    ['--pulse-color-edge']: 'rgba(239, 68, 68, 0.4)',
+                    ['--pulse-color-bright']: 'rgba(239, 68, 68, 0.85)',
+                  }}
+                >
                   <div style={{ ...muted, marginBottom: '0.25rem' }}>BILLS TURNOVERS</div>
-                  <div style={{ ...mono, fontSize: '2rem', fontWeight: 700, color: 'var(--signal-negative)' }}>
+                  <div className="flicker" style={{ ...mono, fontSize: '2rem', fontWeight: 700, color: 'var(--signal-negative)' }}>
                     {lastGame.stats.turnovers.bills}
                   </div>
                   <div style={{ ...label, marginTop: '0.25rem' }}>in Divisional Round</div>
-                </Panel>
-                <Panel recessed style={{ padding: '1rem', textAlign: 'center' }}>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleStatClick('turnovers')}
+                  aria-label="Opponent turnovers — tap for breakdown"
+                  className="stat-clickable"
+                  style={{
+                    padding: '1rem', textAlign: 'center', borderRadius: '3px',
+                    background: 'var(--bg-recessed)',
+                    border: '1px solid var(--border-default)',
+                  }}
+                >
                   <div style={{ ...muted, marginBottom: '0.25rem' }}>OPPONENT TURNOVERS</div>
-                  <div style={{ ...mono, fontSize: '2rem', fontWeight: 700, color: 'var(--signal-positive)' }}>
+                  <div className="flicker" style={{ ...mono, fontSize: '2rem', fontWeight: 700, color: 'var(--signal-positive)' }}>
                     {lastGame.stats.turnovers.opponent}
                   </div>
                   <div style={{ ...label, marginTop: '0.25rem' }}>Denver Broncos</div>
-                </Panel>
+                </button>
               </div>
               <Panel recessed style={{ padding: '0.75rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -323,6 +405,17 @@ export default function SeasonRoom() {
         </Panel>
       </motion.div>
       </div>
+
+      <StatDetailModal
+        open={!!activeStat}
+        onClose={() => setActiveStat(null)}
+        stat={activeStat}
+      />
+      <GameRecapModal
+        open={!!activeGame}
+        onClose={() => setActiveGame(null)}
+        game={activeGame}
+      />
     </>
   );
 }

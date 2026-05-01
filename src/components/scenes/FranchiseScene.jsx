@@ -12,20 +12,27 @@ const ease = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, amount: 0.2 };
 
 // --- StatPanel ----------------------------------------------------------
-function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)', accentChild = null, maxWidth = 280 }) {
+function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)', accentChild = null, maxWidth = 280, pulse = false, scan = false, flickerValue = false }) {
+  const pulseColor = color.startsWith('var(') ? 'rgba(51, 119, 255, 0.35)' : color;
   return (
-    <div style={{
-      padding: '0.875rem 1.125rem',
-      background: 'rgba(8, 12, 22, 0.78)',
-      border: `1px solid ${color}`,
-      borderRadius: '3px',
-      backdropFilter: 'blur(8px)',
-      boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.5rem',
-      maxWidth,
-    }}>
+    <div
+      className={[scan ? 'scan-host' : '', pulse ? 'pulse-border' : ''].filter(Boolean).join(' ')}
+      style={{
+        padding: '0.875rem 1.125rem',
+        background: 'rgba(8, 12, 22, 0.78)',
+        border: `1px solid ${color}`,
+        borderRadius: '3px',
+        backdropFilter: 'blur(8px)',
+        boxShadow: pulse ? undefined : `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.5rem',
+        maxWidth,
+        ['--pulse-color']: pulseColor,
+        ['--pulse-color-edge']: color,
+        ['--pulse-color-bright']: color,
+      }}
+    >
       {accentChild}
       <div style={{
         fontFamily: 'var(--font-mono)',
@@ -34,14 +41,17 @@ function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue
         color,
         fontWeight: 600,
       }}>{label}</div>
-      <div style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '2.25rem',
-        fontWeight: 700,
-        color: 'var(--text-primary)',
-        lineHeight: 1,
-        textShadow: `0 0 16px ${color}50`,
-      }}>{value}</div>
+      <div
+        className={flickerValue ? 'flicker' : ''}
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '2.25rem',
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+          lineHeight: 1,
+          textShadow: `0 0 16px ${color}50`,
+        }}
+      >{value}</div>
       {sublabel && (
         <div style={{
           fontSize: '0.6875rem',
@@ -315,6 +325,8 @@ export default function FranchiseScene() {
             sublabel="Season — League avg ~88"
             coachKey="passer_rating"
             color="var(--bills-blue-bright)"
+            pulse
+            flickerValue
           />
         </motion.div>
 
@@ -333,6 +345,8 @@ export default function FranchiseScene() {
             coachKey="pass_tds"
             color="var(--bills-blue-bright)"
             accentChild={<LightningCluster count={5} />}
+            scan
+            flickerValue
           />
         </motion.div>
 
@@ -388,18 +402,20 @@ export default function FranchiseScene() {
             zIndex: 9,
           }}
         >
-          <div style={{
+          <div className="scan-host pulse-border" style={{
             padding: '1.25rem 1.75rem',
             background: 'rgba(8, 12, 22, 0.82)',
             border: '1px solid var(--bills-blue-bright)',
             borderRadius: '3px',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 6px 28px rgba(0,0,0,0.7), 0 0 36px rgba(125,183,255,0.35)',
             display: 'flex',
             flexDirection: 'column',
             gap: '0.625rem',
             maxWidth: 320,
             textAlign: 'center',
+            ['--pulse-color']: 'rgba(125, 183, 255, 0.35)',
+            ['--pulse-color-edge']: 'rgba(51, 119, 255, 0.55)',
+            ['--pulse-color-bright']: 'rgba(125, 183, 255, 0.95)',
           }}>
             <div style={{
               display: 'inline-flex',
@@ -421,7 +437,7 @@ export default function FranchiseScene() {
               color: 'var(--bills-blue-bright)',
               fontWeight: 600,
             }}>EPA / PLAY</div>
-            <div style={{
+            <div className="flicker" style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '3rem',
               fontWeight: 700,
@@ -455,6 +471,8 @@ export default function FranchiseScene() {
             coachKey="rush_tds"
             color="var(--bills-red)"
             accentChild={<RunningFigure />}
+            pulse
+            flickerValue
           />
         </motion.div>
 
@@ -473,7 +491,7 @@ export default function FranchiseScene() {
             maxWidth: 720,
           }}
         >
-          <div style={{
+          <div className="scan-host" style={{
             padding: '0.875rem 1.125rem',
             background: 'rgba(8, 12, 22, 0.82)',
             border: '1px solid var(--bills-blue-bright)',
@@ -487,7 +505,7 @@ export default function FranchiseScene() {
               justifyContent: 'space-between',
               marginBottom: '0.5rem',
             }}>
-              <div style={{
+              <div className="live-underline" style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.625rem',
                 letterSpacing: '0.18em',
