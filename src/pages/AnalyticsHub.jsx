@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiBarChart2Fill, RiExternalLinkLine } from 'react-icons/ri';
 import { Panel, GradeRing, SectionHeader, PercentileBar, DataTable } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
 import { teamGrades, playerGrades, weeklyGrades, positionGroupGrades } from '../data/analyticsData';
+import { getStat } from '../data/statContext';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -20,7 +23,64 @@ function gradeColor(grade) {
   return 'var(--signal-negative)';
 }
 
+// Clickable unit row — wraps PercentileBar with a button that opens StatDetailModal
+function ClickableUnit({ id, label, value, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(id)}
+      className="stat-clickable"
+      style={{
+        background: 'transparent',
+        border: '1px solid transparent',
+        borderRadius: '3px',
+        padding: '0.375rem 0.5rem',
+        textAlign: 'left',
+        cursor: 'pointer',
+      }}
+    >
+      <PercentileBar value={value} max={100} label={label} displayValue={value.toFixed(1)} />
+    </button>
+  );
+}
+
+// Position group → narrative payload
+function positionGroupToStat(row) {
+  if (!row) return null;
+  const stories = {
+    'Quarterback': "Allen's a top-3 QB and our offensive ceiling. The 5-INT divisional game was an anomaly, not a trend.",
+    'Running Back': "Cook's the dawg. Run him 'til the wheels come off — he's earning yards the line ain't giving.",
+    'Cornerback': "Benford's a Pro Bowl SNUB. League-best passer rating allowed in coverage and they didn't let him in the game. Crime.",
+    'Edge Defender': "Rousseau's the alpha. Need Chubbs to translate to the 3-4 to get this room top-5.",
+    'Linebacker': "Bernard's the heartbeat. Quiet because he doesn't miss tackles — that's the whole game.",
+    'Interior DL': "Ed Oliver's the pressure spike, but the run-fit issues live here. 27th in pass rush win rate ties back to this room.",
+    'Offensive Line': "Below-the-line group. Beane traded for a pivot at center but we still need a first-round tackle.",
+    'Safety': "Rapp anchors. Bishop developing. Decent room, not yet a force-multiplier.",
+    'Wide Receiver': "Rookie Bell saved this room. D.J. Moore reuniting with Brady should jump it 4-6 spots in 2026.",
+    'Special Teams': "Ferguson's the most valuable long-snapper in football and nobody talks about him.",
+    'Tight End': "Kincaid's a chess piece, Knox is the rocker. Need one more red-zone target to climb.",
+  };
+  const note = stories[row.group] || "Unit's pulling weight in some areas, exposed in others.";
+  return {
+    label: `${row.group.toUpperCase()} · POSITION GROUP`,
+    value: row.grade.toFixed(1),
+    sublabel: `NFL Rank #${row.rank} · Top player: ${row.topPlayer}`,
+    verdict: row.rank <= 5 ? 'TOP 5' : row.rank <= 10 ? 'TOP 10' : row.rank <= 15 ? 'STARTER-PLUS' : row.rank <= 20 ? 'AVERAGE' : 'BELOW THE LINE',
+    color: row.grade >= 85 ? '#5BE5A1' : row.grade >= 78 ? 'var(--bills-blue-bright)' : row.grade >= 72 ? '#E8A010' : '#FF4D4D',
+    breakdown: [
+      { label: 'GROUP GRADE', value: row.grade.toFixed(1) },
+      { label: 'NFL RANK', value: `#${row.rank}` },
+      { label: 'TOP PLAYER', value: row.topPlayer },
+    ],
+    impact: `${row.group} is graded ${row.grade.toFixed(1)} — #${row.rank} in the NFL. ${row.rank <= 10 ? 'A strength of the team.' : row.rank <= 20 ? 'Roughly league-average — neither a competitive advantage nor a hole.' : 'A roster weakness that needs a 2026 offseason fix.'}`,
+    uncleJrTake: note,
+  };
+}
+
 export default function AnalyticsHub() {
+  const [activeStat, setActiveStat] = useState(null);
+  const openUnit = (id) => setActiveStat(getStat('analytics', id));
+
   // Weekly grade tracker chart
   const weeklyChartOptions = {
     chart: {
@@ -164,36 +224,37 @@ export default function AnalyticsHub() {
         </Panel>
       </motion.div>
 
-      {/* Offense + Defense Breakdowns */}
+      {/* Offense + Defense Breakdowns — every unit clickable */}
       <motion.div {...fade(2)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Panel>
-          <SectionHeader title="Offense Breakdown" subtitle="PFF grade by unit" context="PFF grades rate every player on every play from 0-100. Grades above 80 indicate a quality starter; above 90 is elite. WAR measures how many wins a player adds vs. a replacement-level player." />
+          <SectionHeader title="Offense Breakdown" subtitle="PFF grade by unit · tap any unit for full breakdown" context="PFF grades rate every player on every play from 0-100. Grades above 80 indicate a quality starter; above 90 is elite. WAR measures how many wins a player adds vs. a replacement-level player." />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            <PercentileBar value={teamGrades.offense.passing} max={100} label="Passing" displayValue={teamGrades.offense.passing.toFixed(1)} />
-            <PercentileBar value={teamGrades.offense.rushing} max={100} label="Rushing" displayValue={teamGrades.offense.rushing.toFixed(1)} />
-            <PercentileBar value={teamGrades.offense.receiving} max={100} label="Receiving" displayValue={teamGrades.offense.receiving.toFixed(1)} />
-            <PercentileBar value={teamGrades.offense.passBlocking} max={100} label="Pass Blocking" displayValue={teamGrades.offense.passBlocking.toFixed(1)} />
-            <PercentileBar value={teamGrades.offense.runBlocking} max={100} label="Run Blocking" displayValue={teamGrades.offense.runBlocking.toFixed(1)} />
+            <ClickableUnit id="passing" label="Passing" value={teamGrades.offense.passing} onClick={openUnit} />
+            <ClickableUnit id="rushing" label="Rushing" value={teamGrades.offense.rushing} onClick={openUnit} />
+            <ClickableUnit id="receiving" label="Receiving" value={teamGrades.offense.receiving} onClick={openUnit} />
+            <ClickableUnit id="passBlocking" label="Pass Blocking" value={teamGrades.offense.passBlocking} onClick={openUnit} />
+            <ClickableUnit id="runBlocking" label="Run Blocking" value={teamGrades.offense.runBlocking} onClick={openUnit} />
           </div>
         </Panel>
         <Panel>
-          <SectionHeader title="Defense Breakdown" subtitle="PFF grade by unit" />
+          <SectionHeader title="Defense Breakdown" subtitle="PFF grade by unit · tap any unit for full breakdown" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            <PercentileBar value={teamGrades.defense.passRush} max={100} label="Pass Rush" displayValue={teamGrades.defense.passRush.toFixed(1)} />
-            <PercentileBar value={teamGrades.defense.coverage} max={100} label="Coverage" displayValue={teamGrades.defense.coverage.toFixed(1)} />
-            <PercentileBar value={teamGrades.defense.runDefense} max={100} label="Run Defense" displayValue={teamGrades.defense.runDefense.toFixed(1)} />
-            <PercentileBar value={teamGrades.defense.tackling} max={100} label="Tackling" displayValue={teamGrades.defense.tackling.toFixed(1)} />
+            <ClickableUnit id="passRush" label="Pass Rush" value={teamGrades.defense.passRush} onClick={openUnit} />
+            <ClickableUnit id="coverage" label="Coverage" value={teamGrades.defense.coverage} onClick={openUnit} />
+            <ClickableUnit id="runDefense" label="Run Defense" value={teamGrades.defense.runDefense} onClick={openUnit} />
+            <ClickableUnit id="tackling" label="Tackling" value={teamGrades.defense.tackling} onClick={openUnit} />
           </div>
         </Panel>
       </motion.div>
 
-      {/* Position Group Rankings */}
+      {/* Position Group Rankings — rows clickable */}
       <motion.div {...fade(3)}>
-        <SectionHeader title="Position Group Rankings" subtitle="Bills position group grades vs. NFL" context="Each position group is graded collectively. NFL Rank shows where the Bills' unit ranks among all 32 teams." />
+        <SectionHeader title="Position Group Rankings" subtitle="Bills position group grades vs. NFL · tap any row for the full read" context="Each position group is graded collectively. NFL Rank shows where the Bills' unit ranks among all 32 teams." />
         <DataTable
           columns={posGroupColumns}
           data={positionGroupGrades}
           defaultSort={{ key: 'grade', dir: 'desc' }}
+          onRowClick={(row) => setActiveStat(positionGroupToStat(row))}
         />
       </motion.div>
 
@@ -233,6 +294,7 @@ export default function AnalyticsHub() {
         </Panel>
       </motion.div>
       </div>
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
     </>
   );
 }

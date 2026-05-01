@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useScrollOrchestrator } from './ScrollOrchestrator';
 import { CHAPTERS } from './QuestLog';
 
@@ -25,6 +25,8 @@ export default function ChapterTabs() {
   const { activeSection, scrollToSection } = useScrollOrchestrator();
   const containerRef = useRef(null);
   const activeTabRef = useRef(null);
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
 
   const activeIndex = useMemo(
     () => CHAPTERS.findIndex((c) => c.id === activeSection),
@@ -38,7 +40,6 @@ export default function ChapterTabs() {
       const container = containerRef.current;
       const tabRect = tab.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
-      // If the active tab is outside the visible region, smooth-scroll it in
       if (
         tabRect.left < containerRect.left ||
         tabRect.right > containerRect.right
@@ -50,12 +51,39 @@ export default function ChapterTabs() {
     }
   }, [activeSection]);
 
+  // Track whether right fade should show (= more tabs hidden to the right)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const more = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+      setShowRightFade(more);
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  // Close overflow on Escape
+  useEffect(() => {
+    if (!overflowOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setOverflowOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [overflowOpen]);
+
+  // Instant teleport to the section — fast, no overshoot, no missed section.
   const handleClick = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
     const top =
       el.getBoundingClientRect().top + window.scrollY - TAB_BAR_HEIGHT;
-    window.scrollTo({ top, behavior: 'smooth' });
+    window.scrollTo({ top, behavior: 'instant' });
+    setOverflowOpen(false);
   };
 
   return (
@@ -207,6 +235,151 @@ export default function ChapterTabs() {
           );
         })}
       </div>
+
+      {/* Right-edge fade — hints there are more tabs to the right */}
+      {showRightFade && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 56,
+            bottom: 0,
+            width: 36,
+            pointerEvents: 'none',
+            background:
+              'linear-gradient(90deg, rgba(8,12,22,0) 0%, rgba(8,12,22,0.92) 100%)',
+            zIndex: 1,
+          }}
+        />
+      )}
+
+      {/* "ALL" overflow button — always reachable */}
+      <button
+        type="button"
+        onClick={() => setOverflowOpen((o) => !o)}
+        aria-label="Open full chapter list"
+        aria-expanded={overflowOpen}
+        style={{
+          flexShrink: 0,
+          width: 56,
+          height: '100%',
+          background: overflowOpen ? 'rgba(51,119,255,0.18)' : 'rgba(8,12,22,0.92)',
+          border: 'none',
+          borderLeft: '1px solid rgba(75, 100, 130, 0.18)',
+          color: 'var(--bills-blue-bright)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5625rem',
+          fontWeight: 700,
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+          textShadow: '0 0 8px rgba(51,119,255,0.6)',
+        }}
+      >
+        <span style={{ fontSize: '0.875rem', lineHeight: 1 }}>{overflowOpen ? '×' : '☰'}</span>
+        <span>{overflowOpen ? 'CLOSE' : 'ALL'}</span>
+      </button>
+
+      {/* Overflow dropdown — full chapter list */}
+      {overflowOpen && (
+        <>
+          <div
+            onClick={() => setOverflowOpen(false)}
+            style={{
+              position: 'fixed',
+              top: TAB_BAR_HEIGHT,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              zIndex: 89,
+            }}
+          />
+          <div
+            role="menu"
+            style={{
+              position: 'fixed',
+              top: TAB_BAR_HEIGHT,
+              right: 0,
+              maxWidth: 320,
+              width: 'min(320px, 90vw)',
+              maxHeight: 'calc(100vh - 64px)',
+              overflowY: 'auto',
+              background: 'rgba(8,12,22,0.97)',
+              border: '1px solid rgba(51,119,255,0.4)',
+              borderTop: 'none',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: '0 12px 36px rgba(0,0,0,0.6), 0 0 24px rgba(51,119,255,0.18)',
+              zIndex: 91,
+              padding: '0.5rem 0',
+            }}
+          >
+            {CHAPTERS.map((c) => {
+              const isActive = c.id === activeSection;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleClick(c.id)}
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.625rem 1rem',
+                    background: isActive ? 'rgba(51,119,255,0.12)' : 'transparent',
+                    border: 'none',
+                    borderLeft: `3px solid ${isActive ? 'var(--bills-blue-bright)' : 'transparent'}`,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.background = 'rgba(51,119,255,0.06)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 36,
+                      flexShrink: 0,
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.625rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
+                      color: isActive ? 'var(--bills-blue-bright)' : 'var(--text-muted)',
+                    }}
+                  >
+                    {c.chapter || '—'}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    {c.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* Hide webkit scrollbar */}
       <style>{`

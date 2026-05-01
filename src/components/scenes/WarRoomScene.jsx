@@ -84,18 +84,24 @@ function GradeRing({ value, label, color = 'var(--bills-blue-bright)', size = 16
 }
 
 // --- Mini PercentileBar reveal ------------------------------------------
-function MiniBar({ label, value, color = 'var(--bills-blue-bright)', sublabel }) {
+function MiniBar({ label, value, color = 'var(--bills-blue-bright)', sublabel, onClick }) {
   const pct = Math.min(100, Math.max(0, value));
+  const Wrapper = onClick ? 'button' : 'div';
   return (
-    <div style={{
-      padding: '0.625rem 0.875rem',
-      background: 'rgba(8, 12, 22, 0.78)',
-      border: `1px solid ${color}`,
-      borderRadius: '3px',
-      backdropFilter: 'blur(8px)',
-      boxShadow: `0 4px 16px rgba(0,0,0,0.55), 0 0 18px ${color}30`,
-      minWidth: 220,
-    }}>
+    <Wrapper
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      className={onClick ? 'stat-clickable' : ''}
+      style={{
+        padding: '0.625rem 0.875rem',
+        background: 'rgba(8, 12, 22, 0.78)',
+        border: `1px solid ${color}`,
+        borderRadius: '3px',
+        backdropFilter: 'blur(8px)',
+        boxShadow: `0 4px 16px rgba(0,0,0,0.55), 0 0 18px ${color}30`,
+        minWidth: 220,
+        textAlign: 'left',
+      }}>
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -130,7 +136,7 @@ function MiniBar({ label, value, color = 'var(--bills-blue-bright)', sublabel })
           transition: 'width 0.6s ease',
         }} />
       </div>
-    </div>
+    </Wrapper>
   );
 }
 
@@ -163,6 +169,7 @@ function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue
 export default function WarRoomScene() {
   const [activeStat, setActiveStat] = useState(null);
   const open = (id) => setActiveStat(getStat('war-room', id));
+  const openUnit = (id) => setActiveStat(getStat('analytics', id));
 
   return (
     <section
@@ -351,14 +358,30 @@ export default function WarRoomScene() {
             maxWidth: '90%',
           }}
         >
-          <MiniBar label="PASS BLOCKING" value={teamGrades.offense.passBlocking} color="var(--signal-positive)" />
-          <MiniBar label="COVERAGE" value={teamGrades.defense.coverage} color="var(--bills-blue-bright)" />
-          <MiniBar label="PASS RUSH" value={teamGrades.defense.passRush} color="var(--bills-red)" />
+          <MiniBar
+            label="PASS BLOCKING"
+            value={teamGrades.offense.passBlocking}
+            color="var(--signal-positive)"
+            onClick={() => openUnit('passBlocking')}
+          />
+          <MiniBar
+            label="COVERAGE"
+            value={teamGrades.defense.coverage}
+            color="var(--bills-blue-bright)"
+            onClick={() => openUnit('coverage')}
+          />
+          <MiniBar
+            label="PASS RUSH"
+            value={teamGrades.defense.passRush}
+            color="var(--bills-red)"
+            onClick={() => openUnit('passRush')}
+          />
           <MiniBar
             label="3RD DOWN"
             value={advancedMetrics.offense.thirdDownRate * 100}
             sublabel={`${(advancedMetrics.offense.thirdDownRate * 100).toFixed(1)}%`}
             color="var(--signal-warning)"
+            onClick={() => openUnit('thirdDown')}
           />
         </motion.div>
       </div>
