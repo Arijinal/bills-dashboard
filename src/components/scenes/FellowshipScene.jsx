@@ -188,13 +188,12 @@ export default function FellowshipScene() {
             textAlign: 'center',
           }}
         >
-          <div style={{
+          <div className="fire-flicker" style={{
             padding: '1rem 1.25rem',
             background: 'rgba(20, 8, 4, 0.85)',
             border: '1px solid #E8B23C',
             borderRadius: '4px',
             backdropFilter: 'blur(8px)',
-            boxShadow: '0 0 60px rgba(232,178,60,0.55), 0 6px 26px rgba(0,0,0,0.75), inset 0 0 30px rgba(232,178,60,0.18)',
             maxWidth: 320,
           }}>
             <div style={{
@@ -205,7 +204,7 @@ export default function FellowshipScene() {
               fontWeight: 700,
               marginBottom: 8,
             }}>BILLS MAFIA · CHARITY GIVEN</div>
-            <div style={{
+            <div className="counter-tick" style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '2.5rem',
               fontWeight: 700,

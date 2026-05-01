@@ -304,7 +304,13 @@ export default function ProvingGroundsScene() {
                 padding: '0.125rem 0.5rem',
                 border: '1px solid #E8B23C',
                 borderRadius: '2px',
-              }}>RANK #1 · {drill.label}</div>
+                display: 'flex', alignItems: 'center', gap: '0.375rem',
+              }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" className="ticker-needle">
+                  <line x1="5" y1="5" x2="5" y2="1" stroke="#E8B23C" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+                RANK #1 · {drill.label}
+              </div>
               <CoachInsight coachKey={drill.coach} compact />
             </div>
           </motion.div>

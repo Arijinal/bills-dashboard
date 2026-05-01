@@ -197,6 +197,36 @@ export default function ChroniclesScene() {
             </motion.div>
           ))}
         </div>
+
+        {/* WIRE TICKER — older headlines scrolling at the bottom */}
+        <div style={{
+          marginTop: '2rem',
+          padding: '0.5rem 0',
+          background: 'rgba(20, 14, 8, 0.85)',
+          borderTop: '2px double #8B4513',
+          borderBottom: '2px double #8B4513',
+          overflow: 'hidden',
+          position: 'relative',
+        }}>
+          <div className="ticker-row" style={{
+            fontFamily: '"Special Elite", "Courier New", monospace',
+            fontSize: '0.8125rem',
+            color: '#E8DDC4',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}>
+            {articles.map((a, i) => (
+              <span key={i} style={{ marginRight: '4rem' }}>
+                ▸ {a.headline || a.title || a.excerpt?.slice(0, 60)}
+              </span>
+            ))}
+            {articles.map((a, i) => (
+              <span key={`d-${i}`} style={{ marginRight: '4rem' }}>
+                ▸ {a.headline || a.title || a.excerpt?.slice(0, 60)}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

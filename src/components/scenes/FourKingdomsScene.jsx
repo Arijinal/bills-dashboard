@@ -281,16 +281,20 @@ export default function FourKingdomsScene() {
               {afcEast.standings.map((s, i) => {
                 const t = TERRITORIES.find(tt => tt.key === s.logo) || TERRITORIES[0];
                 const isBills = s.logo === 'BUF';
+                const isLeader = i === 0;
                 return (
-                  <div key={s.team} style={{
-                    padding: '0.625rem 0.75rem',
-                    background: isBills ? 'rgba(51,119,255,0.12)' : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${isBills ? t.color : 'rgba(255,255,255,0.08)'}`,
-                    borderRadius: '2px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem',
-                  }}>
+                  <div key={s.team}
+                    className={`banner-ripple ${isLeader ? 'gold-shimmer' : ''}`}
+                    style={{
+                      padding: '0.625rem 0.75rem',
+                      background: isBills ? 'rgba(51,119,255,0.12)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${isBills ? t.color : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: '2px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.25rem',
+                      animationDelay: `${i * 0.4}s`,
+                    }}>
                     <div style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.5625rem',

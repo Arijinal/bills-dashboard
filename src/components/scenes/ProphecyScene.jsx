@@ -53,7 +53,7 @@ const TAROT_CARDS = [
 function TarotCard({ card, value, onChange }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{
+    <div className="tarot-flip mystical-hue" style={{
       padding: '0.75rem',
       background: 'rgba(12, 8, 24, 0.88)',
       border: `1px solid ${card.color}`,

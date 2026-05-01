@@ -267,14 +267,37 @@ export default function CostOfWarScene() {
             maxWidth: '40vw',
           }}
         >
-          <div style={{
+          <div className="critical-throb" style={{
             padding: '1rem 1.125rem',
             background: 'rgba(8, 6, 10, 0.85)',
             border: '1px solid var(--bills-red)',
             borderRadius: '3px',
             backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.65), 0 0 28px rgba(198,12,48,0.25)',
+            position: 'relative',
+            overflow: 'hidden',
           }}>
+            {/* EKG line — sweeps across the panel */}
+            <svg
+              viewBox="0 0 400 40"
+              preserveAspectRatio="none"
+              style={{
+                position: 'absolute',
+                bottom: 0, left: 0, right: 0,
+                height: 24,
+                width: '100%',
+                opacity: 0.55,
+                pointerEvents: 'none',
+              }}
+            >
+              <path
+                className="ekg-line"
+                d="M0 20 L80 20 L92 20 L100 5 L108 35 L116 12 L124 28 L132 20 L200 20 L212 20 L220 6 L228 34 L236 11 L244 29 L252 20 L320 20 L332 20 L340 5 L348 35 L356 12 L364 28 L372 20 L400 20"
+                stroke="#FF4D4D"
+                strokeWidth="1.4"
+                fill="none"
+                style={{ filter: 'drop-shadow(0 0 3px #FF4D4D)' }}
+              />
+            </svg>
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -282,6 +305,7 @@ export default function CostOfWarScene() {
               marginBottom: 12,
               paddingBottom: 10,
               borderBottom: '1px solid rgba(198,12,48,0.25)',
+              position: 'relative',
             }}>
               <div style={{
                 fontFamily: 'var(--font-mono)',

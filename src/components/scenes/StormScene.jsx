@@ -170,6 +170,7 @@ export default function StormScene() {
       }}
     >
       <SnowCanvas />
+      <div className="lightning-overlay" />
 
       <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
         {/* TITLE */}

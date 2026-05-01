@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
+import StatDetailModal from '../StatDetailModal';
 import { draftProspects, billsNeeds } from '../../data/draftData';
 
 /**
@@ -43,7 +45,7 @@ function GradeRing({ value, color }) {
 }
 
 // ── Gacha hero card with gold corner ornaments ────────────────────
-function ProspectCard({ p }) {
+function ProspectCard({ p, onClick }) {
   const elite = p.grade >= 92;
   const accent = elite ? '#E8B23C' : 'var(--bills-blue-bright)';
   const accentRGBA = elite ? 'rgba(232,178,60,0.4)' : 'rgba(51,119,255,0.3)';
@@ -68,16 +70,22 @@ function ProspectCard({ p }) {
   };
 
   return (
-    <div style={{
-      width: 168,
-      padding: '0.75rem',
-      background: 'linear-gradient(135deg, rgba(8, 12, 22, 0.92), rgba(10, 26, 64, 0.85))',
-      border: `2px solid ${accent}`,
-      borderRadius: '3px',
-      boxShadow: `0 8px 24px rgba(0,0,0,0.7), 0 0 16px ${accentRGBA}`,
-      position: 'relative',
-      backdropFilter: 'blur(6px)',
-    }}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`${p.name} ${p.position} from ${p.school} — tap for full scouting report`}
+      className="ember-host anvil-glow stat-clickable"
+      style={{
+        width: 168,
+        padding: '0.75rem',
+        background: 'linear-gradient(135deg, rgba(8, 12, 22, 0.92), rgba(10, 26, 64, 0.85))',
+        border: `2px solid ${accent}`,
+        borderRadius: '3px',
+        position: 'relative',
+        backdropFilter: 'blur(6px)',
+        textAlign: 'left',
+        cursor: 'pointer',
+      }}>
       <Corner position="tl" />
       <Corner position="tr" />
       <Corner position="bl" />
@@ -152,14 +160,44 @@ function ProspectCard({ p }) {
         }} />
       </div>
 
-      <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
         <CoachInsight coachKey="bills_fit" compact />
       </div>
-    </div>
+    </button>
   );
 }
 
+// Map a prospect to the StatDetailModal schema (Forge-flavored)
+function prospectToStat(p) {
+  if (!p) return null;
+  const dwayneTakes = {
+    'Travis Hunter': "Unc, the kid plays both ways like Deion did. Yards-per-route-run was 2.94 — top 5%.",
+    'Carson Beck': "Beck's clean-pocket numbers are clean — the question is what happens when the pocket folds.",
+    'Jalon Walker': "Walker's bend off the edge is real. Won't last past pick 12.",
+    'Will Johnson': "Tape's so smooth he ain't even reachin' for receivers. Mirror corner.",
+  };
+  const uncleTake = dwayneTakes[p.name]
+    || `Dwayne sent me 12 minutes of cut-ups on this kid. ${p.position} who plays bigger than his measurables — Bills fit ${p.billsFit}, that's no coincidence.`;
+  return {
+    label: `${p.position} · ${p.school.toUpperCase()}`,
+    value: p.name,
+    sublabel: `Grade ${p.grade} · Bills Fit ${p.billsFit} · Projected Round ${p.projectedRound}`,
+    verdict: p.grade >= 92 ? 'ELITE' : p.grade >= 88 ? 'TOP-TIER' : 'STARTER GRADE',
+    color: p.grade >= 92 ? '#E8B23C' : p.grade >= 88 ? '#37D67A' : 'var(--bills-blue-bright)',
+    breakdown: [
+      { label: 'GRADE', value: p.grade.toString() },
+      { label: 'BILLS FIT', value: p.billsFit.toString() },
+      { label: 'PROJ. ROUND', value: `Rd ${p.projectedRound}` },
+      { label: 'COMP', value: p.comparison || '—', note: 'Pro player comparison' },
+      ...(p.draftedBy ? [{ label: 'DRAFTED BY', value: p.draftedBy }] : []),
+    ].filter(r => r.value !== '—' || r.label === 'COMP'),
+    impact: `${p.position} prospect with a ${p.grade} scouting grade and a ${p.billsFit} Bills-fit score. ${p.billsFit >= 90 ? 'Plug-and-play scheme match — would step into a starting role.' : p.billsFit >= 80 ? 'Strong scheme fit. Day-one rotation candidate.' : 'Rotational fit. Would need development.'} Comp is ${p.comparison || 'still being scouted'}.`,
+    uncleJrTake: uncleTake,
+  };
+}
+
 export default function ForgeScene() {
+  const [activeStat, setActiveStat] = useState(null);
   const top3Needs = billsNeeds.slice(0, 3);
   const topFour = [...draftProspects].sort((a, b) => b.billsFit - a.billsFit).slice(0, 4);
 
@@ -316,7 +354,7 @@ export default function ForgeScene() {
               zIndex: 8,
             }}
           >
-            <ProspectCard p={topFour[i]} />
+            <ProspectCard p={topFour[i]} onClick={() => setActiveStat(prospectToStat(topFour[i]))} />
           </motion.div>
         ))}
 
@@ -395,6 +433,7 @@ export default function ForgeScene() {
           </div>
         </motion.div>
       </div>
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
     </section>
   );
 }

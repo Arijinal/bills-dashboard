@@ -399,13 +399,16 @@ export default function ChampionsDuelScene() {
             pointerEvents: 'none',
           }}
         >
-          <div style={{
+          <div className="spark-burst" style={{
             fontFamily: "'Dela Gothic One', sans-serif",
             fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
             color: '#E8B23C',
             textShadow: '0 0 40px rgba(232,178,60,0.8), 0 0 16px rgba(0,0,0,0.95)',
             letterSpacing: '0.05em',
             lineHeight: 1,
+            position: 'relative',
+            display: 'inline-block',
+            padding: '0 0.5rem',
           }}>VS</div>
         </motion.div>
 
@@ -463,6 +466,7 @@ export default function ChampionsDuelScene() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={VIEWPORT}
                 transition={{ duration: 0.4, delay: 0.7 + i * 0.06, ease }}
+                className="spark-burst"
                 style={{
                   padding: '0.375rem 0.625rem',
                   background: 'rgba(8,12,22,0.85)',
@@ -475,6 +479,7 @@ export default function ChampionsDuelScene() {
                   alignItems: 'center',
                   gap: 2,
                   minWidth: 80,
+                  position: 'relative',
                 }}
               >
                 <div style={{

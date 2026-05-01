@@ -131,14 +131,15 @@ function Hotspot({ constellation, active, onClick, delay }) {
             filter: 'blur(6px)',
           }}
         />
-        {/* core */}
-        <div style={{
+        {/* core — star twinkle */}
+        <div className="star-twinkle" style={{
           width: 14,
           height: 14,
           borderRadius: '50%',
           background: color,
           boxShadow: `0 0 16px ${color}, 0 0 32px ${color}`,
           border: '2px solid #fff',
+          animationDelay: `${(delay || 0) * 1.4}s`,
         }} />
       </div>
       {/* label */}

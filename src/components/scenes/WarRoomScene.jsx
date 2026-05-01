@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
+import StatDetailModal from '../StatDetailModal';
+import { getStat } from '../../data/statContext';
 import { teamGrades, advancedMetrics } from '../../data/analyticsData';
 
 /**
@@ -131,27 +134,36 @@ function MiniBar({ label, value, color = 'var(--bills-blue-bright)', sublabel })
   );
 }
 
-// --- StatPanel ----------------------------------------------------------
-function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)' }) {
+// --- StatPanel — oscilloscope readout, clickable -----------------------
+function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)', onClick, terminal = false }) {
+  const Wrapper = onClick ? 'button' : 'div';
   return (
-    <div style={{
-      padding: '0.875rem 1.125rem',
-      background: 'rgba(8, 12, 22, 0.78)',
-      border: `1px solid ${color}`,
-      borderRadius: '3px',
-      backdropFilter: 'blur(8px)',
-      boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
-      maxWidth: 280,
-    }}>
+    <Wrapper
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      className={`crt-host ${onClick ? 'stat-clickable' : ''}`}
+      style={{
+        padding: '0.875rem 1.125rem',
+        background: 'rgba(8, 12, 22, 0.85)',
+        border: `1px solid ${color}`,
+        borderRadius: '3px',
+        backdropFilter: 'blur(8px)',
+        boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
+        maxWidth: 280,
+        textAlign: 'left',
+      }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.625rem', letterSpacing: '0.18em', color, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1, textShadow: `0 0 16px ${color}50`, marginTop: 6 }}>{value}</div>
+      <div className={terminal ? 'terminal-blink' : ''} style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1, textShadow: `0 0 16px ${color}50`, marginTop: 6 }}>{value}</div>
       {sublabel && <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginTop: 4 }}>{sublabel}</div>}
-      {coachKey && <div style={{ marginTop: 6 }}><CoachInsight coachKey={coachKey} compact /></div>}
-    </div>
+      {coachKey && <div style={{ marginTop: 6 }} onClick={(e) => e.stopPropagation()}><CoachInsight coachKey={coachKey} compact /></div>}
+    </Wrapper>
   );
 }
 
 export default function WarRoomScene() {
+  const [activeStat, setActiveStat] = useState(null);
+  const open = (id) => setActiveStat(getStat('war-room', id));
+
   return (
     <section
       id="war-room"
@@ -260,6 +272,8 @@ export default function WarRoomScene() {
             sublabel="6th in NFL"
             coachKey="off_epa"
             color="var(--signal-positive)"
+            onClick={() => open('offEpa')}
+            terminal
           />
         </motion.div>
 
@@ -277,6 +291,8 @@ export default function WarRoomScene() {
             sublabel="7th in NFL — coverage-anchored"
             coachKey="def_epa"
             color="var(--bills-red)"
+            onClick={() => open('defEpa')}
+            terminal
           />
         </motion.div>
 
@@ -293,6 +309,8 @@ export default function WarRoomScene() {
             value={`+${advancedMetrics.overall.dvoa.toFixed(1)}%`}
             sublabel={`SRS ${advancedMetrics.overall.srsRating.toFixed(1)} — top tier`}
             color="var(--bills-blue-bright)"
+            onClick={() => open('dvoa')}
+            terminal
           />
         </motion.div>
 
@@ -310,6 +328,8 @@ export default function WarRoomScene() {
             sublabel="Reality: 12-5 — no regression coming"
             coachKey="pythagorean"
             color="var(--signal-warning)"
+            onClick={() => open('pythagorean')}
+            terminal
           />
         </motion.div>
 
@@ -342,6 +362,7 @@ export default function WarRoomScene() {
           />
         </motion.div>
       </div>
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
     </section>
   );
 }

@@ -223,6 +223,38 @@ export default function ArenaScene() {
       }} />
 
       <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
+        {/* CROWD WAVEFORM — bottom edge, 70k voices visualized */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
+          height: 38,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          gap: 3,
+          padding: '0 4%',
+          pointerEvents: 'none',
+          zIndex: 6,
+        }}>
+          {Array.from({ length: 60 }).map((_, i) => (
+            <div
+              key={i}
+              className="waveform-bar"
+              style={{
+                width: 4,
+                height: `${10 + (i * 7 % 22)}px`,
+                background: i % 4 === 0 ? 'var(--bills-red-bright)' : 'var(--bills-blue-bright)',
+                borderRadius: '1px',
+                animationDelay: `${(i * 0.07) % 1.2}s`,
+                animationDuration: `${0.9 + (i % 5) * 0.12}s`,
+                boxShadow: i % 4 === 0
+                  ? '0 0 6px rgba(232, 32, 64, 0.5)'
+                  : '0 0 6px rgba(51, 119, 255, 0.5)',
+              }}
+            />
+          ))}
+        </div>
+
         {/* TITLE */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
