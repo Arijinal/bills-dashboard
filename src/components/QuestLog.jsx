@@ -23,6 +23,7 @@ import { useScrollOrchestrator } from './ScrollOrchestrator';
 
 const CHAPTERS = [
   { id: 'arrival',          label: 'The Arrival',           chapter: '' },
+  { id: 'dispatch',         label: "Uncle Jr.'s Dispatch",  chapter: '·' },
   { id: 'sunday-reckoning', label: 'The Sunday Reckoning',  chapter: 'I' },
   { id: 'franchise',        label: 'The Franchise',         chapter: 'II' },
   { id: 'war-room',         label: 'The War Room',          chapter: 'III' },

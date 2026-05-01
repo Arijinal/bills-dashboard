@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getInsight } from '../data/aiInsights';
 
 /**
- * CoachInsight — AI football expert commentary, served as a rich modal.
+ * CoachInsight — Bills Guru commentary, served as a scouting-card modal.
  *
  * Trigger:
- *   A compact "ASK THE COACH" pill button.
+ *   A compact "ASK THE BILLS GURU" pill button.
  *
- * Modal:
- *   Centered overlay card (not anchored to the trigger). Backdrop dims
- *   the page; clicking the backdrop or the close "x" dismisses.
+ * Modal (scouting-card format):
+ *   Centered overlay card (not anchored to the trigger). Tighter width,
+ *   stacked vertically — verdict chip, headline, summary, details list,
+ *   standout, conclusion. Backdrop dims the page; clicking the backdrop
+ *   or the close "x" dismisses. Esc also closes.
  *
  *   The card is built from the rich insight schema in aiInsights.js:
  *     { verdict, verdictColor, headline, body, details[], conclusion, standout }
@@ -19,12 +22,12 @@ import { getInsight } from '../data/aiInsights';
  *   are present.
  *
  * Usage:
- *   <CoachInsight coachKey="passer_rating" label="ASK THE COACH" />
+ *   <CoachInsight coachKey="passer_rating" />
  */
 
 export default function CoachInsight({
   coachKey,
-  label = 'ASK THE COACH',
+  label = 'ASK THE BILLS GURU',
   compact = false,
 }) {
   const [open, setOpen] = useState(false);
@@ -100,6 +103,7 @@ export default function CoachInsight({
         {label}
       </button>
 
+      {createPortal(
       <AnimatePresence>
         {open && (
           <motion.div
@@ -112,9 +116,9 @@ export default function CoachInsight({
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0, 0, 0, 0.75)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
+              background: 'rgba(0, 0, 0, 0.55)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               zIndex: 1000,
               display: 'flex',
               alignItems: 'center',
@@ -131,19 +135,15 @@ export default function CoachInsight({
               style={{
                 position: 'relative',
                 width: '100%',
-                maxWidth: 540,
+                maxWidth: 520,
                 maxHeight: '88vh',
                 overflowY: 'auto',
-                background: 'rgba(15, 21, 32, 0.98)',
-                border: `1px solid ${
-                  insight.verdictColor
-                    ? 'rgba(51, 119, 255, 0.45)'
-                    : 'rgba(51, 119, 255, 0.45)'
-                }`,
-                borderRadius: '4px',
+                background: 'rgba(15, 21, 32, 0.92)',
+                border: '1px solid rgba(51, 119, 255, 0.45)',
+                borderRadius: '6px',
                 boxShadow:
                   '0 24px 60px rgba(0, 0, 0, 0.7), 0 0 32px rgba(51, 119, 255, 0.18)',
-                padding: '1.25rem 1.5rem 1.5rem',
+                padding: '1.5rem 1.625rem 1.75rem',
               }}
             >
               {/* Header bar */}
@@ -185,7 +185,7 @@ export default function CoachInsight({
                       textTransform: 'uppercase',
                     }}
                   >
-                    Coach's Read
+                    Insight From The Bills Guru
                   </span>
                 </div>
                 <button
@@ -424,7 +424,9 @@ export default function CoachInsight({
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+      )}
     </>
   );
 }

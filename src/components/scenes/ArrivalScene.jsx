@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
+import DailyBriefCard from '../DailyBriefCard';
 import { teamInfo } from '../../data/mockData';
 
 /**
@@ -205,7 +206,7 @@ export default function ArrivalScene() {
             textShadow: '0 0 12px rgba(51,119,255,0.6)',
           }}
         >
-          THE CHRONICLE OF THE 2025 BUFFALO BILLS
+          THE CHRONICLE OF THE 2026 BUFFALO BILLS
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 24, scale: 0.94 }}
@@ -280,6 +281,19 @@ export default function ArrivalScene() {
               color="#E8B23C"
               delay={0.45}
             />
+          </div>
+
+          {/* Daily Brief — center card between the four corner stat panels */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 12,
+            }}
+          >
+            <DailyBriefCard delay={0.6} />
           </div>
         </>
       )}

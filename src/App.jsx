@@ -7,6 +7,7 @@ import ChapterDivider from './components/ChapterDivider';
 // Lazy-load each section page (these will be turned into scroll sections)
 const SeasonRoom = lazy(() => import('./pages/SeasonRoom'));       // → SECTION 2 detail follow-up
 const ArrivalScene = lazy(() => import('./components/scenes/ArrivalScene')); // → SECTION 1: The Arrival
+const DispatchScene = lazy(() => import('./components/scenes/DispatchScene')); // → SECTION 1.5: Uncle Jr.'s Dispatch
 const SundayReckoningScene = lazy(() => import('./components/scenes/SundayReckoningScene')); // → SECTION 2
 const FourKingdomsScene = lazy(() => import('./components/scenes/FourKingdomsScene')); // → SECTION 5
 const FranchiseScene = lazy(() => import('./components/scenes/FranchiseScene')); // → SECTION 3
@@ -42,7 +43,7 @@ const FellowshipScene = lazy(() => import('./components/scenes/FellowshipScene')
 const UniverseScene = lazy(() => import('./components/scenes/UniverseScene'));       // → SECTION 15
 
 const SECTION_IDS = [
-  'arrival', 'sunday-reckoning', 'franchise', 'war-room', 'four-kingdoms',
+  'arrival', 'dispatch', 'sunday-reckoning', 'franchise', 'war-room', 'four-kingdoms',
   'champions-duel', 'forge', 'proving-grounds', 'cost-of-war', 'storm',
   'chronicles', 'arena', 'prophecy', 'fellowship', 'universe'
 ];
@@ -69,6 +70,9 @@ export default function App() {
       <QuestLog />
       <main style={{ position: 'relative', paddingTop: '48px' }}>
         <Suspense fallback={<SectionFallback />}><ArrivalScene /></Suspense>
+        <ChapterDivider />
+
+        <Suspense fallback={<SectionFallback />}><DispatchScene /></Suspense>
         <ChapterDivider />
 
         <Suspense fallback={<SectionFallback />}><SundayReckoningScene /></Suspense>

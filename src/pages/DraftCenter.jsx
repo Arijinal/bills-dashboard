@@ -135,6 +135,7 @@ export default function DraftCenter() {
     {
       key: 'status', label: 'Status',
       render: (val) => {
+        if (!val) return <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>—</span>;
         let statusColor = 'var(--text-secondary)';
         if (val.includes('Starter') || val.includes('Pro Bowl') || val.includes('Extension') || val.includes('Captain'))
           statusColor = 'var(--signal-positive)';
