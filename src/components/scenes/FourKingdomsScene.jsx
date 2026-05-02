@@ -33,6 +33,107 @@ const ALL_PAIRS = (() => {
   return out; // 6 unordered pairs
 })();
 
+// Bills cannon — fixed position just below the Bills dot.
+const CANNON = { x: 22, y: 42 };
+
+// ── Old-school Bills cannon (decorative SVG) ────────────
+function CannonSVG({ pulsing }) {
+  return (
+    <svg width="64" height="48" viewBox="0 0 64 48" style={{ display: 'block', filter: pulsing ? 'drop-shadow(0 0 10px rgba(232,178,60,0.7))' : 'drop-shadow(0 4px 6px rgba(0,0,0,0.7))' }}>
+      {/* Carriage trapezoid */}
+      <path d="M 6 38 L 54 38 L 48 28 L 12 28 Z" fill="#6b3f17" stroke="#3a2010" strokeWidth="1" />
+      <line x1="12" y1="28" x2="6" y2="38" stroke="#3a2010" strokeWidth="0.8" />
+      <line x1="48" y1="28" x2="54" y2="38" stroke="#3a2010" strokeWidth="0.8" />
+      {/* Wheel left */}
+      <circle cx="16" cy="40" r="6.5" fill="#2c1c0e" stroke="#0a0606" strokeWidth="0.7" />
+      <circle cx="16" cy="40" r="2" fill="#0a0606" />
+      <line x1="9.5" y1="40" x2="22.5" y2="40" stroke="#0a0606" strokeWidth="0.5" />
+      <line x1="16" y1="33.5" x2="16" y2="46.5" stroke="#0a0606" strokeWidth="0.5" />
+      {/* Wheel right */}
+      <circle cx="44" cy="40" r="6.5" fill="#2c1c0e" stroke="#0a0606" strokeWidth="0.7" />
+      <circle cx="44" cy="40" r="2" fill="#0a0606" />
+      <line x1="37.5" y1="40" x2="50.5" y2="40" stroke="#0a0606" strokeWidth="0.5" />
+      <line x1="44" y1="33.5" x2="44" y2="46.5" stroke="#0a0606" strokeWidth="0.5" />
+      {/* Barrel — angled up-right */}
+      <g transform="rotate(-18 30 22)">
+        <rect x="10" y="17" width="44" height="10" fill="#1a1a1a" stroke="#0a0a0a" strokeWidth="0.7" rx="1.5" />
+        <rect x="50" y="14.5" width="2.5" height="15" fill="#3a3a3a" />
+        <rect x="48" y="19" width="6" height="6" fill="#0a0a0a" />
+        <circle cx="22" cy="27" r="2.4" fill="#0a0a0a" stroke="#3a3a3a" strokeWidth="0.5" />
+      </g>
+      {/* Bills shield emblem on the carriage */}
+      <circle cx="30" cy="34" r="3" fill="#3377FF" stroke="#fff" strokeWidth="0.8" />
+      <circle cx="30" cy="34" r="1.2" fill="#fff" />
+    </svg>
+  );
+}
+
+// ── Cannonball SVG (rendered inside top-level overlay SVG) ──────
+function CannonBall({ shot }) {
+  const target = TERRITORIES.find(t => t.key === shot.target);
+  if (!target) return null;
+  const startX = CANNON.x + 1;   // muzzle offset
+  const startY = CANNON.y - 4;
+  const midX = (startX + target.x) / 2;
+  const midY = Math.min(startY, target.y) - 14;
+  return (
+    <>
+      <motion.circle
+        r={5}
+        fill="#0E0E0E"
+        stroke="#5a5a5a"
+        strokeWidth="0.6"
+        initial={{ cx: `${startX}%`, cy: `${startY}%`, opacity: 0, scale: 0.4 }}
+        animate={{
+          cx: [`${startX}%`, `${midX}%`, `${target.x}%`, `${target.x}%`],
+          cy: [`${startY}%`, `${midY}%`, `${target.y}%`, `${target.y}%`],
+          opacity: [0, 1, 1, 0],
+          scale: [0.5, 1.25, 1, 0.7],
+        }}
+        transition={{ duration: 1.1, ease: 'easeOut', times: [0, 0.06, 0.92, 1] }}
+        style={{ filter: 'drop-shadow(0 0 10px rgba(255,180,80,0.95)) drop-shadow(0 0 4px rgba(255,90,0,0.7))' }}
+      />
+      {/* Smoke trail */}
+      <motion.circle
+        r={2.5}
+        fill="rgba(180,180,180,0.6)"
+        initial={{ cx: `${startX}%`, cy: `${startY}%`, opacity: 0 }}
+        animate={{
+          cx: [`${startX}%`, `${midX}%`, `${target.x}%`],
+          cy: [`${startY}%`, `${midY}%`, `${target.y}%`],
+          opacity: [0, 0.5, 0],
+        }}
+        transition={{ duration: 1.1, ease: 'easeOut', delay: 0.08, times: [0, 0.5, 1] }}
+        style={{ filter: 'blur(2px)' }}
+      />
+    </>
+  );
+}
+
+// ── Impact ring (when cannonball lands) ────────────────
+function ImpactRing({ target }) {
+  const t = TERRITORIES.find(tt => tt.key === target);
+  if (!t) return null;
+  return (
+    <motion.div
+      initial={{ width: 12, height: 12, opacity: 0.95 }}
+      animate={{ width: 110, height: 110, opacity: 0 }}
+      transition={{ duration: 0.85, ease: 'easeOut' }}
+      style={{
+        position: 'absolute',
+        left: `${t.x}%`,
+        top: `${t.y}%`,
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,180,60,0.95) 0%, rgba(255,80,40,0.55) 35%, rgba(255,80,40,0) 70%)',
+        zIndex: 10,
+        pointerEvents: 'none',
+        boxShadow: '0 0 30px rgba(255,140,40,0.6)',
+      }}
+    />
+  );
+}
+
 // Pick 3 of 6 unordered pairs to glow this cycle, assign random direction +
 // staggered beamDelay. Remaining 3 stay as quiet dashed lines so all
 // intra-division connections remain visible.
@@ -186,58 +287,42 @@ function BattleLine({ from, to, delay, glow = false, beamDelay = 0 }) {
         style={{ filter: lineDropShadow }}
       />
 
-      {/* Traveling beams — only on glow lines, two beams crossing in opposite directions */}
+      {/* Traveling beam — single direction per cycle, fully random per pair */}
       {glow && (
         <>
-          {/* Outbound beam: from → to, in source team's color */}
+          {/* Primary beam: from → to in source team's color */}
           <motion.circle
             r={4}
             fill={fromT.color}
             initial={{ cx: `${fromT.x}%`, cy: `${fromT.y}%`, opacity: 0 }}
             animate={{
-              cx: [`${fromT.x}%`, `${toT.x}%`, `${fromT.x}%`],
-              cy: [`${fromT.y}%`, `${toT.y}%`, `${fromT.y}%`],
+              cx: [`${fromT.x}%`, `${toT.x}%`],
+              cy: [`${fromT.y}%`, `${toT.y}%`],
               opacity: [0, 1, 1, 0.95, 0],
             }}
             transition={{
-              duration: 4.2,
+              duration: 2.4,
               repeat: Infinity,
+              repeatDelay: 0.4,
               ease: 'easeInOut',
               delay: beamDelay,
             }}
             style={{ filter: `drop-shadow(0 0 12px ${fromT.glow}) drop-shadow(0 0 4px ${fromT.glow})` }}
           />
-          {/* Inbound beam: to → from, in destination team's color, offset by half-cycle */}
-          <motion.circle
-            r={4}
-            fill={toT.color}
-            initial={{ cx: `${toT.x}%`, cy: `${toT.y}%`, opacity: 0 }}
-            animate={{
-              cx: [`${toT.x}%`, `${fromT.x}%`, `${toT.x}%`],
-              cy: [`${toT.y}%`, `${fromT.y}%`, `${toT.y}%`],
-              opacity: [0, 1, 1, 0.95, 0],
-            }}
-            transition={{
-              duration: 4.2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: beamDelay + 2.1,
-            }}
-            style={{ filter: `drop-shadow(0 0 12px ${toT.glow}) drop-shadow(0 0 4px ${toT.glow})` }}
-          />
-          {/* Trailing afterglow — fades behind each outbound beam */}
+          {/* Trailing afterglow — fades behind the primary beam */}
           <motion.circle
             r={2}
             fill={fromT.color}
             initial={{ cx: `${fromT.x}%`, cy: `${fromT.y}%`, opacity: 0 }}
             animate={{
-              cx: [`${fromT.x}%`, `${toT.x}%`, `${fromT.x}%`],
-              cy: [`${fromT.y}%`, `${toT.y}%`, `${fromT.y}%`],
+              cx: [`${fromT.x}%`, `${toT.x}%`],
+              cy: [`${fromT.y}%`, `${toT.y}%`],
               opacity: [0, 0.55, 0],
             }}
             transition={{
-              duration: 4.2,
+              duration: 2.4,
               repeat: Infinity,
+              repeatDelay: 0.4,
               ease: 'easeInOut',
               delay: beamDelay + 0.18,
             }}
@@ -252,6 +337,10 @@ function BattleLine({ from, to, delay, glow = false, beamDelay = 0 }) {
 export default function FourKingdomsScene() {
   const [cycle, setCycle] = useState(0);
   const [battleLines, setBattleLines] = useState(() => generateBattleLines());
+  const [cannonOpen, setCannonOpen] = useState(false);
+  const [activeShot, setActiveShot] = useState(null);
+  const [impact, setImpact] = useState(null);
+  const [hits, setHits] = useState({ NE: 0, MIA: 0, NYJ: 0 });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -260,6 +349,20 @@ export default function FourKingdomsScene() {
     }, BEAM_CYCLE_MS);
     return () => clearInterval(interval);
   }, []);
+
+  const fireCannon = (targetKey) => {
+    const id = Date.now();
+    setActiveShot({ target: targetKey, id });
+    setCannonOpen(false);
+    // Cannonball lands ~1.05s in
+    setTimeout(() => {
+      setImpact({ targetKey, id: id + 1 });
+      setHits((h) => ({ ...h, [targetKey]: (h[targetKey] || 0) + 1 }));
+      setActiveShot(null);
+    }, 1050);
+    // Clear impact after the ring fades
+    setTimeout(() => setImpact(null), 1900);
+  };
 
   return (
     <section
@@ -304,6 +407,114 @@ export default function FourKingdomsScene() {
         {TERRITORIES.map((t, i) => (
           <Territory key={t.key} t={t} delay={0.2 + i * 0.12} />
         ))}
+
+        {/* BILLS CANNON — clickable, opens fire menu, launches cannonballs */}
+        <div style={{
+          position: 'absolute',
+          left: `${CANNON.x}%`,
+          top: `${CANNON.y}%`,
+          transform: 'translate(-50%, -50%)',
+          zIndex: 9,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+          pointerEvents: 'none',
+        }}>
+          <button
+            type="button"
+            onClick={() => setCannonOpen((o) => !o)}
+            aria-label="Open Bills cannon — fire on a rival"
+            className="stat-clickable"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              transform: cannonOpen ? 'scale(1.08)' : 'scale(1)',
+              transition: 'transform 0.18s ease-out',
+            }}
+          >
+            <CannonSVG pulsing={cannonOpen} />
+          </button>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.5rem',
+            letterSpacing: '0.2em',
+            color: cannonOpen ? '#E8B23C' : 'var(--text-muted)',
+            fontWeight: 700,
+            textShadow: '0 0 10px rgba(0,0,0,0.95)',
+            pointerEvents: 'none',
+          }}>
+            {cannonOpen ? 'PICK A TARGET' : 'BILLS CANNON · TAP'}
+          </div>
+        </div>
+
+        {/* Fire-target chips — shown when cannon is armed */}
+        {cannonOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'absolute',
+              left: `${CANNON.x}%`,
+              top: `${CANNON.y + 11}%`,
+              transform: 'translateX(-50%)',
+              zIndex: 11,
+              display: 'flex',
+              gap: '0.375rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            {TERRITORIES.filter((t) => t.key !== 'BUF').map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => fireCannon(t.key)}
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.625rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  padding: '0.375rem 0.625rem',
+                  background: 'rgba(8,12,22,0.92)',
+                  color: t.color,
+                  border: `1px solid ${t.color}`,
+                  borderRadius: '2px',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(6px)',
+                  boxShadow: `0 0 14px ${t.color}55`,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                FIRE @ {t.key}{hits[t.key] > 0 ? ` · ${hits[t.key]}` : ''}
+              </button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Cannonball overlay — top-level SVG */}
+        {activeShot && (
+          <svg
+            key={`shot-${activeShot.id}`}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 11,
+              pointerEvents: 'none',
+            }}
+          >
+            <CannonBall shot={activeShot} />
+          </svg>
+        )}
+
+        {/* Impact ring on target */}
+        {impact && <ImpactRing key={`impact-${impact.id}`} target={impact.targetKey} />}
 
         {/* Title — top center */}
         <motion.div
