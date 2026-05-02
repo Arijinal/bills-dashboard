@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { RiUser3Fill } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader, PercentileBar, DataTable } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
 import { joshAllen } from '../data/mockData';
 import { weeklyGrades } from '../data/analyticsData';
+import { getStat } from '../data/statContext';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -14,10 +16,30 @@ const fade = (i = 0) => ({
 
 const mono = { fontFamily: 'var(--font-mono)' };
 const sans = { fontFamily: 'var(--font-sans)' };
+const cellClickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: '0.5rem',
+  textAlign: 'left',
+  cursor: 'pointer',
+};
+const barClickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: '0.375rem 0.5rem',
+  textAlign: 'left',
+  cursor: 'pointer',
+  width: '100%',
+};
 
 export default function AllenCenter() {
   const s = joshAllen.season;
   const totalYards = s.passingYards + s.rushYards;
+
+  const [activeStat, setActiveStat] = useState(null);
+  const open = (id) => setActiveStat(getStat('allen', id));
 
   // Weekly Rating line chart
   const ratingOptions = {
@@ -217,12 +239,24 @@ export default function AllenCenter() {
       {/* Top Stats Row */}
       <motion.div {...fade(1)}>
         <Panel style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1.25rem' }}>
-          <DataCell label="PASSER RATING" value={s.rating.toFixed(1)} sub="Season" size="large" />
-          <DataCell label="EPA/PLAY" value={s.epaPlay.toFixed(2)} sub="6th in NFL" size="large" />
-          <DataCell label="COMP %" value={`${s.compPct}%`} sub={`${s.completions}/${s.attempts}`} size="large" />
-          <DataCell label="PASS TDs" value={s.passingTDs} sub={`${s.interceptions} INT`} size="large" />
-          <DataCell label="RUSH TDs" value={s.rushTDs} sub={`${s.rushYards} rush yds`} size="large" />
-          <DataCell label="TOTAL YARDS" value={totalYards.toLocaleString()} sub={`${s.yardsPerAttempt} Y/A`} size="large" />
+          <button type="button" onClick={() => open('passerRating')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="PASSER RATING" value={s.rating.toFixed(1)} sub="Season" size="large" />
+          </button>
+          <button type="button" onClick={() => open('epaPlay')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="EPA/PLAY" value={s.epaPlay.toFixed(2)} sub="6th in NFL" size="large" />
+          </button>
+          <button type="button" onClick={() => open('compPct')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="COMP %" value={`${s.compPct}%`} sub={`${s.completions}/${s.attempts}`} size="large" />
+          </button>
+          <button type="button" onClick={() => open('passTDs')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="PASS TDs" value={s.passingTDs} sub={`${s.interceptions} INT`} size="large" />
+          </button>
+          <button type="button" onClick={() => open('rushTDs')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="RUSH TDs" value={s.rushTDs} sub={`${s.rushYards} rush yds`} size="large" />
+          </button>
+          <button type="button" onClick={() => open('totalYards')} className="stat-clickable" style={cellClickWrap}>
+            <DataCell label="TOTAL YARDS" value={totalYards.toLocaleString()} sub={`${s.yardsPerAttempt} Y/A`} size="large" />
+          </button>
         </Panel>
       </motion.div>
 
@@ -243,16 +277,24 @@ export default function AllenCenter() {
         <Panel>
           <SectionHeader title="Advanced Metrics" subtitle="Percentile rankings among qualified QBs" context="These analytics go beyond the box score to measure how Josh Allen performs relative to what's expected given the difficulty of each play." />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            <PercentileBar value={cpoePercent} max={100} label="CPOE" displayValue={`+${s.cpoe}`} />
-            <PercentileBar value={s.deepBallAcc} max={100} label="Deep Ball Acc" displayValue={`${s.deepBallAcc}%`} />
-            <PercentileBar
-              value={pressureInverted}
-              max={100}
-              label="Pressure Rate"
-              displayValue={`${s.pressureRate}%`}
-              color={pressureInverted >= 50 ? undefined : 'var(--signal-warning)'}
-            />
-            <PercentileBar value={s.qbr} max={100} label="QBR" displayValue={s.qbr.toFixed(1)} />
+            <button type="button" onClick={() => open('cpoe')} className="stat-clickable" style={barClickWrap}>
+              <PercentileBar value={cpoePercent} max={100} label="CPOE" displayValue={`+${s.cpoe}`} />
+            </button>
+            <button type="button" onClick={() => open('deepBallAcc')} className="stat-clickable" style={barClickWrap}>
+              <PercentileBar value={s.deepBallAcc} max={100} label="Deep Ball Acc" displayValue={`${s.deepBallAcc}%`} />
+            </button>
+            <button type="button" onClick={() => open('pressureRate')} className="stat-clickable" style={barClickWrap}>
+              <PercentileBar
+                value={pressureInverted}
+                max={100}
+                label="Pressure Rate"
+                displayValue={`${s.pressureRate}%`}
+                color={pressureInverted >= 50 ? undefined : 'var(--signal-warning)'}
+              />
+            </button>
+            <button type="button" onClick={() => open('qbr')} className="stat-clickable" style={barClickWrap}>
+              <PercentileBar value={s.qbr} max={100} label="QBR" displayValue={s.qbr.toFixed(1)} />
+            </button>
           </div>
         </Panel>
       </motion.div>
@@ -266,6 +308,8 @@ export default function AllenCenter() {
           defaultSort={{ key: 'week', dir: 'asc' }}
         />
       </motion.div>
+
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
       </div>
     </>
   );
