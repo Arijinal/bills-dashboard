@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Chart from 'react-apexcharts';
 import { Panel, DataCell, SectionHeader, PercentileBar, DataTable } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
 import { advancedMetrics, snapCountSummary, weeklyGrades } from '../data/analyticsData';
+import { getStat } from '../data/statContext';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -11,6 +14,23 @@ const fade = (i = 0) => ({
 
 const mono = { fontFamily: 'var(--font-mono)' };
 const sans = { fontFamily: 'var(--font-sans)' };
+const clickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: '0.375rem 0.5rem',
+  textAlign: 'left',
+  cursor: 'pointer',
+  width: '100%',
+};
+const rankClickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: '0.5rem',
+  textAlign: 'left',
+  cursor: 'pointer',
+};
 
 // Map raw metrics to 0-100 percentile-like scale for display
 function epaToPercent(epa) {
@@ -76,6 +96,9 @@ export default function TeamStatsPage() {
   const def = advancedMetrics.defense;
   const overall = advancedMetrics.overall;
   const snaps = snapCountSummary;
+
+  const [activeStat, setActiveStat] = useState(null);
+  const open = (id) => setActiveStat(getStat('efficiency', id));
 
   // Season results table
   const resultsColumns = [
@@ -186,18 +209,30 @@ export default function TeamStatsPage() {
         <Panel>
           <SectionHeader title="Offense Metrics" subtitle="Efficiency and performance rates" context="Advanced metrics measure efficiency beyond traditional stats. EPA (Expected Points Added) shows how much each play helps or hurts scoring chances." />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <PercentileBar value={epaToPercent(off.epaPerPlay)} max={100} label="EPA/Play" displayValue={off.epaPerPlay.toFixed(3)} />
-            <PercentileBar value={off.successRate * 100} max={100} label="Success Rate" displayValue={`${(off.successRate * 100).toFixed(1)}%`} />
-            <PercentileBar value={off.explosivePlayRate * 100 * 5} max={100} label="Explosive Plays" displayValue={`${(off.explosivePlayRate * 100).toFixed(1)}%`} />
-            <PercentileBar value={off.redZoneTdRate * 100} max={100} label="Red Zone TD%" displayValue={`${(off.redZoneTdRate * 100).toFixed(1)}%`} />
-            <PercentileBar value={off.thirdDownRate * 100} max={100} label="3rd Down Conv" displayValue={`${(off.thirdDownRate * 100).toFixed(1)}%`} />
-            <PercentileBar
-              value={100 - off.pressureRate * 100}
-              max={100}
-              label="Pass Prot"
-              displayValue={`${(off.pressureRate * 100).toFixed(1)}% press`}
-              color={off.pressureRate > 0.3 ? 'var(--signal-warning)' : undefined}
-            />
+            <button type="button" onClick={() => open('offEpaPerPlay')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={epaToPercent(off.epaPerPlay)} max={100} label="EPA/Play" displayValue={off.epaPerPlay.toFixed(3)} />
+            </button>
+            <button type="button" onClick={() => open('offSuccessRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={off.successRate * 100} max={100} label="Success Rate" displayValue={`${(off.successRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('offExplosiveRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={off.explosivePlayRate * 100 * 5} max={100} label="Explosive Plays" displayValue={`${(off.explosivePlayRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('offRedZoneTd')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={off.redZoneTdRate * 100} max={100} label="Red Zone TD%" displayValue={`${(off.redZoneTdRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('offThirdDown')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={off.thirdDownRate * 100} max={100} label="3rd Down Conv" displayValue={`${(off.thirdDownRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('offPressureRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar
+                value={100 - off.pressureRate * 100}
+                max={100}
+                label="Pass Prot"
+                displayValue={`${(off.pressureRate * 100).toFixed(1)}% press`}
+                color={off.pressureRate > 0.3 ? 'var(--signal-warning)' : undefined}
+              />
+            </button>
           </div>
         </Panel>
 
@@ -205,12 +240,24 @@ export default function TeamStatsPage() {
         <Panel>
           <SectionHeader title="Defense Metrics" subtitle="Stopping power and pressure rates" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <PercentileBar value={epaToPercent(-def.epaPerPlay)} max={100} label="EPA/Play" displayValue={def.epaPerPlay.toFixed(3)} />
-            <PercentileBar value={(1 - def.successRate) * 100} max={100} label="Stop Rate" displayValue={`${((1 - def.successRate) * 100).toFixed(1)}%`} />
-            <PercentileBar value={(1 - def.explosivePlayRate) * 100} max={100} label="Explosive Suppr" displayValue={`${(def.explosivePlayRate * 100).toFixed(1)}%`} />
-            <PercentileBar value={(1 - def.redZoneTdRate) * 100} max={100} label="Red Zone Stop" displayValue={`${(def.redZoneTdRate * 100).toFixed(1)}% TD`} />
-            <PercentileBar value={(1 - def.thirdDownRate) * 100} max={100} label="3rd Down Stop" displayValue={`${(def.thirdDownRate * 100).toFixed(1)}%`} />
-            <PercentileBar value={def.pressureRate * 100 * 2.5} max={100} label="Pressure Rate" displayValue={`${(def.pressureRate * 100).toFixed(1)}%`} />
+            <button type="button" onClick={() => open('defEpaPerPlay')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={epaToPercent(-def.epaPerPlay)} max={100} label="EPA/Play" displayValue={def.epaPerPlay.toFixed(3)} />
+            </button>
+            <button type="button" onClick={() => open('defSuccessRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={(1 - def.successRate) * 100} max={100} label="Stop Rate" displayValue={`${((1 - def.successRate) * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('defExplosiveRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={(1 - def.explosivePlayRate) * 100} max={100} label="Explosive Suppr" displayValue={`${(def.explosivePlayRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('defRedZoneAllowed')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={(1 - def.redZoneTdRate) * 100} max={100} label="Red Zone Stop" displayValue={`${(def.redZoneTdRate * 100).toFixed(1)}% TD`} />
+            </button>
+            <button type="button" onClick={() => open('defThirdDownAllowed')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={(1 - def.thirdDownRate) * 100} max={100} label="3rd Down Stop" displayValue={`${(def.thirdDownRate * 100).toFixed(1)}%`} />
+            </button>
+            <button type="button" onClick={() => open('defPressureRate')} className="stat-clickable" style={clickWrap}>
+              <PercentileBar value={def.pressureRate * 100 * 2.5} max={100} label="Pressure Rate" displayValue={`${(def.pressureRate * 100).toFixed(1)}%`} />
+            </button>
           </div>
         </Panel>
       </motion.div>
@@ -305,33 +352,43 @@ export default function TeamStatsPage() {
       <motion.div {...fade(4)}>
         <SectionHeader title="Key Rankings" subtitle="Overall team analytics" />
         <Panel style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem' }}>
-          <DataCell
-            label="SRS RATING"
-            value={overall.srsRating.toFixed(1)}
-            sub="Simple Rating System"
-            size="large"
-          />
-          <DataCell
-            label="DVOA"
-            value={`${overall.dvoa.toFixed(1)}%`}
-            sub="Defense-adj. Value Over Avg"
-            size="large"
-          />
-          <DataCell
-            label="PYTHAG WINS"
-            value={overall.pythagoreanWins.toFixed(1)}
-            sub="Expected wins from PD"
-            size="large"
-          />
-          <DataCell
-            label="WPA"
-            value={`+${overall.winProbabilityAdded.toFixed(1)}`}
-            sub="Wins over expected"
-            trend="up"
-            size="large"
-          />
+          <button type="button" onClick={() => open('srs')} className="stat-clickable" style={rankClickWrap}>
+            <DataCell
+              label="SRS RATING"
+              value={overall.srsRating.toFixed(1)}
+              sub="Simple Rating System"
+              size="large"
+            />
+          </button>
+          <button type="button" onClick={() => open('dvoa')} className="stat-clickable" style={rankClickWrap}>
+            <DataCell
+              label="DVOA"
+              value={`${overall.dvoa.toFixed(1)}%`}
+              sub="Defense-adj. Value Over Avg"
+              size="large"
+            />
+          </button>
+          <button type="button" onClick={() => open('pythagorean')} className="stat-clickable" style={rankClickWrap}>
+            <DataCell
+              label="PYTHAG WINS"
+              value={overall.pythagoreanWins.toFixed(1)}
+              sub="Expected wins from PD"
+              size="large"
+            />
+          </button>
+          <button type="button" onClick={() => open('wpa')} className="stat-clickable" style={rankClickWrap}>
+            <DataCell
+              label="WPA"
+              value={`+${overall.winProbabilityAdded.toFixed(1)}`}
+              sub="Wins over expected"
+              trend="up"
+              size="large"
+            />
+          </button>
         </Panel>
       </motion.div>
+
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
     </div>
   );
 }
