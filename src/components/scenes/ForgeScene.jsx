@@ -6,162 +6,127 @@ import { billsDraft2026 } from '../../data/draftData';
 
 /**
  * ForgeScene — Chapter VI.
- * AUTO-PLAY: torii-gate background. Needs banner + 4 corner gacha cards +
- * center prophecy + pick badge cascade in on viewport entry.
+ * Calligraphic player names flank the torii uprights so the gate reads
+ * cleanly and the names feel inscribed onto the chapter, not stamped over
+ * it. Tapping a name opens the full scouting card with the complete
+ * combine grid.
  */
 
 const ease = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, amount: 0.2 };
 
-const PRIORITY_COLOR = {
-  critical: '#FF6464',
-  high: '#E8B23C',
-  medium: 'var(--bills-blue-bright)',
-  low: 'var(--signal-positive)',
-};
+// Each pick gets a fixed slot flanking the torii — 5 names left, 5 right.
+// Coordinates assume the torii image's central uprights are around 36% / 64%.
+const NAME_SLOTS = [
+  { side: 'left',  top: '14%',  x: '4%' },
+  { side: 'left',  top: '26%',  x: '6%' },
+  { side: 'left',  top: '38%',  x: '4%' },
+  { side: 'left',  top: '50%',  x: '6%' },
+  { side: 'left',  top: '62%',  x: '4%' },
+  { side: 'right', top: '14%',  x: '4%' },
+  { side: 'right', top: '26%',  x: '6%' },
+  { side: 'right', top: '38%',  x: '4%' },
+  { side: 'right', top: '50%',  x: '6%' },
+  { side: 'right', top: '62%',  x: '4%' },
+];
 
-// ── Grade Ring (44px — compact for 10-card grid) ──────────────────
-function GradeRing({ value, color }) {
-  const size = 44;
-  const stroke = 3;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const offset = c - (value / 100) * c;
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
-      <circle cx={size / 2} cy={size / 2} r={r}
-        stroke="rgba(255,255,255,0.12)" strokeWidth={stroke} fill="none" />
-      <circle cx={size / 2} cy={size / 2} r={r}
-        stroke={color} strokeWidth={stroke} fill="none"
-        strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={offset}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
-      <text x="50%" y="54%" textAnchor="middle" dominantBaseline="middle"
-        fill="var(--text-primary)" fontSize="11" fontWeight="700"
-        fontFamily="var(--font-mono)">{value}</text>
-    </svg>
-  );
-}
-
-// ── Gacha hero card with gold corner ornaments — Bills 2026 pick ──
-function ProspectCard({ p, onClick }) {
+// ── A single calligraphic player name with its meta line ─────────
+function CursiveNameEntry({ p, slot, onClick, delay }) {
   const elite = p.fitScore >= 92;
   const accent = elite ? '#E8B23C' : 'var(--bills-blue-bright)';
-  const accentRGBA = elite ? 'rgba(232,178,60,0.4)' : 'rgba(51,119,255,0.3)';
-  const ringColor = p.fitScore >= 90 ? '#37D67A' : p.fitScore >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
-  const fitColor = p.fitScore >= 90 ? '#37D67A' : p.fitScore >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
-
-  const Corner = ({ position }) => {
-    const styles = {
-      tl: { top: -1, left: -1, transform: 'rotate(0deg)' },
-      tr: { top: -1, right: -1, transform: 'rotate(90deg)' },
-      bl: { bottom: -1, left: -1, transform: 'rotate(-90deg)' },
-      br: { bottom: -1, right: -1, transform: 'rotate(180deg)' },
-    };
-    return (
-      <svg width="14" height="14" viewBox="0 0 14 14"
-        style={{ position: 'absolute', ...styles[position], pointerEvents: 'none' }}>
-        <path d="M0 0 L10 0 M0 0 L0 10 M0 0 L4 4"
-          stroke={accent} strokeWidth="1.4" fill="none"
-          style={{ filter: `drop-shadow(0 0 2px ${accent})` }} />
-      </svg>
-    );
-  };
+  const fitColor = p.fitScore >= 90 ? '#5BE5A1' : p.fitScore >= 80 ? 'var(--bills-blue-bright)' : '#E8B23C';
+  const c = p.combine || {};
+  const verifiedForty = c.fortyYard ?? p.fortyYard;
+  const sideAlign = slot.side === 'left' ? 'flex-start' : 'flex-end';
+  const textAlign = slot.side === 'left' ? 'left' : 'right';
 
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
-      aria-label={`Round ${p.round} pick ${p.pick} — ${p.name}, ${p.position} from ${p.school}. Tap for full scouting report.`}
-      className="ember-host anvil-glow stat-clickable"
+      aria-label={`Round ${p.round} pick ${p.pick} — ${p.name}, ${p.position} from ${p.school}. Tap for the full scouting report.`}
+      className="stat-clickable"
+      initial={{ opacity: 0, x: slot.side === 'left' ? -28 : 28, filter: 'blur(6px)' }}
+      whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+      viewport={VIEWPORT}
+      transition={{ duration: 0.6, delay, ease }}
       style={{
-        width: '100%',
-        maxWidth: 148,
-        padding: '0.5rem 0.625rem',
-        background: 'linear-gradient(135deg, rgba(8, 12, 22, 0.92), rgba(10, 26, 64, 0.85))',
-        border: `2px solid ${accent}`,
-        borderRadius: '3px',
-        position: 'relative',
-        backdropFilter: 'blur(6px)',
-        textAlign: 'left',
+        position: 'absolute',
+        top: slot.top,
+        [slot.side]: slot.x,
+        maxWidth: 'min(34%, 360px)',
+        zIndex: 8,
+        background: 'transparent',
+        border: 'none',
+        padding: '0.25rem 0.5rem',
+        textAlign,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: sideAlign,
+        gap: 2,
         cursor: 'pointer',
-      }}>
-      <Corner position="tl" />
-      <Corner position="tr" />
-      <Corner position="bl" />
-      <Corner position="br" />
-
-      {/* Round/pick badge */}
+        font: 'inherit',
+      }}
+    >
+      {/* Round / pick + elite chip */}
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.5rem',
-        letterSpacing: '0.16em',
+        fontSize: '0.55rem',
+        letterSpacing: '0.24em',
         color: accent,
         fontWeight: 700,
-        marginBottom: 4,
-      }}>R{p.round} · #{p.pick}</div>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.5625rem',
-          letterSpacing: '0.18em',
-          color: accent,
-          fontWeight: 700,
-          padding: '0.125rem 0.375rem',
-          border: `1px solid ${accent}`,
-          borderRadius: '2px',
-        }}>{p.position}</div>
-        {elite && (
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.5rem',
-            letterSpacing: '0.15em',
-            color: '#E8B23C',
-            fontWeight: 700,
-          }}>★ ELITE FIT</div>
-        )}
-      </div>
-
-      <div style={{
-        fontWeight: 700,
-        fontSize: '0.875rem',
-        color: '#fff',
-        marginTop: 6,
-        textShadow: '0 0 8px rgba(0,0,0,0.9)',
-        lineHeight: 1.1,
-      }}>{p.name}</div>
-      <div style={{
-        fontFamily: "'Shippori Mincho', serif",
-        fontStyle: 'italic',
-        fontSize: '0.6875rem',
-        color: 'var(--text-secondary)',
-        marginTop: 2,
-      }}>{p.school}</div>
-
-      <div style={{
+        textShadow: '0 0 12px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.9)',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '0.25rem 0',
+        alignItems: 'baseline',
+        gap: '0.5rem',
+        flexDirection: slot.side === 'right' ? 'row-reverse' : 'row',
       }}>
-        <GradeRing value={p.fitScore} color={ringColor} />
+        <span>R{p.round} · #{p.pick}</span>
+        {elite && <span style={{ color: '#E8B23C' }}>★ ELITE FIT</span>}
       </div>
 
+      {/* Name in cursive — the hero */}
+      <div style={{
+        fontFamily: "'Tangerine', 'Apple Chancery', 'Brush Script MT', cursive",
+        fontWeight: 700,
+        fontSize: 'clamp(2.4rem, 4.4vw, 3.6rem)',
+        color: 'var(--text-primary)',
+        lineHeight: 0.92,
+        letterSpacing: '0.005em',
+        textShadow: '0 0 30px rgba(0,0,0,0.95), 0 4px 14px rgba(0,0,0,0.95), 0 0 18px rgba(232,178,60,0.22)',
+        marginTop: -2,
+        marginBottom: 2,
+        whiteSpace: 'nowrap',
+      }}>{p.name}</div>
+
+      {/* Position · school · verified forty */}
       <div style={{
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.5rem',
-        letterSpacing: '0.1em',
-        color: 'var(--text-muted)',
-        textAlign: 'center',
-        marginBottom: 3,
-      }}>BILLS FIT · {p.fitScore}</div>
+        fontSize: '0.625rem',
+        letterSpacing: '0.16em',
+        color: 'var(--text-secondary)',
+        fontWeight: 600,
+        textShadow: '0 0 10px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.9)',
+        display: 'flex',
+        gap: '0.5rem',
+        alignItems: 'baseline',
+        flexDirection: slot.side === 'right' ? 'row-reverse' : 'row',
+        flexWrap: 'wrap',
+      }}>
+        <span style={{ color: accent, fontWeight: 700 }}>{p.position}</span>
+        <span>· {p.school.toUpperCase()}</span>
+        {verifiedForty != null && <span style={{ color: '#5BE5A1', fontWeight: 700 }}>· {verifiedForty}s</span>}
+      </div>
+
+      {/* Tiny Bills-Fit bar */}
       <div style={{
-        height: 4,
-        background: 'rgba(255,255,255,0.08)',
-        borderRadius: 2,
+        marginTop: 4,
+        height: 2,
+        width: 'min(160px, 100%)',
+        background: 'rgba(255,255,255,0.12)',
+        borderRadius: 1,
         overflow: 'hidden',
+        alignSelf: sideAlign,
       }}>
         <div style={{
           width: `${p.fitScore}%`,
@@ -170,28 +135,13 @@ function ProspectCard({ p, onClick }) {
           boxShadow: `0 0 8px ${fitColor}`,
         }} />
       </div>
-
-      {/* 40-yard time + height/weight (only if measurables verified) */}
-      {(p.height || p.fortyYard) && (
-        <div style={{
-          marginTop: 4,
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: 4,
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.5rem',
-          letterSpacing: '0.04em',
-          color: 'var(--text-secondary)',
-        }}>
-          <span>{p.height ? `${p.height} · ${p.weight}lb` : '—'}</span>
-          {p.fortyYard != null && <span style={{ color: '#5BE5A1' }}>{p.fortyYard}</span>}
-        </div>
-      )}
-    </button>
+    </motion.button>
   );
 }
 
-// Map a Bills 2026 pick to the StatDetailModal schema — full scout card
+// Map a Bills 2026 pick to the StatDetailModal schema — full scout card.
+// Combine grid always renders all 6 drills (N/A for unverified) so the
+// reader sees the complete athletic profile, not just the fields we have.
 function pickToStat(p) {
   if (!p) return null;
   const c = p.combine || {};
@@ -201,6 +151,25 @@ function pickToStat(p) {
     p.ageOnDraftDay ? `Age ${p.ageOnDraftDay}` : null,
     `Bills Fit ${p.fitScore}`,
   ].filter(Boolean);
+
+  const fortyNote = forty == null
+    ? 'Not on file'
+    : forty < 4.4 ? 'Elite speed'
+    : forty < 4.55 ? 'Above average'
+    : 'Functional';
+  const vertNote = c.vertical == null ? 'Not on file'
+    : c.vertical >= 38 ? 'Top-tier explosion' : 'Solid';
+
+  // The combine card — always 6 metrics, N/A for missing.
+  const combineRows = [
+    { label: '40-YARD',       value: forty != null ? `${forty}s`         : 'N/A', note: fortyNote },
+    { label: 'VERTICAL',      value: c.vertical    != null ? `${c.vertical}"` : 'N/A', note: vertNote },
+    { label: 'BROAD JUMP',    value: c.broadJump   != null ? `${c.broadJump}` : 'N/A' },
+    { label: 'BENCH (225lb)', value: c.benchPress  != null ? `${c.benchPress} reps` : 'N/A' },
+    { label: '3-CONE',        value: c.threeCone   != null ? `${c.threeCone}s`      : 'N/A' },
+    { label: 'SHUTTLE',       value: c.shortShuttle != null ? `${c.shortShuttle}s`  : 'N/A' },
+  ];
+
   return {
     label: `R${p.round} · PICK #${p.pick} · ${p.position} · ${p.school.toUpperCase()}`,
     value: p.name,
@@ -208,12 +177,7 @@ function pickToStat(p) {
     verdict: p.fitScore >= 92 ? 'ELITE FIT' : p.fitScore >= 85 ? 'STRONG FIT' : p.fitScore >= 75 ? 'SOLID FIT' : 'PROJECT / DEPTH',
     color: p.fitScore >= 92 ? '#E8B23C' : p.fitScore >= 85 ? '#37D67A' : p.fitScore >= 75 ? 'var(--bills-blue-bright)' : '#E8A010',
     breakdown: [
-      ...(forty != null ? [{ label: '40-YARD', value: `${forty}s`, note: forty < 4.4 ? 'Elite speed' : forty < 4.55 ? 'Above average' : 'Functional' }] : []),
-      ...(c.vertical ? [{ label: 'VERTICAL', value: `${c.vertical}"`, note: c.vertical >= 38 ? 'Top-tier explosion' : 'Solid' }] : []),
-      ...(c.broadJump ? [{ label: 'BROAD JUMP', value: c.broadJump }] : []),
-      ...(c.benchPress ? [{ label: 'BENCH (225lb)', value: `${c.benchPress} reps` }] : []),
-      ...(c.shortShuttle ? [{ label: 'SHORT SHUTTLE', value: `${c.shortShuttle}s` }] : []),
-      ...(c.threeCone ? [{ label: '3-CONE', value: `${c.threeCone}s` }] : []),
+      ...combineRows,
       ...(c.handSize ? [{ label: 'HAND SIZE', value: c.handSize }] : []),
       ...(c.armLength ? [{ label: 'ARM LENGTH', value: c.armLength }] : []),
       { label: 'BILLS FIT SCORE', value: `${p.fitScore} / 100`, color: p.fitScore >= 90 ? '#5BE5A1' : 'var(--text-primary)' },
@@ -297,35 +261,19 @@ export default function ForgeScene() {
             color: 'var(--text-secondary)',
             marginTop: '0.5rem',
             textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-          }}>The 2026 Bills draft class — tap any card for the full scout report.</div>
+          }}>The 2026 Bills draft class — tap any name for the full scout report.</div>
         </motion.div>
 
-        {/* THE 10-PICK GRID — 5×2 band along the bottom so the torii uprights read cleanly above */}
-        <div style={{
-          position: 'absolute',
-          bottom: '12%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '94%',
-          maxWidth: 1280,
-          zIndex: 8,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-          gap: '0.625rem',
-          justifyItems: 'center',
-        }}>
-          {picks.map((p, i) => (
-            <motion.div
-              key={`${p.round}-${p.pick}`}
-              initial={{ opacity: 0, scale: 0.7, filter: 'blur(8px)' }}
-              whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              viewport={VIEWPORT}
-              transition={{ duration: 0.5, delay: 0.18 + i * 0.06, ease }}
-            >
-              <ProspectCard p={p} onClick={() => setActiveStat(pickToStat(p))} />
-            </motion.div>
-          ))}
-        </div>
+        {/* TEN CALLIGRAPHIC NAMES FLANKING THE TORII — 5 left, 5 right */}
+        {picks.map((p, i) => (
+          <CursiveNameEntry
+            key={`${p.round}-${p.pick}`}
+            p={p}
+            slot={NAME_SLOTS[i]}
+            onClick={() => setActiveStat(pickToStat(p))}
+            delay={0.2 + (i % 5) * 0.08}
+          />
+        ))}
 
         {/* CLASS GRADE BADGE (bottom-center) */}
         <motion.div
