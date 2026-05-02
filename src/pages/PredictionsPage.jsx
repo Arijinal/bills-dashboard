@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RiTrophyLine, RiHistoryLine, RiTeamLine, RiFootballLine } from 'react-icons/ri';
 import { Panel, DataCell, SectionHeader } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
+import { getStat } from '../data/statContext';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -100,10 +102,23 @@ const btnSecondary = {
   color: 'var(--text-data)',
 };
 
+const consensusClickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: 0,
+  textAlign: 'left',
+  cursor: 'pointer',
+  width: '100%',
+  display: 'block',
+};
+
 export default function PredictionsPage() {
   const [billsScore, setBillsScore] = useState('');
   const [oppScore, setOppScore] = useState('');
   const [predictions, setPredictions] = useState({ history: [] });
+  const [activeStat, setActiveStat] = useState(null);
+  const openConsensus = (id) => setActiveStat(getStat('crystal-ball', id));
 
   // Prop predictions
   const [firstTD, setFirstTD] = useState('');
@@ -350,11 +365,12 @@ export default function PredictionsPage() {
       <motion.div {...fade(3)}>
         <SectionHeader
           title="Community Consensus"
-          subtitle={`Based on ${consensus.totalVoters.toLocaleString()} fan predictions`}
+          subtitle={`Based on ${consensus.totalVoters.toLocaleString()} fan predictions · click any panel for Junior's take`}
           right={<RiTeamLine style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }} />}
         />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
           {/* Average Score */}
+          <button type="button" onClick={() => openConsensus('consensusScore')} className="stat-clickable" style={consensusClickWrap}>
           <Panel>
             <div style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
               Average Predicted Score
@@ -380,8 +396,10 @@ export default function PredictionsPage() {
               </span>
             </div>
           </Panel>
+          </button>
 
           {/* First TD Distribution */}
+          <button type="button" onClick={() => openConsensus('consensusFirstTD')} className="stat-clickable" style={consensusClickWrap}>
           <Panel>
             <div style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
               First TD Scorer Picks
@@ -411,8 +429,10 @@ export default function PredictionsPage() {
               ))}
             </div>
           </Panel>
+          </button>
 
           {/* Over/Under Split */}
+          <button type="button" onClick={() => openConsensus('consensusOverUnder')} className="stat-clickable" style={consensusClickWrap}>
           <Panel>
             <div style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.75rem' }}>
               Over/Under 48.5
@@ -454,6 +474,7 @@ export default function PredictionsPage() {
               ))}
             </div>
           </Panel>
+          </button>
         </div>
       </motion.div>
 
@@ -511,6 +532,8 @@ export default function PredictionsPage() {
           </Panel>
         </motion.div>
       )}
+
+      <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
       </div>
     </>
   );

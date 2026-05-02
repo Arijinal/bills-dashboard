@@ -762,6 +762,54 @@ export const statContext = {
     impact: 'QBR is ESPN\'s opinionated metric — it weights for clutch, opponent strength, and game-script. 70.1 puts Allen 9th among qualifiers, but the rushing component (82.4) is generational. The pure-pass QBR (67.8) is where the pressure rate shows up.',
     uncleJrTake: "QBR at 70.1 is solid but not where the kid lives. He's been north of 75 plenty. That pressure rate explains the dip — see the pass-rush note.",
   },
+
+  // Crystal Ball — Community Consensus modals (PredictionsPage)
+  'crystal-ball:consensusScore': {
+    label: 'COMMUNITY AVG SCORE',
+    value: '27.4 — 20.1',
+    sublabel: 'Bills 27.4 · Opp 20.1 · 4,218 fan picks',
+    verdict: 'BULLISH ON BUFFALO',
+    color: 'var(--bills-blue-bright)',
+    breakdown: [
+      { label: 'BUF AVG', value: '27.4', note: 'High-confidence number' },
+      { label: 'OPP AVG', value: '20.1' },
+      { label: 'AVG MARGIN', value: '+7.3', note: 'Mafia floor expectation' },
+      { label: 'TOTAL VOTERS', value: '4,218' },
+    ],
+    impact: 'Mafia consensus settles on a 7.3-point Bills win. 27.4 points from the Bills is a confident number — fans expect the offense to keep cooking. Anything below 24 suggests the crowd thinks the OL gives up the game.',
+    uncleJrTake: "Mafia's bullish on the offense, son. 27.4 from the Bills tells you they trust the kid stays clean. 7-point margin? That's the FLOOR we expect. Anything less and Pop'd say we're underachievin'.",
+  },
+  'crystal-ball:consensusFirstTD': {
+    label: 'FIRST TD CONSENSUS',
+    value: 'ALLEN 32%',
+    sublabel: 'Mafia leans on the QB legs · Cook 28% close behind',
+    verdict: 'TWO-HEADED',
+    color: 'var(--bills-blue-bright)',
+    breakdown: [
+      { label: 'JOSH ALLEN', value: '32%', note: 'Goal-line legs + scramble TDs' },
+      { label: 'JAMES COOK', value: '28%', note: 'Bell-cow back, red-zone touches' },
+      { label: 'KHALIL SHAKIR', value: '18%', note: 'Slot reliability' },
+      { label: 'DALTON KINCAID', value: '13%', note: 'TE red-zone weapon' },
+      { label: 'KEON COLEMAN', value: '9%', note: 'Outside vertical threat' },
+    ],
+    impact: 'Allen and Cook combined account for 60% of fan first-TD picks. The crowd expects the Bills to score early on the ground or via Allen scramble. Skill-position picks (Shakir, Kincaid, Coleman) split the remaining 40%.',
+    uncleJrTake: "Mafia's bettin' on the LEGS. 32% on the kid first scoring — that's his rush TD volume showin' up. Cook at 28% close behind. They expect to RUN it in early.",
+  },
+  'crystal-ball:consensusOverUnder': {
+    label: 'TOTAL POINTS · ALLEN TDs',
+    value: '62% OVER',
+    sublabel: 'O/U 48.5 · Allen TD distribution mode = 3',
+    verdict: 'TRACK MEET EXPECTED',
+    color: '#5BE5A1',
+    breakdown: [
+      { label: 'OVER 48.5', value: '62%', note: 'Mafia leans high-scoring' },
+      { label: 'UNDER 48.5', value: '38%' },
+      { label: 'ALLEN MODE TDs', value: '3', note: '35% pick three throwing scores' },
+      { label: 'ALLEN MEAN', value: '2.7', note: 'Distribution centers near 3' },
+    ],
+    impact: 'Mafia leans 62% over on a 48.5 total — they think this is a track meet. Allen TD distribution clusters tight around 3 (35% mode, 28% pick 2, 18% pick 4). The crowd expects offense from both sides.',
+    uncleJrTake: "Mafia leanin' OVER 48.5 — 62%. Tells you they think this is a track meet, not a rock fight. Crowd settles on THREE throwin' TDs from the kid. That's his median. Pop'd say defense gotta show up.",
+  },
 };
 
 /** Helper to look up by a single id within a scene. */

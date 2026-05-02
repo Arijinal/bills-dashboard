@@ -3,6 +3,7 @@ import { ScrollOrchestratorProvider } from './components/ScrollOrchestrator';
 import QuestLog from './components/QuestLog';
 import ChapterTabs from './components/ChapterTabs';
 import ChapterDivider from './components/ChapterDivider';
+import TriptychIntro from './components/TriptychIntro';
 
 // Lazy-load each section page (these will be turned into scroll sections)
 const SeasonRoom = lazy(() => import('./pages/SeasonRoom'));       // → SECTION 2 detail follow-up
@@ -173,8 +174,9 @@ export default function App() {
 
         <Suspense fallback={<SectionFallback />}><ProphecyScene /></Suspense>
         <ChapterDivider />
-        {/* Detail follow-up — Predictions + Wall + Polls */}
+        {/* Detail follow-up — Triptych: Algorithm / Mafia / Crowd */}
         <section id="prophecy-detail" style={{ position: 'relative', padding: '4rem 2rem', background: 'var(--bg-base)', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+          <TriptychIntro />
           <Suspense fallback={<SectionFallback />}>
             <PredictionsPage />
             <PropheticWall />
