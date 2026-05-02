@@ -4,9 +4,10 @@ import { createPortal } from 'react-dom';
 import { JUNIOR_SEED, PAINT_BY_ID, PAINT_STYLES, pickPaint, pickRotation, pickPosition } from '../data/wallSeed';
 
 const STORAGE_KEY = 'billsPropheticWall.v1';
-const PER_PAGE = 25;
+const PER_PAGE = 10;
 const MAX_PRED_CHARS = 280;
 const MAX_SIG_CHARS = 24;
+const TAG_WIDTH = 300;
 
 const mono = { fontFamily: 'var(--font-mono)' };
 const sans = { fontFamily: 'var(--font-sans)' };
@@ -37,12 +38,17 @@ function saveFanPredictions(list) {
 function GraffitiTag({ p, onClick, pinned }) {
   const paint = PAINT_BY_ID[p.paintId] || PAINT_STYLES[0];
   const [hovered, setHovered] = useState(false);
+  // Hover rotates the tag back to 0° for legibility (chaos at rest, readable on focus).
+  const rotation = hovered ? 0 : p.rotation;
+  const scale = hovered ? 1.04 : 1;
   return (
     <motion.button
       type="button"
       onClick={() => onClick(p)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
       initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -50,32 +56,46 @@ function GraffitiTag({ p, onClick, pinned }) {
         position: 'absolute',
         top: `${p.topPct}%`,
         left: `${p.leftPct}%`,
-        transform: `translate(-50%, -50%) rotate(${p.rotation}deg) scale(${hovered ? 1.08 : 1})`,
+        transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`,
         transformOrigin: 'center',
+        width: `${TAG_WIDTH}px`,
         background: 'transparent',
         border: 'none',
-        padding: '0.25rem 0.5rem',
+        padding: '0.5rem 0.625rem',
         cursor: 'pointer',
         fontFamily: paint.font,
         color: paint.color,
         textShadow: paint.glow,
         filter: paint.filter,
-        whiteSpace: 'nowrap',
-        zIndex: hovered ? 100 : pinned ? 50 : Math.round(p.rotation) % 30 + 1,
-        transition: 'transform 0.25s var(--ease-out-expo), filter 0.25s ease',
-        lineHeight: 1.05,
+        whiteSpace: 'normal',
+        wordWrap: 'break-word',
+        zIndex: hovered ? 200 : pinned ? 60 : Math.round(p.rotation) % 30 + 1,
+        transition: 'transform 0.3s var(--ease-out-expo), filter 0.25s ease',
+        lineHeight: 1.18,
         letterSpacing: '0.01em',
         textAlign: 'center',
       }}
-      aria-label={`${p.author} predicts ${p.score} for ${p.game}`}
+      aria-label={`${p.author} predicts ${p.score} for ${p.game}: ${p.prediction}`}
     >
-      <div style={{ fontSize: p.fontSize || '1.1rem', fontWeight: 700 }}>
+      <div style={{
+        fontSize: '1.15rem',
+        fontWeight: 700,
+        marginBottom: '0.375rem',
+      }}>
         {p.score}
       </div>
       <div style={{
+        fontSize: '0.8125rem',
+        lineHeight: 1.35,
+        fontWeight: 500,
+        marginBottom: '0.5rem',
+        opacity: 0.95,
+      }}>
+        {p.prediction}
+      </div>
+      <div style={{
         fontSize: '0.6875rem',
-        opacity: 0.85,
-        marginTop: '0.125rem',
+        opacity: 0.8,
         fontFamily: paint.font,
       }}>
         — {p.signature || p.author}
@@ -87,7 +107,7 @@ function GraffitiTag({ p, onClick, pinned }) {
           letterSpacing: '0.22em',
           color: '#E8B23C',
           textShadow: '0 0 6px rgba(232,178,60,0.5)',
-          marginTop: '0.125rem',
+          marginTop: '0.25rem',
         }}>
           ★ PINNED
         </div>

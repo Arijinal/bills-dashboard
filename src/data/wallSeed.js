@@ -32,10 +32,11 @@ export function pickRotation() {
 }
 
 export function pickPosition() {
-  // Random within the wall's safe interior (8–88% on each axis)
+  // Random within the wall's safe interior. Tags are ~300px wide and multi-line tall,
+  // so tighten the spawn box to keep them mostly inside the visible wall area.
   return {
-    topPct: 8 + Math.random() * 80,
-    leftPct: 8 + Math.random() * 80,
+    topPct: 18 + Math.random() * 64, // 18–82% vertical center
+    leftPct: 20 + Math.random() * 60, // 20–80% horizontal center
   };
 }
 
