@@ -28,6 +28,7 @@ const WeatherPage = lazy(() => import('./pages/WeatherPage'));     // → SECTIO
 const NewsPage = lazy(() => import('./pages/NewsPage'));           // → SECTION 11 detail
 const SocialPage = lazy(() => import('./pages/SocialPage'));       // → SECTION 12 detail
 const PredictionsPage = lazy(() => import('./pages/PredictionsPage')); // → SECTION 13 detail
+const PropheticWall = lazy(() => import('./pages/PropheticWall'));     // → SECTION 13 detail (fan wall, augments PredictionsPage)
 const PollsPage = lazy(() => import('./pages/PollsPage'));
 const MafiaCorner = lazy(() => import('./pages/MafiaCorner'));     // → SECTION 14 detail
 const UniversePage = lazy(() => import('./pages/UniversePage'));   // → SECTION 15 detail
@@ -172,10 +173,11 @@ export default function App() {
 
         <Suspense fallback={<SectionFallback />}><ProphecyScene /></Suspense>
         <ChapterDivider />
-        {/* Detail follow-up — Predictions + Polls */}
-        <section id="prophecy-detail" style={{ position: 'relative', padding: '4rem 2rem', background: 'var(--bg-base)' }}>
+        {/* Detail follow-up — Predictions + Wall + Polls */}
+        <section id="prophecy-detail" style={{ position: 'relative', padding: '4rem 2rem', background: 'var(--bg-base)', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
           <Suspense fallback={<SectionFallback />}>
             <PredictionsPage />
+            <PropheticWall />
             <PollsPage />
           </Suspense>
         </section>
