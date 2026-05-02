@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { RiUserSearchLine } from 'react-icons/ri';
 import { Panel, GradeRing, PercentileBar, DataTable, SectionHeader, DataCell } from '../components/ui';
+import StatDetailModal from '../components/StatDetailModal';
 import { playerGrades } from '../data/analyticsData';
 import { players } from '../data/mockData';
 import { topTenByPosition } from '../data/topTenByPosition';
@@ -35,6 +36,66 @@ function trendLabel(trend) {
   return { text: 'STABLE', color: 'var(--text-muted)' };
 }
 
+const metricNarrative = {
+  overallGrade: {
+    impactTpl: (winner, loser, gap) => `Overall grade is the composite — every snap weighted, every play graded. A ${gap.toFixed(1)}-point edge means ${winner} is producing meaningfully more value per opportunity. Anything inside two points is noise; anything past four is a tier-shift.`,
+    junior: (winner, loser, gap) => gap >= 4
+      ? `${gap.toFixed(1)} grade points is a TIER-SHIFT, son. Tape don't lie — ${winner} is in a different conversation right now.`
+      : `Grade gap's only ${gap.toFixed(1)}. That's a coin flip on tape. ${winner} barely edges it — tell me more about who they're playin' WITH.`,
+  },
+  snapCount: {
+    impactTpl: (winner, loser, gap) => `Snap counts are a coach's vote. ${winner} is on the field for ${Math.round(gap)} more snaps this season — that's the "we trust this guy" signal. Reps don't lie.`,
+    junior: (winner, loser, gap) => `Reps tell you everything. ${winner}'s on the field for ${Math.round(gap)} more snaps — that's the COACHES sayin' "we ride with him." Football's still football.`,
+  },
+  war: {
+    impactTpl: (winner, loser, gap) => `WAR — Wins Above Replacement — is the deepest single number we have. It strips out scheme, situation, teammate help. ${winner} produced ${gap.toFixed(1)} more wins of value than ${loser} this season.`,
+    junior: (winner, loser, gap) => `${gap.toFixed(1)} more WINS from one position. WAR strips out the noise — ${winner} is the better football player, period.`,
+  },
+  positionRank: {
+    impactTpl: (winner, loser, gap) => `Position rank is a tournament — every qualifying player at the position sorted into a ladder. ${winner} sits ${Math.round(gap)} rungs higher. The question for the loser is: is the gap real, or is it grade-volatility?`,
+    junior: (winner, loser, gap) => `${winner} ranks ${Math.round(gap)} spots higher at the position. Rank's a tournament — you gotta beat the OTHER guys to climb. ${winner} did. ${loser} hasn't yet.`,
+  },
+};
+
+function comparisonToStat(metric, playerA, playerB, teamAName, teamBName) {
+  const aVal = playerA[metric.key];
+  const bVal = playerB[metric.key];
+  const aBetter = metric.invert ? aVal < bVal : aVal > bVal;
+  const winner = aBetter ? playerA : playerB;
+  const loser = aBetter ? playerB : playerA;
+  const gap = Math.abs(aVal - bVal);
+
+  const fmt = (v) => metric.key === 'war' ? v.toFixed(1) : metric.key === 'positionRank' ? `#${v}` : v.toLocaleString();
+  const narrative = metricNarrative[metric.key];
+
+  return {
+    label: metric.label.toUpperCase(),
+    value: `${fmt(aVal)} — ${fmt(bVal)}`,
+    sublabel: `${playerA.name} (${teamAName}) vs ${playerB.name} (${teamBName})`,
+    verdict: aBetter ? `${teamAName} EDGE` : `${teamBName} EDGE`,
+    color: aBetter ? 'var(--bills-blue-bright)' : '#FF4D4D',
+    breakdown: [
+      { label: playerA.name.toUpperCase(), value: fmt(aVal), note: `${teamAName} · ${playerA.position}` },
+      { label: playerB.name.toUpperCase(), value: fmt(bVal), note: `${teamBName} · ${playerB.position}` },
+      { label: 'GAP', value: metric.key === 'war' ? gap.toFixed(1) : metric.key === 'positionRank' ? `${Math.round(gap)} spots` : Math.round(gap).toLocaleString() },
+      { label: 'EDGE', value: aBetter ? teamAName : teamBName, color: aBetter ? 'var(--bills-blue-bright)' : '#FF4D4D' },
+    ],
+    impact: narrative ? narrative.impactTpl(winner.name, loser.name, gap) : `${winner.name} leads on ${metric.label.toLowerCase()}.`,
+    uncleJrTake: narrative ? narrative.junior(winner.name, loser.name, gap) : `${winner.name} got the edge here, son. Tape don't lie.`,
+  };
+}
+
+const metricRowClickWrap = {
+  background: 'transparent',
+  border: '1px solid transparent',
+  borderRadius: '3px',
+  padding: '0.5rem 0.625rem',
+  textAlign: 'left',
+  cursor: 'pointer',
+  width: '100%',
+  display: 'block',
+};
+
 // Pretty position-aware stat key labels.
 const STAT_LABELS = {
   passingYards: 'Passing Yards', tds: 'Passing TDs', rating: 'Passer Rating', rushYards: 'Rush Yards',
@@ -46,6 +107,7 @@ const STAT_LABELS = {
 export default function ComparisonLab() {
   const [playerAIdx, setPlayerAIdx] = useState(0);
   const [playerBIdx, setPlayerBIdx] = useState(0);
+  const [activeStat, setActiveStat] = useState(null);
 
   const playerA = playerGrades[playerAIdx];
   const positionPeers = useMemo(
@@ -255,7 +317,8 @@ export default function ComparisonLab() {
                 context={`Compare any Bills player against the top 10 NFL peers at the same position. Greens highlight whoever is winning that specific metric.`}
               />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {comparisonMetrics.map(({ label: metricLabel, key, max, invert }) => {
+                {comparisonMetrics.map((metric) => {
+                  const { label: metricLabel, key, max, invert } = metric;
                   const aVal = playerA[key];
                   const bVal = playerB[key];
                   const aDisplay = key === 'war' ? aVal.toFixed(1) : key === 'positionRank' ? `#${aVal}` : aVal;
@@ -264,7 +327,13 @@ export default function ComparisonLab() {
                   const bBetter = invert ? bVal < aVal : bVal > aVal;
 
                   return (
-                    <div key={key}>
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setActiveStat(comparisonToStat(metric, playerA, playerB, 'BUF', playerB.team))}
+                      className="stat-clickable"
+                      style={metricRowClickWrap}
+                    >
                       <div style={{ ...muted, marginBottom: '0.375rem' }}>{metricLabel}</div>
                       <div style={{ display: 'grid', gridTemplateColumns: '6rem 1fr 6rem 1fr', gap: '0.75rem', alignItems: 'center' }}>
                         <span style={{
@@ -290,7 +359,7 @@ export default function ComparisonLab() {
                           color={bBetter ? 'var(--bills-red)' : 'var(--text-muted)'}
                         />
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -312,6 +381,8 @@ export default function ComparisonLab() {
             </Panel>
           </motion.div>
         )}
+
+        <StatDetailModal open={!!activeStat} onClose={() => setActiveStat(null)} stat={activeStat} />
       </div>
     </>
   );
