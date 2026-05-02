@@ -300,7 +300,7 @@ export default function FranchiseScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE FRANCHISE</h1>
+          }}>THE KID</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

@@ -860,7 +860,7 @@ function RosterView({ picks, onSelect }) {
           letterSpacing: '0.02em',
           margin: 0,
           lineHeight: 0.95,
-        }}>THE PROVING GROUNDS</h1>
+        }}>GAME SPEED</h1>
         <div style={{
           fontFamily: "'Shippori Mincho', serif",
           fontStyle: 'italic',

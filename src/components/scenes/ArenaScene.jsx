@@ -287,7 +287,7 @@ export default function ArenaScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE ARENA</h1>
+          }}>MAFIA ROLL CALL</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

@@ -22,22 +22,22 @@ import { useScrollOrchestrator } from './ScrollOrchestrator';
  */
 
 const CHAPTERS = [
-  { id: 'arrival',          label: 'The Arrival',           chapter: '' },
-  { id: 'dispatch',         label: "Uncle Jr.'s Dispatch",  chapter: '·' },
-  { id: 'sunday-reckoning', label: 'The Sunday Reckoning',  chapter: 'I' },
-  { id: 'franchise',        label: 'The Franchise',         chapter: 'II' },
-  { id: 'war-room',         label: 'The War Room',          chapter: 'III' },
-  { id: 'four-kingdoms',    label: 'The Four Kingdoms',     chapter: 'IV' },
-  { id: 'champions-duel',   label: "The Champion's Duel",   chapter: 'V' },
-  { id: 'forge',            label: 'The Forge',             chapter: 'VI' },
-  { id: 'proving-grounds',  label: 'The Proving Grounds',   chapter: 'VII' },
-  { id: 'cost-of-war',      label: 'The Cost of War',       chapter: 'VIII' },
-  { id: 'storm',            label: 'The Storm',             chapter: 'IX' },
-  { id: 'chronicles',       label: 'The Chronicles',        chapter: 'X' },
-  { id: 'arena',            label: 'The Arena',             chapter: 'XI' },
-  { id: 'prophecy',         label: 'The Prophecy',          chapter: 'XII' },
-  { id: 'fellowship',       label: 'The Fellowship',        chapter: 'XIII' },
-  { id: 'universe',         label: 'The Universe Beyond',   chapter: 'XIV' },
+  { id: 'arrival',          label: 'Pull Up a Chair',          chapter: '' },
+  { id: 'dispatch',         label: "Uncle Jr.'s Dispatch",     chapter: '·' },
+  { id: 'sunday-reckoning', label: "Tape Don't Lie",           chapter: 'I' },
+  { id: 'franchise',        label: 'The Kid',                  chapter: 'II' },
+  { id: 'war-room',         label: "X's and O's",              chapter: 'III' },
+  { id: 'four-kingdoms',    label: 'The AFC East Yard',        chapter: 'IV' },
+  { id: 'champions-duel',   label: 'Heavyweight Bout',         chapter: 'V' },
+  { id: 'forge',            label: 'Where Steel Gets Made',    chapter: 'VI' },
+  { id: 'proving-grounds',  label: 'Game Speed',               chapter: 'VII' },
+  { id: 'cost-of-war',      label: 'What It Costs',            chapter: 'VIII' },
+  { id: 'storm',            label: "Weather Don't Care",       chapter: 'IX' },
+  { id: 'chronicles',       label: 'Word From the Building',   chapter: 'X' },
+  { id: 'arena',            label: 'Mafia Roll Call',          chapter: 'XI' },
+  { id: 'prophecy',         label: 'Crystal Ball',             chapter: 'XII' },
+  { id: 'fellowship',       label: 'The Tailgate',             chapter: 'XIII' },
+  { id: 'universe',         label: 'Out the Park',             chapter: 'XIV' },
 ];
 
 const GOLD = '#E8B23C';

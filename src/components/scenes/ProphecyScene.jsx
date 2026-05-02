@@ -236,7 +236,7 @@ export default function ProphecyScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE PROPHECY</h1>
+          }}>CRYSTAL BALL</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

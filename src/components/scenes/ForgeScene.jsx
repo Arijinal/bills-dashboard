@@ -253,7 +253,7 @@ export default function ForgeScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE FORGE</h1>
+          }}>WHERE STEEL GETS MADE</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

@@ -316,7 +316,7 @@ export default function UniverseScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE UNIVERSE</h1>
+          }}>OUT THE PARK</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

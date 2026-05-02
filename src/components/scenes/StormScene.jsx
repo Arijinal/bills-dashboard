@@ -497,7 +497,7 @@ export default function StormScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE STORM</h1>
+          }}>WEATHER DON'T CARE</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

@@ -287,7 +287,7 @@ export default function ChampionsDuelScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE CHAMPION'S DUEL</h1>
+          }}>HEAVYWEIGHT BOUT</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',

@@ -279,7 +279,7 @@ export default function SundayReckoningScene() {
             lineHeight: 1,
             textShadow: '0 0 32px rgba(51,119,255,0.4), 0 4px 16px rgba(0,0,0,0.85)',
           }}>
-            THE SUNDAY RECKONING
+            TAPE DON'T LIE
           </h2>
         </motion.div>
 

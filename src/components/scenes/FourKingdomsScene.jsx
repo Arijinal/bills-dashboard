@@ -632,7 +632,7 @@ export default function FourKingdomsScene() {
             lineHeight: 1,
             textShadow: '0 0 32px rgba(51,119,255,0.4), 0 4px 16px rgba(0,0,0,0.85)',
           }}>
-            THE FOUR KINGDOMS
+            THE AFC EAST YARD
           </h2>
         </motion.div>
 

@@ -215,7 +215,7 @@ export default function WarRoomScene() {
             letterSpacing: '0.02em',
             margin: 0,
             lineHeight: 0.95,
-          }}>THE WAR ROOM</h1>
+          }}>X'S AND O'S</h1>
           <div style={{
             fontFamily: "'Shippori Mincho', serif",
             fontStyle: 'italic',
