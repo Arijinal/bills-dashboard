@@ -1,10 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { weatherImpact } from '../../data/mockData';
+import { weatherImpact, nextGameWeather } from '../../data/mockData';
+import { tammyKowalski, tammyForecasts } from '../../data/stormCaster';
 
 /**
  * StormScene — Chapter IX. Buffalo's most loyal ally.
- * AUTO-PLAY: Canvas2D snow/blizzard background. Stats cascade in via whileInView.
+ * Tammy Kowalski (WGRZ-2 Bills Beat Weather) takes the chapter — left half is
+ * her live forecast for the upcoming Bills game, right half is the season's
+ * weather record reframed as her "By The Numbers" sidebar. Snow + lightning
+ * keep the atmosphere; she's the gravity.
  */
 
 const ease = [0.16, 1, 0.3, 1];
@@ -134,20 +138,310 @@ function SnowCanvas() {
   );
 }
 
-// --- StatPanel ----------------------------------------------------------
+// --- Tammy SVG Avatar ----------------------------------------------------
+function TammyAvatar() {
+  return (
+    <svg
+      viewBox="0 0 200 240"
+      width="170"
+      height="204"
+      style={{
+        display: 'block',
+        filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.7))',
+      }}
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="tammyBg" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="#1A2F58" />
+          <stop offset="100%" stopColor="#050912" />
+        </radialGradient>
+        <linearGradient id="tammyHair" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#F4D78A" />
+          <stop offset="55%" stopColor="#E8B23C" />
+          <stop offset="100%" stopColor="#A87A1E" />
+        </linearGradient>
+        <linearGradient id="tammyJacket" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#1A2F58" />
+          <stop offset="100%" stopColor="#0A1A3F" />
+        </linearGradient>
+        <linearGradient id="tammyScarf" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#E2143A" />
+          <stop offset="100%" stopColor="#9A0B26" />
+        </linearGradient>
+      </defs>
+
+      {/* Frame BG — TV broadcast vibe */}
+      <rect width="200" height="240" rx="3" fill="url(#tammyBg)" />
+
+      {/* Buffalo skyline silhouette behind her */}
+      <path
+        d="M0 200 L18 188 L24 188 L24 178 L34 178 L40 192 L52 168 L58 168 L58 158 L64 158 L70 178 L84 184 L92 172 L100 152 L106 158 L114 170 L122 158 L132 178 L142 168 L154 188 L168 178 L182 188 L200 184 L200 240 L0 240 Z"
+        fill="rgba(8,12,22,0.85)"
+      />
+      {/* Skyline twinkle lights */}
+      <circle cx="34" cy="184" r="0.8" fill="#E8B23C" opacity="0.7" />
+      <circle cx="64" cy="166" r="0.8" fill="#E8B23C" opacity="0.6" />
+      <circle cx="100" cy="160" r="1" fill="#E8B23C" opacity="0.8" />
+      <circle cx="142" cy="172" r="0.8" fill="#E8B23C" opacity="0.7" />
+      <circle cx="168" cy="184" r="0.8" fill="#E8B23C" opacity="0.6" />
+
+      {/* Suit jacket */}
+      <path
+        d="M28 240 L42 180 L72 175 L100 178 L128 175 L158 180 L172 240 Z"
+        fill="url(#tammyJacket)"
+      />
+      {/* Lapels */}
+      <path d="M72 175 L92 200 L86 218 L100 200 Z" fill="#0E1B36" stroke="#1F3A6A" strokeWidth="0.5" />
+      <path d="M128 175 L108 200 L114 218 L100 200 Z" fill="#0E1B36" stroke="#1F3A6A" strokeWidth="0.5" />
+      {/* BUF lapel pin */}
+      <circle cx="78" cy="195" r="2.5" fill="#C60C30" stroke="#E8B23C" strokeWidth="0.6" />
+
+      {/* Scarf — Bills red knot */}
+      <path
+        d="M62 168 Q100 184, 138 168 L138 196 Q100 208, 62 196 Z"
+        fill="url(#tammyScarf)"
+      />
+      <ellipse cx="100" cy="186" rx="9" ry="6" fill="#9A0B26" />
+
+      {/* Neck */}
+      <rect x="86" y="130" width="28" height="42" rx="3" fill="#F2D2B3" />
+
+      {/* Face */}
+      <ellipse cx="100" cy="115" rx="32" ry="38" fill="#F2D2B3" />
+      {/* Cheek warmth */}
+      <ellipse cx="84" cy="125" rx="6" ry="3" fill="#E89C9C" opacity="0.45" />
+      <ellipse cx="116" cy="125" rx="6" ry="3" fill="#E89C9C" opacity="0.45" />
+
+      {/* Eyes */}
+      <ellipse cx="89" cy="115" rx="2.5" ry="1.6" fill="#0E1B36" />
+      <ellipse cx="111" cy="115" rx="2.5" ry="1.6" fill="#0E1B36" />
+      {/* Brows */}
+      <path d="M83 108 Q89 105, 95 108" stroke="#A87A1E" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M105 108 Q111 105, 117 108" stroke="#A87A1E" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Lipstick smile */}
+      <path d="M91 134 Q100 140, 109 134 Q100 138, 91 134 Z" fill="#C60C30" />
+
+      {/* Earrings */}
+      <circle cx="69" cy="120" r="2.2" fill="none" stroke="#D9D9D9" strokeWidth="1" />
+      <circle cx="131" cy="120" r="2.2" fill="none" stroke="#D9D9D9" strokeWidth="1" />
+
+      {/* Hair — animated swing */}
+      <g className="tammy-hair">
+        {/* Crown */}
+        <path
+          d="M62 95 Q60 70, 80 60 Q100 48, 120 60 Q140 70, 138 95 Q138 88, 130 84 Q116 80, 100 80 Q84 80, 70 84 Q62 88, 62 95 Z"
+          fill="url(#tammyHair)"
+        />
+        {/* Side waves */}
+        <path
+          d="M60 95 Q56 130, 70 152 Q66 138, 64 124 Q62 108, 60 95 Z"
+          fill="url(#tammyHair)"
+        />
+        <path
+          d="M140 95 Q144 130, 130 152 Q134 138, 136 124 Q138 108, 140 95 Z"
+          fill="url(#tammyHair)"
+        />
+        {/* Front bangs sweep */}
+        <path
+          d="M72 86 Q88 78, 100 84 Q92 92, 80 94 Q72 92, 72 86 Z"
+          fill="url(#tammyHair)"
+          opacity="0.95"
+        />
+      </g>
+
+      {/* Microphone — bottom-right */}
+      <g transform="translate(150, 200) rotate(-18)">
+        <rect x="-3" y="0" width="6" height="22" rx="3" fill="#1F1F1F" stroke="#444" strokeWidth="0.5" />
+        <ellipse cx="0" cy="0" rx="6" ry="9" fill="#2A2A2A" stroke="#555" strokeWidth="0.7" />
+        <ellipse cx="0" cy="0" rx="4" ry="7" fill="#0E0E0E" />
+        {/* WGRZ-2 mic flag */}
+        <rect x="-9" y="10" width="18" height="9" rx="1" fill="#C60C30" />
+        <text x="0" y="17" textAnchor="middle" fontSize="6" fontWeight="800" fill="#fff" fontFamily="ui-monospace, monospace">2</text>
+      </g>
+    </svg>
+  );
+}
+
+// --- Forecast metric pill ------------------------------------------------
+function ForecastPill({ label, value, sublabel, color = '#A8D0FF' }) {
+  return (
+    <div style={{
+      padding: '0.5rem 0.625rem',
+      background: 'rgba(8, 12, 22, 0.78)',
+      border: `1px solid ${color}55`,
+      borderRadius: '2px',
+      backdropFilter: 'blur(6px)',
+      minWidth: 0,
+    }}>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.5625rem',
+        letterSpacing: '0.18em',
+        color,
+        fontWeight: 700,
+      }}>{label}</div>
+      <div style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '1.125rem',
+        fontWeight: 700,
+        color: 'var(--text-primary)',
+        lineHeight: 1.05,
+        marginTop: 2,
+      }}>{value}</div>
+      {sublabel && (
+        <div style={{
+          fontSize: '0.625rem',
+          color: 'var(--text-muted)',
+          marginTop: 2,
+        }}>{sublabel}</div>
+      )}
+    </div>
+  );
+}
+
+// --- Weather Caster Panel (Tammy) ---------------------------------------
+function WeatherCasterPanel({ forecast }) {
+  const f = forecast.forecast;
+  const script = tammyForecasts.seasonOpener2026;
+
+  return (
+    <div style={{
+      padding: '1rem 1.125rem',
+      background: 'rgba(8, 12, 22, 0.85)',
+      border: '1px solid rgba(168, 208, 255, 0.4)',
+      borderRadius: '4px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.7), 0 0 28px rgba(168,208,255,0.18)',
+      maxWidth: 480,
+      width: '100%',
+    }}>
+      {/* Live broadcast masthead */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.625rem',
+        paddingBottom: 8,
+        borderBottom: '1px solid rgba(168, 208, 255, 0.18)',
+        marginBottom: 12,
+      }}>
+        <div className="live-dot" style={{
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          background: '#FF3850',
+        }} />
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5625rem',
+          letterSpacing: '0.22em',
+          color: '#FF3850',
+          fontWeight: 700,
+        }}>LIVE</div>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5625rem',
+          letterSpacing: '0.22em',
+          color: 'var(--text-muted)',
+          fontWeight: 600,
+        }}>· {tammyKowalski.station} · {tammyKowalski.segment.toUpperCase()}</div>
+      </div>
+
+      {/* Avatar + headline */}
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        alignItems: 'flex-start',
+      }}>
+        <div style={{ flexShrink: 0 }}>
+          <TammyAvatar />
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{
+            fontFamily: "'Dela Gothic One', sans-serif",
+            fontSize: '1.1rem',
+            color: 'var(--text-primary)',
+            lineHeight: 1.05,
+            letterSpacing: '0.01em',
+            textShadow: '0 0 18px rgba(168,208,255,0.45)',
+          }}>{script.headline}</div>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.625rem',
+            letterSpacing: '0.16em',
+            color: '#A8D0FF',
+            fontWeight: 700,
+            marginTop: 6,
+          }}>{tammyKowalski.onAirName.toUpperCase()} KOWALSKI · {forecast.opponent.toUpperCase()}</div>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.625rem',
+            color: 'var(--text-muted)',
+            marginTop: 2,
+          }}>{forecast.date} · {forecast.kickoff} · {forecast.venue}</div>
+
+          {/* Tammy's voice copy */}
+          <div style={{
+            marginTop: 12,
+            fontFamily: "'Shippori Mincho', serif",
+            fontStyle: 'italic',
+            fontSize: '0.85rem',
+            color: 'var(--text-primary)',
+            lineHeight: 1.5,
+            paddingLeft: 10,
+            borderLeft: '2px solid #C60C30',
+          }}>"{script.body}"</div>
+        </div>
+      </div>
+
+      {/* Forecast pills row */}
+      <div style={{
+        marginTop: 14,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: '0.5rem',
+      }}>
+        <ForecastPill
+          label="TEMP"
+          value={`${f.temp}°F`}
+          sublabel={`Feels ${f.feelsLike}°`}
+          color="#A8D0FF"
+        />
+        <ForecastPill
+          label="WIND"
+          value={`${f.wind} mph`}
+          sublabel={f.windDirection}
+          color="#A8D0FF"
+        />
+        <ForecastPill
+          label="SKIES"
+          value={f.precip}
+          sublabel={f.conditions}
+          color="#E8B23C"
+        />
+        <ForecastPill
+          label="HUMID"
+          value={`${f.humidity}%`}
+          color="#A8D0FF"
+        />
+      </div>
+    </div>
+  );
+}
+
+// --- By The Numbers stat panel (right rail) ------------------------------
 function StatPanel({ label, value, sublabel, color = 'var(--bills-blue-bright)' }) {
   return (
     <div style={{
-      padding: '0.875rem 1.125rem',
+      padding: '0.75rem 1rem',
       background: 'rgba(8, 12, 22, 0.82)',
       border: `1px solid ${color}`,
       borderRadius: '3px',
       backdropFilter: 'blur(8px)',
       boxShadow: `0 4px 20px rgba(0,0,0,0.6), 0 0 24px ${color}30`,
-      maxWidth: 280,
     }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.625rem', letterSpacing: '0.18em', color, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1, textShadow: `0 0 16px ${color}50`, marginTop: 6 }}>{value}</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5625rem', letterSpacing: '0.18em', color, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.625rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1, textShadow: `0 0 14px ${color}50`, marginTop: 4 }}>{value}</div>
       {sublabel && <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginTop: 4 }}>{sublabel}</div>}
     </div>
   );
@@ -181,7 +475,7 @@ export default function StormScene() {
           transition={{ duration: 0.6, ease }}
           style={{
             position: 'absolute',
-            top: '5%',
+            top: '4%',
             left: '50%',
             transform: 'translateX(-50%)',
             textAlign: 'center',
@@ -214,66 +508,82 @@ export default function StormScene() {
           }}>Buffalo's most loyal ally.</div>
         </motion.div>
 
-        {/* COLD RECORD — top-left */}
+        {/* WEATHER CASTER PANEL — left half */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={VIEWPORT}
-          transition={{ duration: 0.5, delay: 0.2, ease }}
-          style={{ position: 'absolute', top: '22%', left: '4%' }}
+          transition={{ duration: 0.6, delay: 0.2, ease }}
+          style={{
+            position: 'absolute',
+            top: '20%',
+            left: '3%',
+            width: 'min(42%, 520px)',
+            zIndex: 8,
+          }}
         >
+          <WeatherCasterPanel forecast={nextGameWeather} />
+        </motion.div>
+
+        {/* BY THE NUMBERS — right rail */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT}
+          transition={{ duration: 0.6, delay: 0.4, ease }}
+          style={{
+            position: 'absolute',
+            top: '20%',
+            right: '3%',
+            width: 'min(34%, 360px)',
+            zIndex: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.625rem',
+          }}
+        >
+          {/* Chyron */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            paddingBottom: 4,
+          }}>
+            <div style={{
+              width: 4,
+              height: 16,
+              background: '#C60C30',
+              boxShadow: '0 0 6px rgba(198,12,48,0.7)',
+            }} />
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.625rem',
+              letterSpacing: '0.22em',
+              color: '#E8B23C',
+              fontWeight: 700,
+            }}>BY THE NUMBERS — TAMMY'S DESK</div>
+          </div>
+
           <StatPanel
             label="COLD WEATHER (≤40°F)"
             value={`${coldGames.wins}-${coldGames.losses}`}
             sublabel={`${coldPct}% — ${coldGames.avgPoints.toFixed(1)} ppg`}
             color="#A8D0FF"
           />
-        </motion.div>
 
-        {/* SNOW RECORD — top-right */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={VIEWPORT}
-          transition={{ duration: 0.5, delay: 0.3, ease }}
-          style={{ position: 'absolute', top: '22%', right: '4%' }}
-        >
-          <StatPanel
-            label="SNOW GAMES"
-            value={`${snowGames.wins}-${snowGames.losses}`}
-            sublabel={`${snowPct}% — ${snowGames.avgPoints.toFixed(1)} ppg`}
-            color="#E8B23C"
-          />
-        </motion.div>
-
-        {/* HOME ADVANTAGE — center */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.88, y: 30 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={VIEWPORT}
-          transition={{ duration: 0.6, delay: 0.5, ease }}
-          style={{
-            position: 'absolute',
-            top: '40%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9,
-          }}
-        >
+          {/* The 100% home callout — Tammy's "this is the gift" stat */}
           <div style={{
-            padding: '1.25rem 1.75rem',
+            padding: '0.875rem 1rem',
             background: 'rgba(8, 12, 22, 0.88)',
-            border: '1px solid #A8D0FF',
+            border: '1px solid #E8B23C',
             borderRadius: '3px',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 6px 32px rgba(0,0,0,0.75), 0 0 40px rgba(168,208,255,0.35)',
-            textAlign: 'center',
-            maxWidth: 360,
+            boxShadow: '0 6px 24px rgba(0,0,0,0.7), 0 0 32px rgba(232,178,60,0.32)',
           }}>
             <div style={{
               display: 'inline-block',
-              padding: '0.2rem 0.5rem',
-              fontSize: '0.5625rem',
+              padding: '0.15rem 0.5rem',
+              fontSize: '0.5rem',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
               letterSpacing: '0.2em',
@@ -285,38 +595,36 @@ export default function StormScene() {
             }}>BLIZZARD HOME-FIELD</div>
             <div style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.6875rem',
-              letterSpacing: '0.2em',
+              fontSize: '0.6rem',
+              letterSpacing: '0.18em',
               color: '#A8D0FF',
               fontWeight: 600,
-              marginTop: 4,
             }}>WIN RATE — TEMP ≤ 40°F + HOME</div>
             <div style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '3.5rem',
+              fontSize: '2.5rem',
               fontWeight: 700,
               color: 'var(--text-primary)',
               lineHeight: 1,
               textShadow: '0 0 22px rgba(168,208,255,0.65)',
-              marginTop: 8,
+              marginTop: 6,
             }}>100%</div>
             <div style={{
-              fontSize: '0.8125rem',
+              fontFamily: "'Shippori Mincho', serif",
+              fontStyle: 'italic',
+              fontSize: '0.75rem',
               color: 'var(--text-secondary)',
-              fontFamily: 'var(--font-sans)',
-              marginTop: 8,
-            }}>5-0 in cold + snow at Highmark this season</div>
+              marginTop: 6,
+            }}>5-0 in cold + snow at Highmark — "{tammyKowalski.voice.catchphrase}"</div>
           </div>
-        </motion.div>
 
-        {/* DOME RECORD — bottom-left */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={VIEWPORT}
-          transition={{ duration: 0.5, delay: 0.7, ease }}
-          style={{ position: 'absolute', bottom: '5%', left: '4%' }}
-        >
+          <StatPanel
+            label="SNOW GAMES"
+            value={`${snowGames.wins}-${snowGames.losses}`}
+            sublabel={`${snowPct}% — ${snowGames.avgPoints.toFixed(1)} ppg`}
+            color="#E8B23C"
+          />
+
           <StatPanel
             label="INSIDE A DOME"
             value={`${domeGames.wins}-${domeGames.losses}`}
@@ -325,24 +633,26 @@ export default function StormScene() {
           />
         </motion.div>
 
-        {/* QUOTE — bottom-right */}
+        {/* SIGN-OFF — bottom-center, low key */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={VIEWPORT}
           transition={{ duration: 0.5, delay: 0.85, ease }}
           style={{
             position: 'absolute',
-            bottom: '5%',
-            right: '4%',
-            maxWidth: 420,
+            bottom: '4%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            maxWidth: 520,
+            textAlign: 'center',
           }}
         >
           <div style={{
-            padding: '1rem 1.125rem',
+            padding: '0.625rem 1rem',
             background: 'rgba(8, 12, 22, 0.78)',
-            borderLeft: '3px solid #E8B23C',
-            borderRadius: '2px',
+            borderTop: '1px solid rgba(232,178,60,0.5)',
+            borderBottom: '1px solid rgba(232,178,60,0.5)',
             backdropFilter: 'blur(8px)',
           }}>
             <div style={{
@@ -350,15 +660,15 @@ export default function StormScene() {
               fontStyle: 'italic',
               fontSize: '1rem',
               color: 'var(--text-primary)',
-              lineHeight: 1.5,
-            }}>"Buffalo is not for the weak."</div>
+              lineHeight: 1.4,
+            }}>"{tammyKowalski.voice.signoff}"</div>
             <div style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.625rem',
-              letterSpacing: '0.16em',
+              fontSize: '0.5625rem',
+              letterSpacing: '0.22em',
               color: 'var(--text-muted)',
-              marginTop: 6,
-            }}>— BILLS MAFIA, EVERY JANUARY</div>
+              marginTop: 4,
+            }}>— TAMMY KOWALSKI · WGRZ-2</div>
           </div>
         </motion.div>
       </div>

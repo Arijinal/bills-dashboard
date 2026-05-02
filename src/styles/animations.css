@@ -368,3 +368,22 @@
   50% { opacity: 1; transform: scale(1.15); }
 }
 .star-twinkle { animation: starTwinkle 2.6s ease-in-out infinite; }
+
+/* XVI. Storm — Tammy Kowalski's hair sways with the lake breeze */
+@keyframes hairBlow {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  25% { transform: rotate(-1.4deg) translateX(-1px); }
+  50% { transform: rotate(0.6deg) translateX(0.5px); }
+  75% { transform: rotate(-0.8deg) translateX(-0.6px); }
+}
+.tammy-hair {
+  transform-origin: 50% 18%;
+  animation: hairBlow 4.2s ease-in-out infinite;
+}
+
+/* Live broadcast red dot pulse */
+@keyframes liveDotPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(255,56,80,0.85), 0 0 14px rgba(255,56,80,0.55); }
+  50% { opacity: 0.45; box-shadow: 0 0 4px rgba(255,56,80,0.6); }
+}
+.live-dot { animation: liveDotPulse 1.6s ease-in-out infinite; }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import { afcEast } from '../../data/mockData';
@@ -6,10 +7,13 @@ import { afcEast } from '../../data/mockData';
  * SCENE 3 — The Four Kingdoms.
  * AUTO-PLAY: AFC East fantasy battle map. Territories light up via cascade,
  * battle lines draw in once the section enters viewport.
+ * Beam pairings cycle every 6s — random which 3 of the 6 possible team
+ * pairs glow with traveling beams, and which direction each beam travels.
  */
 
 const ease = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, amount: 0.2 };
+const BEAM_CYCLE_MS = 6000;
 
 const TERRITORIES = [
   { key: 'BUF', label: 'BUFFALO', record: '12-5', seed: '2nd', x: 28, y: 32, color: '#3377FF', glow: 'rgba(51,119,255,0.85)' },
@@ -18,16 +22,39 @@ const TERRITORIES = [
   { key: 'NYJ', label: 'NEW YORK JETS', record: '3-14', seed: '4th', x: 70, y: 70, color: '#5BE5A1', glow: 'rgba(91,229,161,0.85)' },
 ];
 
-const BATTLE_LINES = [
-  // Bills lines GLOW with traveling color beams (rivalry signal)
-  { from: 'BUF', to: 'NE', glow: true, beamDelay: 0 },
-  { from: 'BUF', to: 'MIA', glow: true, beamDelay: 1.2 },
-  { from: 'BUF', to: 'NYJ', glow: true, beamDelay: 2.4 },
-  // Other intra-division lines stay quiet
-  { from: 'NE', to: 'MIA' },
-  { from: 'NE', to: 'NYJ' },
-  { from: 'MIA', to: 'NYJ' },
-];
+const TEAM_KEYS = ['BUF', 'NE', 'MIA', 'NYJ'];
+const ALL_PAIRS = (() => {
+  const out = [];
+  for (let i = 0; i < TEAM_KEYS.length; i++) {
+    for (let j = i + 1; j < TEAM_KEYS.length; j++) {
+      out.push([TEAM_KEYS[i], TEAM_KEYS[j]]);
+    }
+  }
+  return out; // 6 unordered pairs
+})();
+
+// Pick 3 of 6 unordered pairs to glow this cycle, assign random direction +
+// staggered beamDelay. Remaining 3 stay as quiet dashed lines so all
+// intra-division connections remain visible.
+function generateBattleLines() {
+  const shuffled = [...ALL_PAIRS].sort(() => Math.random() - 0.5);
+  const glowing = shuffled.slice(0, 3).map(([a, b], i) => {
+    const reverse = Math.random() < 0.5;
+    return {
+      from: reverse ? b : a,
+      to: reverse ? a : b,
+      glow: true,
+      beamDelay: i * 1.2,
+    };
+  });
+  const quiet = shuffled.slice(3).map(([a, b]) => ({
+    from: a,
+    to: b,
+    glow: false,
+    beamDelay: 0,
+  }));
+  return [...glowing, ...quiet];
+}
 
 function Territory({ t, delay }) {
   return (
@@ -223,6 +250,17 @@ function BattleLine({ from, to, delay, glow = false, beamDelay = 0 }) {
 }
 
 export default function FourKingdomsScene() {
+  const [cycle, setCycle] = useState(0);
+  const [battleLines, setBattleLines] = useState(() => generateBattleLines());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBattleLines(generateBattleLines());
+      setCycle((c) => c + 1);
+    }, BEAM_CYCLE_MS);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section
       id="four-kingdoms"
@@ -250,13 +288,13 @@ export default function FourKingdomsScene() {
       }} />
 
       <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 5 }}>
-        {/* Battle lines (drawn behind dots) — Bills lines glow with traveling beams */}
-        {BATTLE_LINES.map((b, i) => (
+        {/* Battle lines — 3 of 6 pairs glow each cycle; pairs + direction reshuffle every 6s */}
+        {battleLines.map((b, i) => (
           <BattleLine
-            key={`${b.from}-${b.to}`}
+            key={`cycle-${cycle}-${b.from}-${b.to}-${i}`}
             from={b.from}
             to={b.to}
-            delay={0.6 + i * 0.05}
+            delay={0.1 + i * 0.05}
             glow={b.glow}
             beamDelay={b.beamDelay}
           />

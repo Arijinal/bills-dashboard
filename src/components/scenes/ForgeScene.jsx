@@ -20,10 +20,10 @@ const PRIORITY_COLOR = {
   low: 'var(--signal-positive)',
 };
 
-// ── Grade Ring (60px) ─────────────────────────────────────────────
+// ── Grade Ring (44px — compact for 10-card grid) ──────────────────
 function GradeRing({ value, color }) {
-  const size = 60;
-  const stroke = 4;
+  const size = 44;
+  const stroke = 3;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (value / 100) * c;
@@ -38,7 +38,7 @@ function GradeRing({ value, color }) {
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
         style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
       <text x="50%" y="54%" textAnchor="middle" dominantBaseline="middle"
-        fill="var(--text-primary)" fontSize="13" fontWeight="700"
+        fill="var(--text-primary)" fontSize="11" fontWeight="700"
         fontFamily="var(--font-mono)">{value}</text>
     </svg>
   );
@@ -76,8 +76,9 @@ function ProspectCard({ p, onClick }) {
       aria-label={`Round ${p.round} pick ${p.pick} — ${p.name}, ${p.position} from ${p.school}. Tap for full scouting report.`}
       className="ember-host anvil-glow stat-clickable"
       style={{
-        width: 156,
-        padding: '0.625rem 0.75rem',
+        width: '100%',
+        maxWidth: 148,
+        padding: '0.5rem 0.625rem',
         background: 'linear-gradient(135deg, rgba(8, 12, 22, 0.92), rgba(10, 26, 64, 0.85))',
         border: `2px solid ${accent}`,
         borderRadius: '3px',
@@ -143,7 +144,7 @@ function ProspectCard({ p, onClick }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        margin: '0.4rem 0',
+        margin: '0.25rem 0',
       }}>
         <GradeRing value={p.fitScore} color={ringColor} />
       </div>
@@ -170,20 +171,22 @@ function ProspectCard({ p, onClick }) {
         }} />
       </div>
 
-      {/* 40-yard time + height/weight */}
-      <div style={{
-        marginTop: 6,
-        display: 'flex',
-        justifyContent: 'space-between',
-        gap: 4,
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.5rem',
-        letterSpacing: '0.04em',
-        color: 'var(--text-secondary)',
-      }}>
-        <span>{p.height} · {p.weight}lb</span>
-        <span style={{ color: '#5BE5A1' }}>{p.fortyYard}</span>
-      </div>
+      {/* 40-yard time + height/weight (only if measurables verified) */}
+      {(p.height || p.fortyYard) && (
+        <div style={{
+          marginTop: 4,
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 4,
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.5rem',
+          letterSpacing: '0.04em',
+          color: 'var(--text-secondary)',
+        }}>
+          <span>{p.height ? `${p.height} · ${p.weight}lb` : '—'}</span>
+          {p.fortyYard != null && <span style={{ color: '#5BE5A1' }}>{p.fortyYard}</span>}
+        </div>
+      )}
     </button>
   );
 }
@@ -192,14 +195,20 @@ function ProspectCard({ p, onClick }) {
 function pickToStat(p) {
   if (!p) return null;
   const c = p.combine || {};
+  const forty = c.fortyYard ?? p.fortyYard;
+  const sublabelParts = [
+    p.height ? `${p.height} · ${p.weight}lb` : null,
+    p.ageOnDraftDay ? `Age ${p.ageOnDraftDay}` : null,
+    `Bills Fit ${p.fitScore}`,
+  ].filter(Boolean);
   return {
     label: `R${p.round} · PICK #${p.pick} · ${p.position} · ${p.school.toUpperCase()}`,
     value: p.name,
-    sublabel: `${p.height} · ${p.weight}lb · Age ${p.ageOnDraftDay} · Bills Fit ${p.fitScore}`,
+    sublabel: sublabelParts.join(' · '),
     verdict: p.fitScore >= 92 ? 'ELITE FIT' : p.fitScore >= 85 ? 'STRONG FIT' : p.fitScore >= 75 ? 'SOLID FIT' : 'PROJECT / DEPTH',
     color: p.fitScore >= 92 ? '#E8B23C' : p.fitScore >= 85 ? '#37D67A' : p.fitScore >= 75 ? 'var(--bills-blue-bright)' : '#E8A010',
     breakdown: [
-      { label: '40-YARD', value: `${c.fortyYard ?? p.fortyYard}s`, note: c.fortyYard < 4.4 ? 'Elite speed' : c.fortyYard < 4.55 ? 'Above average' : 'Functional' },
+      ...(forty != null ? [{ label: '40-YARD', value: `${forty}s`, note: forty < 4.4 ? 'Elite speed' : forty < 4.55 ? 'Above average' : 'Functional' }] : []),
       ...(c.vertical ? [{ label: 'VERTICAL', value: `${c.vertical}"`, note: c.vertical >= 38 ? 'Top-tier explosion' : 'Solid' }] : []),
       ...(c.broadJump ? [{ label: 'BROAD JUMP', value: c.broadJump }] : []),
       ...(c.benchPress ? [{ label: 'BENCH (225lb)', value: `${c.benchPress} reps` }] : []),
@@ -291,19 +300,19 @@ export default function ForgeScene() {
           }}>The 2026 Bills draft class — tap any card for the full scout report.</div>
         </motion.div>
 
-        {/* THE 7-PICK GRID — 4 on top, 3 on bottom, all centered */}
+        {/* THE 10-PICK GRID — 5×2 band along the bottom so the torii uprights read cleanly above */}
         <div style={{
           position: 'absolute',
-          top: '20%',
+          bottom: '12%',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '92%',
-          maxWidth: 1200,
+          width: '94%',
+          maxWidth: 1280,
           zIndex: 8,
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gap: '0.625rem',
+          justifyItems: 'center',
         }}>
           {picks.map((p, i) => (
             <motion.div
@@ -311,7 +320,7 @@ export default function ForgeScene() {
               initial={{ opacity: 0, scale: 0.7, filter: 'blur(8px)' }}
               whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               viewport={VIEWPORT}
-              transition={{ duration: 0.55, delay: 0.2 + i * 0.08, ease }}
+              transition={{ duration: 0.5, delay: 0.18 + i * 0.06, ease }}
             >
               <ProspectCard p={p} onClick={() => setActiveStat(pickToStat(p))} />
             </motion.div>
@@ -359,7 +368,7 @@ export default function ForgeScene() {
                 color: '#fff',
                 letterSpacing: '0.05em',
                 textShadow: '0 0 12px rgba(232,178,60,0.5)',
-              }}>7 PICKS · OFF 4 / DEF 3</div>
+              }}>10 PICKS · OFF 3 / DEF 6 / ST 1</div>
             </div>
             <div style={{
               borderLeft: '1px solid rgba(232,178,60,0.4)',
@@ -370,9 +379,9 @@ export default function ForgeScene() {
               fontSize: '0.6875rem',
               fontWeight: 700,
             }}>
-              <span><span style={{ color: 'var(--text-muted)' }}>ESPN</span> <span style={{ color: '#5BE5A1' }}>B+</span></span>
+              <span><span style={{ color: 'var(--text-muted)' }}>ESPN</span> <span style={{ color: 'var(--bills-blue-bright)' }}>B</span></span>
               <span><span style={{ color: 'var(--text-muted)' }}>PFF</span> <span style={{ color: 'var(--bills-blue-bright)' }}>B</span></span>
-              <span><span style={{ color: 'var(--text-muted)' }}>SN</span> <span style={{ color: '#E8B23C' }}>A−</span></span>
+              <span><span style={{ color: 'var(--text-muted)' }}>SN</span> <span style={{ color: '#5BE5A1' }}>B+</span></span>
             </div>
           </div>
         </motion.div>

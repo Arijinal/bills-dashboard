@@ -53,12 +53,67 @@ function drillPercentile(value, drillKey) {
   return Math.max(0, Math.min(100, ((value - drill.min) / (drill.max - drill.min)) * 100));
 }
 
+// Complete Combine Results table — sortable column config.
+// `lowerIsBetter` flips the default direction so "first click" always = best-first.
+// `path` is the access path on a prospect (use null-safe in the sorter).
+const TABLE_COLUMNS = [
+  { key: 'name', label: 'Name', align: 'left', kind: 'string', path: (p) => p.name, lowerIsBetter: true },
+  { key: 'position', label: 'Pos', align: 'left', kind: 'string', path: (p) => p.position, lowerIsBetter: true },
+  { key: 'school', label: 'School', align: 'left', kind: 'string', path: (p) => p.school, lowerIsBetter: true },
+  { key: 'fortyYard', label: '40-Yard', align: 'center', kind: 'drill', drillKey: 'fortyYard', path: (p) => p.combine?.fortyYard, lowerIsBetter: true },
+  { key: 'benchPress', label: 'Bench', align: 'center', kind: 'drill', drillKey: 'benchPress', path: (p) => p.combine?.benchPress, lowerIsBetter: false },
+  { key: 'verticalJump', label: 'Vert', align: 'center', kind: 'drill', drillKey: 'verticalJump', path: (p) => p.combine?.verticalJump, lowerIsBetter: false },
+  { key: 'broadJump', label: 'Broad', align: 'center', kind: 'drill', drillKey: 'broadJump', path: (p) => p.combine?.broadJump, lowerIsBetter: false },
+  { key: 'threeCone', label: '3-Cone', align: 'center', kind: 'drill', drillKey: 'threeCone', path: (p) => p.combine?.threeCone, lowerIsBetter: true },
+  { key: 'shuttle', label: 'Shuttle', align: 'center', kind: 'drill', drillKey: 'shuttle', path: (p) => p.combine?.shuttle, lowerIsBetter: true },
+  { key: 'grade', label: 'Grade', align: 'center', kind: 'number', path: (p) => p.grade, lowerIsBetter: false },
+  { key: 'billsFit', label: 'Fit', align: 'center', kind: 'number', path: (p) => p.billsFit, lowerIsBetter: false },
+];
+
+function sortProspects(prospects, sortKey, sortDir) {
+  const col = TABLE_COLUMNS.find(c => c.key === sortKey);
+  if (!col) return prospects;
+  const dirSign = sortDir === 'asc' ? 1 : -1;
+  return [...prospects].sort((a, b) => {
+    const va = col.path(a);
+    const vb = col.path(b);
+    // null/undefined/NaN sinks to bottom regardless of direction
+    const aMissing = va == null || (typeof va === 'number' && Number.isNaN(va));
+    const bMissing = vb == null || (typeof vb === 'number' && Number.isNaN(vb));
+    if (aMissing && bMissing) return 0;
+    if (aMissing) return 1;
+    if (bMissing) return -1;
+    if (col.kind === 'string') {
+      return va.localeCompare(vb) * dirSign;
+    }
+    return (va - vb) * dirSign;
+  });
+}
+
 export default function CombineCenter() {
   const [activeDrill, setActiveDrill] = useState('fortyYard');
   const [radarProspects, setRadarProspects] = useState([0, 2, 4]); // Cooper, Faulk, Morrison
+  // Complete Combine Results sort — default forty ascending (best-first).
+  const [sortKey, setSortKey] = useState('fortyYard');
+  const [sortDir, setSortDir] = useState('asc');
 
   const activeDrillInfo = drills.find(d => d.key === activeDrill);
   const leaderboard = useMemo(() => getLeaderboard(activeDrill, activeDrillInfo.lowerIsBetter), [activeDrill]);
+
+  const sortedProspects = useMemo(
+    () => sortProspects(draftProspects, sortKey, sortDir),
+    [sortKey, sortDir]
+  );
+
+  const handleSort = (colKey) => {
+    if (sortKey === colKey) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+      return;
+    }
+    const col = TABLE_COLUMNS.find(c => c.key === colKey);
+    setSortKey(colKey);
+    setSortDir(col?.lowerIsBetter ? 'asc' : 'desc');
+  };
 
   const billsTargets = useMemo(() =>
     draftProspects
@@ -305,32 +360,52 @@ export default function CombineCenter() {
         </motion.div>
       </div>
 
-      {/* Full Combine Data Grid */}
+      {/* Full Combine Data Grid — sortable */}
       <motion.div {...stagger(4)}>
         <Panel>
-          <SectionHeader title="Complete Combine Results" subtitle="All prospects with recorded athletic testing data" />
+          <SectionHeader title="Complete Combine Results" subtitle="Click any column to sort. Best-first by default; click again to reverse. Missing values sink to the bottom." />
           <div style={{ overflowX: 'auto', border: '1px solid var(--border-default)', borderRadius: '2px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
               <thead>
                 <tr>
-                  {['Name', 'Pos', 'School', '40-Yard', 'Bench', 'Vert', 'Broad', '3-Cone', 'Shuttle', 'Grade', 'Fit'].map(h => (
-                    <th key={h} style={{
-                      padding: '0.625rem 0.5rem',
-                      fontSize: '0.6875rem',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                      color: 'var(--text-muted)',
-                      background: 'var(--bg-elevated)',
-                      borderBottom: '1px solid var(--border-default)',
-                      whiteSpace: 'nowrap',
-                      textAlign: h === 'Name' || h === 'Pos' || h === 'School' ? 'left' : 'center',
-                    }}>{h}</th>
-                  ))}
+                  {TABLE_COLUMNS.map(col => {
+                    const isActive = sortKey === col.key;
+                    const arrow = isActive ? (sortDir === 'asc' ? '↑' : '↓') : '';
+                    return (
+                      <th key={col.key} style={{
+                        padding: 0,
+                        background: 'var(--bg-elevated)',
+                        borderBottom: '1px solid var(--border-default)',
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => handleSort(col.key)}
+                          aria-label={`Sort by ${col.label}${isActive ? ` (currently ${sortDir})` : ''}`}
+                          style={{
+                            width: '100%',
+                            padding: '0.625rem 0.5rem',
+                            fontSize: '0.6875rem',
+                            fontWeight: isActive ? 700 : 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                            color: isActive ? 'var(--bills-blue-bright)' : 'var(--text-muted)',
+                            background: 'transparent',
+                            border: 'none',
+                            whiteSpace: 'nowrap',
+                            textAlign: col.align,
+                            cursor: 'pointer',
+                            fontFamily: 'inherit',
+                          }}
+                        >
+                          {col.label}{arrow ? ` ${arrow}` : ''}
+                        </button>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
-                {draftProspects.map((p, i) => (
+                {sortedProspects.map((p, i) => (
                   <tr key={p.id} style={{ background: i % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-base)' }}>
                     <td style={{ padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text-primary)', borderBottom: '1px solid var(--border-divider)' }}>{p.name}</td>
                     <td style={{

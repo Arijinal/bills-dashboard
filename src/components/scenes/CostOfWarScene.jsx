@@ -1,11 +1,51 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
+import StatDetailModal from '../StatDetailModal';
 import { capSpace, injuries } from '../../data/mockData';
 
 /**
  * CostOfWarScene — Chapter VIII. Every battle leaves its mark.
  * AUTO-PLAY: procedural warm-red bg, viewport-triggered cascade.
+ * Each fallen player opens a depth modal with status + history + Uncle Jr.'s
+ * read on what their absence means for the unit.
  */
+
+// Map an injury timeline entry to the StatDetailModal schema.
+function injuryToStat(inj) {
+  if (!inj) return null;
+  const statusColor = inj.status === 'IR'
+    ? '#FF3850'
+    : inj.status === 'Out'
+      ? '#FF6464'
+      : inj.status === 'Returned'
+        ? '#5BE5A1'
+        : '#E8B23C';
+  const verdict = inj.status === 'IR' ? 'SEASON-ENDING'
+    : inj.status === 'Out' ? 'STILL OUT'
+    : inj.status === 'Returned' ? 'RETURNED'
+    : inj.status.toUpperCase();
+  const history = Array.isArray(inj.history) ? inj.history : [];
+  return {
+    label: `${inj.position} · ${inj.injury.toUpperCase()} · ${inj.gamesMissed} GAMES MISSED`,
+    value: inj.player,
+    sublabel: `${inj.start} → ${inj.end}`,
+    verdict,
+    color: statusColor,
+    breakdown: [
+      { label: 'CURRENT INJURY', value: inj.injury, note: `${inj.start} through ${inj.end} — ${inj.gamesMissed} games missed` },
+      { label: 'STATUS', value: inj.status, color: statusColor },
+      ...history.map((h) => ({
+        label: `${h.season} HISTORY`,
+        value: h.type,
+        note: h.detail,
+      })),
+      ...(history.length === 0 ? [{ label: 'PRIOR HISTORY', value: 'Clean', note: 'No major prior injuries on file.' }] : []),
+    ],
+    impact: `${history.length} prior recorded injury event${history.length === 1 ? '' : 's'} on this player's chart. Soft-tissue and recurrence patterns matter more than any single absence — what follows is the read.`,
+    uncleJrTake: inj.impact || `Hate seein' this kid go down. Defense plays different without him out there, son.`,
+  };
+}
 
 const ease = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, amount: 0.2 };
@@ -127,7 +167,7 @@ function CapGauge({ availableCap, totalCap }) {
 }
 
 // --- Injury list item ----------------------------------------------------
-function InjuryRow({ player, position, injury, status, gamesMissed }) {
+function InjuryRow({ player, position, injury, status, gamesMissed, onClick }) {
   const statusColor = status === 'IR'
     ? '#FF3850'
     : status === 'Out'
@@ -136,19 +176,34 @@ function InjuryRow({ player, position, injury, status, gamesMissed }) {
         ? 'var(--signal-positive)'
         : 'var(--signal-warning)';
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      padding: '0.5rem 0.75rem',
-      background: 'rgba(0,0,0,0.4)',
-      borderLeft: `3px solid ${statusColor}`,
-      borderRadius: '2px',
-    }}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`${player}, ${position}, ${injury}, ${status}, ${gamesMissed} games missed. Tap for injury history and impact.`}
+      className="stat-clickable"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        padding: '0.5rem 0.75rem',
+        background: 'rgba(0,0,0,0.4)',
+        borderLeft: `3px solid ${statusColor}`,
+        borderTop: '1px solid transparent',
+        borderRight: '1px solid transparent',
+        borderBottom: '1px solid transparent',
+        borderRadius: '2px',
+        width: '100%',
+        textAlign: 'left',
+        cursor: 'pointer',
+        font: 'inherit',
+        color: 'inherit',
+      }}
+    >
       <div style={{
         width: 8, height: 8, borderRadius: '50%',
         background: statusColor,
         boxShadow: `0 0 8px ${statusColor}`,
+        flexShrink: 0,
       }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
@@ -173,13 +228,15 @@ function InjuryRow({ player, position, injury, status, gamesMissed }) {
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: statusColor,
+        flexShrink: 0,
       }}>{status.toUpperCase()}</div>
-    </div>
+    </button>
   );
 }
 
 export default function CostOfWarScene() {
   const top5Injuries = injuries.timeline.slice(0, 5);
+  const [activeStat, setActiveStat] = useState(null);
 
   return (
     <section
@@ -323,7 +380,11 @@ export default function CostOfWarScene() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {top5Injuries.map((inj, i) => (
-                <InjuryRow key={i} {...inj} />
+                <InjuryRow
+                  key={i}
+                  {...inj}
+                  onClick={() => setActiveStat(injuryToStat(inj))}
+                />
               ))}
             </div>
           </div>
@@ -374,6 +435,7 @@ export default function CostOfWarScene() {
         </motion.div>
 
         {/* DEAD MONEY — bottom-right */}
+        {/* (modal mounted at the end of the section) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -417,6 +479,11 @@ export default function CostOfWarScene() {
           </div>
         </motion.div>
       </div>
+      <StatDetailModal
+        open={!!activeStat}
+        onClose={() => setActiveStat(null)}
+        stat={activeStat}
+      />
     </section>
   );
 }

@@ -269,11 +269,77 @@ export const driveEfficiency = {
 
 export const injuries = {
   timeline: [
-    { player: 'Ed Oliver', position: 'DT', injury: 'Ankle', start: 'Week 4', end: 'Week 8', status: 'Returned', gamesMissed: 4 },
-    { player: 'Joshua Palmer', position: 'WR', injury: 'Hamstring', start: 'Week 2', end: 'Week 10', status: 'Returned', gamesMissed: 8 },
-    { player: 'Dalton Kincaid', position: 'TE', injury: 'Hamstring', start: 'Week 10', end: 'Week 14', status: 'Returned', gamesMissed: 4 },
-    { player: 'Matt Milano', position: 'LB', injury: 'Pectoral', start: 'Week 6', end: 'Season', status: 'IR', gamesMissed: 12 },
-    { player: 'Joey Bosa', position: 'DE', injury: 'Shoulder', start: 'Week 12', end: 'Week 16', status: 'Returned', gamesMissed: 5 }
+    {
+      player: 'Ed Oliver',
+      position: 'DT',
+      injury: 'Ankle',
+      start: 'Week 4',
+      end: 'Week 8',
+      status: 'Returned',
+      gamesMissed: 4,
+      history: [
+        { season: 2024, type: 'Hand', detail: 'Hand fracture vs MIA, missed 2 games' },
+        { season: 2023, type: 'Knee', detail: 'MCL strain, played through, limited 4 games' },
+      ],
+      impact: "When Ed went down in October, the run D gave up 142 yards a game over the next two. Boy is the only true 1-tech we got who can collapse a pocket from the inside — without him, Bernard's makin' tackles 8 yards downfield instead of 2. The trade rumors? Cute. Cap relief is real, but you can't replace him on the field, son.",
+    },
+    {
+      player: 'Joshua Palmer',
+      position: 'WR',
+      injury: 'Hamstring',
+      start: 'Week 2',
+      end: 'Week 10',
+      status: 'Returned',
+      gamesMissed: 8,
+      history: [
+        { season: 2023, type: 'Hamstring', detail: 'Same leg, with the Chargers, missed 5 games' },
+        { season: 2022, type: 'Shoulder', detail: 'AC sprain, missed 1 game' },
+      ],
+      impact: "Ain't gonna lie — losin' Palmer for half a season hurt less than I thought it would. Shakir kept eatin', and the WR room found a rhythm without him. But same hamstring popped on him in San Diego in '23 — that's twice now in three years. If it pops again in 2026 we got a soft-tissue PROBLEM, not a bad-luck story.",
+    },
+    {
+      player: 'Dalton Kincaid',
+      position: 'TE',
+      injury: 'Hamstring',
+      start: 'Week 10',
+      end: 'Week 14',
+      status: 'Returned',
+      gamesMissed: 4,
+      history: [
+        { season: 2024, type: 'Hamstring', detail: 'Same leg as a rookie, missed 3 games' },
+        { season: 2024, type: 'Shoulder', detail: 'Played through, limited 5 games' },
+      ],
+      impact: "Two years in a row, same hamstring. The kid's a matchup nightmare when he's healthy — Allen's safety blanket on third down, the seam-stretcher we don't get with Knox alone. But if soft tissue keeps grabbin' him every September, that fifth-year option starts lookin' shaky real fast. Get him on a Pilates mat, son.",
+    },
+    {
+      player: 'Matt Milano',
+      position: 'LB',
+      injury: 'Pectoral',
+      start: 'Week 6',
+      end: 'Season',
+      status: 'IR',
+      gamesMissed: 12,
+      history: [
+        { season: 2023, type: 'Tibia', detail: 'Lower leg fracture, missed 12 games' },
+        { season: 2022, type: 'Hamstring', detail: 'Missed 2 games early' },
+      ],
+      impact: "Milano in the middle is the QB of this defense. Without him this year? Bernard had to do EVERYTHING — and the third-down stops were not what they were in '22. We rolled to 12-5 anyway 'cause Allen kept us above water, but you felt his absence in the playoff loss. He's a UFA at 30 with a pec history and a leg history. Tells you everything you need to know about why we drafted Elarms-Orr.",
+    },
+    {
+      player: 'Joey Bosa',
+      position: 'DE',
+      injury: 'Shoulder',
+      start: 'Week 12',
+      end: 'Week 16',
+      status: 'Returned',
+      gamesMissed: 5,
+      history: [
+        { season: 2024, type: 'Groin', detail: 'Recurring with the Chargers, missed 8 games' },
+        { season: 2023, type: 'Back', detail: 'Multiple flare-ups, missed 9 games' },
+        { season: 2022, type: 'Foot', detail: 'Surgery, missed 12 games' },
+      ],
+      impact: "Joey is what he is — Hall of Fame talent, glass body. We got 5 sacks in 12 games when he was upright, and then his shoulder folded on him just like everything else has folded on him for five years runnin'. One-year deal expires this offseason. Don't expect a renewal — Beane took that swing once and he ain't doin' it twice. That's why Parker's here.",
+    }
   ],
   currentReport: [
     { player: 'Josh Allen', status: 'Healthy', designation: '', details: 'Offseason — full health' },
@@ -309,6 +375,26 @@ export const weatherImpact = {
   domeGames: { wins: 1, losses: 2, avgPoints: 22.7, avgPassYards: 273.3 },
   coldGames: { wins: 5, losses: 0, avgPoints: 32.0, avgPassYards: 184.0 },
   warmGames: { wins: 4, losses: 3, avgPoints: 26.7, avgPassYards: 241.6 }
+};
+
+// Next-game forecast — feeds the Storm scene weather caster panel.
+// Updates with the schedule; current entry is the 2026 season opener at
+// the inaugural New Highmark Stadium (Sept 13, 2026).
+export const nextGameWeather = {
+  opponent: '2026 Season Opener',
+  date: 'Sept 13, 2026',
+  kickoff: '1:00 PM ET',
+  venue: 'New Highmark Stadium (Inaugural)',
+  forecast: {
+    temp: 72,
+    feelsLike: 70,
+    wind: 8,
+    windDirection: 'WSW',
+    precip: 'Clear',
+    humidity: 55,
+    conditions: 'Sunny / Light Breeze',
+  },
+  outlook: 'Mild for an opener — low wind, no rain. Allen gets to throw it deep without the lake sending it sideways.',
 };
 
 export const news = {
