@@ -113,6 +113,31 @@ const consensusClickWrap = {
   display: 'block',
 };
 
+const propCardStyle = {
+  padding: '0.875rem 1rem',
+  background: 'var(--bg-recessed)',
+  border: '1px solid var(--border-divider)',
+  borderRadius: '3px',
+};
+
+const propLabelStyle = {
+  ...sans,
+  fontSize: '0.875rem',
+  fontWeight: 700,
+  color: 'var(--text-primary)',
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  marginBottom: '0.25rem',
+};
+
+const propDescStyle = {
+  ...sans,
+  fontSize: '0.75rem',
+  color: 'var(--text-secondary)',
+  lineHeight: 1.45,
+  marginBottom: '0.625rem',
+};
+
 export default function PredictionsPage() {
   const [billsScore, setBillsScore] = useState('');
   const [oppScore, setOppScore] = useState('');
@@ -249,21 +274,24 @@ export default function PredictionsPage() {
         {/* Prop Predictions */}
         <motion.div {...fade(2)}>
           <Panel>
-            <SectionHeader title="Prop Predictions" subtitle="Game props and player picks" context="Fun prediction picks for specific game outcomes. These are for bragging rights only — not real bets." />
+            <SectionHeader
+              title="Prop Predictions"
+              subtitle="Pick your sub-bets for the game · brag-rights only, no real money"
+              context="Each prop is a separate side-bet on a specific game outcome. Lock in your picks before kickoff. Junior says: 'These ain't real money, son — but the Mafia remembers who called what.'"
+            />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {/* First TD Scorer */}
-              <div>
-                <label style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.375rem' }}>
-                  First TD Scorer
-                </label>
+              <div style={propCardStyle}>
+                <div style={propLabelStyle}>FIRST TD SCORER</div>
+                <div style={propDescStyle}>Who finds the endzone first this game? Allen and Cook usually split this one.</div>
                 <select
                   value={firstTD}
                   onChange={e => setFirstTD(e.target.value)}
                   style={{
                     ...mono,
                     width: '100%',
-                    padding: '0.5rem 0.75rem',
-                    background: 'var(--bg-recessed)',
+                    padding: '0.625rem 0.75rem',
+                    background: 'var(--bg-base)',
                     border: '1px solid var(--border-default)',
                     borderRadius: '2px',
                     color: 'var(--text-data)',
@@ -271,16 +299,15 @@ export default function PredictionsPage() {
                     outline: 'none',
                   }}
                 >
-                  <option value="">Select player...</option>
+                  <option value="">Pick a player…</option>
                   {KEY_PLAYERS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
 
               {/* Josh Allen Pass TDs */}
-              <div>
-                <label style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.375rem' }}>
-                  Josh Allen Pass TDs
-                </label>
+              <div style={propCardStyle}>
+                <div style={propLabelStyle}>JOSH ALLEN — PASSING TDs</div>
+                <div style={propDescStyle}>How many touchdown passes #17 throws this game. Career average is ~2.0; he's had as many as 6 in a single game.</div>
                 <div style={{ display: 'flex', gap: '0.375rem' }}>
                   {[0, 1, 2, 3, 4, 5, 6].map(n => (
                     <button
@@ -289,10 +316,10 @@ export default function PredictionsPage() {
                       style={{
                         ...mono,
                         flex: 1,
-                        padding: '0.5rem',
-                        fontSize: '0.875rem',
-                        fontWeight: 600,
-                        background: allenTDs === String(n) ? 'var(--bills-blue)' : 'var(--bg-recessed)',
+                        padding: '0.625rem 0',
+                        fontSize: '0.9375rem',
+                        fontWeight: 700,
+                        background: allenTDs === String(n) ? 'var(--bills-blue)' : 'var(--bg-base)',
                         color: allenTDs === String(n) ? '#fff' : 'var(--text-data)',
                         border: '1px solid',
                         borderColor: allenTDs === String(n) ? 'var(--bills-blue-bright)' : 'var(--border-default)',
@@ -307,10 +334,11 @@ export default function PredictionsPage() {
               </div>
 
               {/* Over/Under */}
-              <div>
-                <label style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.375rem' }}>
-                  Total Points O/U <span style={{ ...mono, color: 'var(--text-data)' }}>48.5</span>
-                </label>
+              <div style={propCardStyle}>
+                <div style={propLabelStyle}>
+                  TOTAL POINTS · O/U <span style={{ ...mono, color: 'var(--bills-blue-bright)' }}>48.5</span>
+                </div>
+                <div style={propDescStyle}>Combined Bills + opponent score. Pick OVER if you think it's a track meet, UNDER if you think it's a rock fight.</div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {['over', 'under'].map(opt => (
                     <button
@@ -319,11 +347,12 @@ export default function PredictionsPage() {
                       style={{
                         ...mono,
                         flex: 1,
-                        padding: '0.625rem',
+                        padding: '0.75rem',
                         fontSize: '0.875rem',
-                        fontWeight: 600,
+                        fontWeight: 700,
+                        letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        background: overUnder === opt ? 'var(--bills-blue)' : 'var(--bg-recessed)',
+                        background: overUnder === opt ? 'var(--bills-blue)' : 'var(--bg-base)',
                         color: overUnder === opt ? '#fff' : 'var(--text-data)',
                         border: '1px solid',
                         borderColor: overUnder === opt ? 'var(--bills-blue-bright)' : 'var(--border-default)',
@@ -338,10 +367,9 @@ export default function PredictionsPage() {
               </div>
 
               {/* Win Margin */}
-              <div>
-                <label style={{ ...sans, fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.375rem' }}>
-                  Bills Win Margin
-                </label>
+              <div style={propCardStyle}>
+                <div style={propLabelStyle}>BILLS WIN MARGIN</div>
+                <div style={propDescStyle}>Score gap. Positive = Bills win by that many (e.g. 7 means BUF wins by a TD). Negative = Bills lose by that many.</div>
                 <input
                   type="number"
                   min="-50"
@@ -349,12 +377,12 @@ export default function PredictionsPage() {
                   value={winMargin}
                   onChange={e => setWinMargin(e.target.value)}
                   placeholder="e.g. 7"
-                  style={{ ...inputStyle, fontSize: '0.875rem', textAlign: 'left' }}
+                  style={{ ...inputStyle, background: 'var(--bg-base)', fontSize: '0.875rem', textAlign: 'left' }}
                 />
               </div>
 
               <button onClick={handleSaveProps} style={propSaved ? { ...btnStyle, background: 'var(--signal-positive)' } : btnStyle}>
-                {propSaved ? 'Saved' : 'Save Props'}
+                {propSaved ? '✓ Props Saved' : 'Lock In Props'}
               </button>
             </div>
           </Panel>

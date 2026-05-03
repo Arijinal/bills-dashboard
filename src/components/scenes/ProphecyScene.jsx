@@ -50,7 +50,9 @@ const TAROT_CARDS = [
 ];
 
 // --- TarotCard ----------------------------------------------------------
-function TarotCard({ card, value, onChange }) {
+// dropdownDirection: 'down' (default) | 'up' — bottom-row cards must open upward
+// so the dropdown doesn't get cut off below the section edge.
+function TarotCard({ card, value, onChange, dropdownDirection = 'down' }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="tarot-flip mystical-hue" style={{
@@ -106,7 +108,9 @@ function TarotCard({ card, value, onChange }) {
       {open && (
         <div style={{
           position: 'absolute',
-          top: 'calc(100% + 6px)',
+          ...(dropdownDirection === 'up'
+            ? { bottom: 'calc(100% + 6px)' }
+            : { top: 'calc(100% + 6px)' }),
           left: 0,
           right: 0,
           background: 'rgba(8, 6, 16, 0.96)',
@@ -416,7 +420,7 @@ export default function ProphecyScene() {
           transition={{ duration: 0.5, delay: 0.75, ease }}
           style={{ position: 'absolute', bottom: '8%', left: '4%', zIndex: 8 }}
         >
-          <TarotCard card={TAROT_CARDS[2]} value={props[TAROT_CARDS[2].id]} onChange={(v) => setProp(TAROT_CARDS[2].id, v)} />
+          <TarotCard card={TAROT_CARDS[2]} value={props[TAROT_CARDS[2].id]} onChange={(v) => setProp(TAROT_CARDS[2].id, v)} dropdownDirection="up" />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -425,7 +429,7 @@ export default function ProphecyScene() {
           transition={{ duration: 0.5, delay: 0.85, ease }}
           style={{ position: 'absolute', bottom: '8%', right: '4%', zIndex: 8 }}
         >
-          <TarotCard card={TAROT_CARDS[3]} value={props[TAROT_CARDS[3].id]} onChange={(v) => setProp(TAROT_CARDS[3].id, v)} />
+          <TarotCard card={TAROT_CARDS[3]} value={props[TAROT_CARDS[3].id]} onChange={(v) => setProp(TAROT_CARDS[3].id, v)} dropdownDirection="up" />
         </motion.div>
 
         {/* FOOTER hint */}
