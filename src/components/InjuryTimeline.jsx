@@ -2,6 +2,7 @@ import { injuries, fullRoster } from '../data/mockData';
 import { motion } from 'framer-motion';
 import { usePlayerDossier } from '../contexts/PlayerDossierContext';
 
+import { onKeyboardActivate } from '../utils/a11y';
 const statusColors = {
   Healthy: '#22c55e',
   Questionable: '#FFB81C',
@@ -41,7 +42,7 @@ export default function InjuryTimeline() {
             return (
               <div key={i} className="timeline-row">
                 <div className="timeline-player-col">
-                  <span className="timeline-player-name player-name-link" onClick={() => openDossier(findPlayer(inj.player))}>{inj.player}</span>
+                  <span className="timeline-player-name player-name-link" onClick={() => openDossier(findPlayer(inj.player))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findPlayer(inj.player)))}>{inj.player}</span>
                   <span className="timeline-player-pos">{inj.position}</span>
                 </div>
                 <div className="timeline-weeks">
@@ -82,7 +83,7 @@ export default function InjuryTimeline() {
             <tbody>
               {injuries.currentReport.map((p, i) => (
                 <tr key={i}>
-                  <td style={{ fontWeight: 600 }}><span className="player-name-link" onClick={() => openDossier(findPlayer(p.player))}>{p.player}</span></td>
+                  <td style={{ fontWeight: 600 }}><span className="player-name-link" onClick={() => openDossier(findPlayer(p.player))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findPlayer(p.player)))}>{p.player}</span></td>
                   <td>
                     <span className="badge" style={{ background: `${statusColors[p.status] || statusColors[p.designation]}20`, color: statusColors[p.status] || statusColors[p.designation] }}>
                       {p.designation || p.status}
@@ -102,7 +103,7 @@ export default function InjuryTimeline() {
             {injuries.timeline.map((inj, i) => (
               <div key={i} className="impact-row">
                 <div className="impact-player">
-                  <span className="impact-name player-name-link" onClick={() => openDossier(findPlayer(inj.player))}>{inj.player}</span>
+                  <span className="impact-name player-name-link" onClick={() => openDossier(findPlayer(inj.player))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findPlayer(inj.player)))}>{inj.player}</span>
                   <span className="impact-injury">{inj.injury}</span>
                 </div>
                 <div className="impact-bar-container">

@@ -147,7 +147,7 @@ export default function AFCEast() {
           <div className="card-title">Head-to-Head vs Division</div>
           <div className="h2h-grid">
             {afcEast.headToHead.map((h, i) => (
-              <div key={i} className="h2h-card stat-clickable" onClick={() => openInsight(h.logo)}>
+              <button type="button" key={i} className="h2h-card stat-clickable button-reset" onClick={() => openInsight(h.logo)} aria-label={`${h.opponent} head-to-head — tap for analysis`}>
                 <div className="h2h-opponent">
                   <span className="team-badge" style={{ background: teamColors[h.logo], width: 32, height: 32, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontFamily: 'var(--font-data)', fontWeight: 700, color: 'white' }}>{h.logo}</span>
                   <span>{h.opponent}</span>
@@ -158,18 +158,18 @@ export default function AFCEast() {
                   </span>
                   <span className="h2h-score">{h.billsPF} — {h.billsPA}</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
         {/* SOS — clickable */}
-        <div className="card stat-clickable" onClick={() => openInsight('Strength of Schedule')}>
+        <button type="button" className="card stat-clickable button-reset" onClick={() => openInsight('Strength of Schedule')} aria-label="Strength of Schedule — tap for analysis">
           <div className="hud-corners" />
           <div className="card-title">Strength of Schedule</div>
           <Chart options={sosChart.options} series={sosChart.series} type="bar" height={280} />
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
       </div>
 
       <InsightModal insight={selectedInsight} onClose={closeInsight} />

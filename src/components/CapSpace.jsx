@@ -3,6 +3,7 @@ import { capSpace, fullRoster } from '../data/mockData';
 import { motion } from 'framer-motion';
 import { usePlayerDossier } from '../contexts/PlayerDossierContext';
 
+import { onKeyboardActivate } from '../utils/a11y';
 const fmt = (n) => `$${(n / 1000000).toFixed(1)}M`;
 
 export default function CapSpace() {
@@ -119,7 +120,7 @@ export default function CapSpace() {
           {capSpace.freeAgents.map((fa, i) => (
             <div key={i} className="fa-card">
               <div className="fa-info">
-                <span className="fa-name player-name-link" onClick={() => openDossier(findPlayer(fa.player))}>{fa.player}</span>
+                <span className="fa-name player-name-link" onClick={() => openDossier(findPlayer(fa.player))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findPlayer(fa.player)))}>{fa.player}</span>
                 <span className="fa-pos">{fa.position}</span>
               </div>
               <span className={`badge ${fa.type === 'UFA' ? 'badge-loss' : 'badge-blue'}`}>{fa.type}</span>

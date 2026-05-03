@@ -17,8 +17,12 @@ import { latestDispatch, sortedDispatches } from '../../data/dispatches';
 
 const ease = [0.16, 1, 0.3, 1];
 
-// TODO: replace with the actual payment URL (Stripe Payment Link / Venmo / Cash App)
-const TIP_URL = '#tip-jar';
+// 🪙 Tip jar — paste your Stripe Payment Link / Venmo / Cash App URL here when you have it.
+//    Example: 'https://buy.stripe.com/abc123'
+//    Until TIP_URL is a real https:// URL, the "tip a dollar" CTA below is hidden
+//    automatically so we never ship a broken link.
+const TIP_URL = '';
+const TIP_READY = !!(TIP_URL && /^https?:\/\//i.test(TIP_URL));
 
 export default function DispatchScene() {
   const [dossierOpen, setDossierOpen] = useState(false);
@@ -114,14 +118,19 @@ export default function DispatchScene() {
               lineHeight: 1.5,
             }}
           >
-            Just here casually? Skim the saga and{' '}
-            <a
-              href={TIP_URL}
-              style={{ color: 'var(--bills-blue-bright)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
-            >
-              tip a dollar
-            </a>
-            . The dispatch below is for the ones who never left.
+            Just here casually? Skim the saga{TIP_READY && (
+              <>
+                {' '}and{' '}
+                <a
+                  href={TIP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--bills-blue-bright)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+                >
+                  tip a dollar
+                </a>
+              </>
+            )}. The dispatch below is for the ones who never left.
           </div>
         </motion.div>
 

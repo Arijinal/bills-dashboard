@@ -238,7 +238,7 @@ export default function ArrivalScene() {
             textShadow: '0 2px 8px rgba(0,0,0,0.9)',
           }}
         >
-          The Saga of the Charging Bull. The 2025-26 season told as it was lived.
+          Pull up a chair, son. 2025-26 the way Uncle Jr. saw it — front porch, black-and-white Zenith, tape don't lie.
         </motion.div>
       </div>
 

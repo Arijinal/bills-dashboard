@@ -156,7 +156,7 @@ export default function GameAnalysis() {
       {/* Key Stats Grid — clickable */}
       <div className="grid-4 mt-2">
         {gameStats.map((stat, i) => (
-          <div key={i} className="card text-center stat-clickable" onClick={() => openInsight(stat.label)}>
+          <button type="button" key={i} className="card text-center stat-clickable button-reset" onClick={() => openInsight(stat.label)} aria-label={`${stat.label} — tap for analysis`}>
             <div className="hud-corners" />
             <div className="card-title">{stat.label}</div>
             <div className="stat-comparison">
@@ -171,7 +171,7 @@ export default function GameAnalysis() {
               </div>
             </div>
             <span className="click-hint">TAP FOR ANALYSIS</span>
-          </div>
+          </button>
         ))}
       </div>
 

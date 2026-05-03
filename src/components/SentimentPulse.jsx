@@ -78,7 +78,7 @@ export default function SentimentPulse() {
 
       <div className="grid-3 mb-2">
         {/* Gauge — clickable */}
-        <div className="card text-center stat-clickable" onClick={() => openInsight('Current Sentiment')}>
+        <button type="button" className="card text-center stat-clickable button-reset" onClick={() => openInsight('Current Sentiment')} aria-label="Current Sentiment — tap for analysis">
           <div className="card-title">Current Sentiment</div>
           <svg viewBox="0 0 200 130" className="sentiment-gauge" style={{ maxWidth: 280, margin: '0 auto' }}>
             {/* Background arc */}
@@ -111,10 +111,10 @@ export default function SentimentPulse() {
             <span style={{ color: '#C60C30', fontFamily: 'var(--font-data)', fontSize: '0.8rem' }}>{negative}% Negative</span>
           </div>
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
 
         {/* Trending Topics — clickable */}
-        <div className="card stat-clickable" style={{ gridColumn: 'span 2' }} onClick={() => openInsight('Trending Topics')}>
+        <button type="button" className="card stat-clickable button-reset" style={{ gridColumn: 'span 2' }} onClick={() => openInsight('Trending Topics')} aria-label="Trending Topics — tap for analysis">
           <div className="card-title">Trending Topics — Bills Mafia</div>
           <div className="trending-grid">
             {sentiment.trending.map((topic, i) => (
@@ -137,15 +137,15 @@ export default function SentimentPulse() {
             ))}
           </div>
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
       </div>
 
       {/* Sentiment Over Time — clickable */}
-      <div className="card stat-clickable" onClick={() => openInsight('Sentiment Trend')}>
+      <button type="button" className="card stat-clickable button-reset" onClick={() => openInsight('Sentiment Trend')} aria-label="Sentiment Trend — tap for analysis">
         <div className="card-title">Fan Sentiment by Week (Correlates with W/L)</div>
         <Chart options={sentimentTrend.options} series={sentimentTrend.series} type="area" height={300} />
         <span className="click-hint">TAP FOR ANALYSIS</span>
-      </div>
+      </button>
 
       <InsightModal insight={selectedInsight} onClose={closeInsight} />
     </motion.section>

@@ -4,6 +4,7 @@ import { players, fullRoster } from '../data/mockData';
 import { motion } from 'framer-motion';
 import { usePlayerDossier } from '../contexts/PlayerDossierContext';
 
+import { onKeyboardActivate } from '../utils/a11y';
 function normalizeStats(player) {
   const s = player.stats;
   if (player.position === 'QB') {
@@ -86,9 +87,9 @@ export default function PlayerComparison() {
           <table className="data-table">
             <thead>
               <tr>
-                <th><span className="player-name-link" onClick={() => openDossier(findFullPlayer(player1.name))}>{player1.name}</span></th>
+                <th><span className="player-name-link" onClick={() => openDossier(findFullPlayer(player1.name))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findFullPlayer(player1.name)))}>{player1.name}</span></th>
                 <th>Stat</th>
-                <th><span className="player-name-link" onClick={() => openDossier(findFullPlayer(player2.name))}>{player2.name}</span></th>
+                <th><span className="player-name-link" onClick={() => openDossier(findFullPlayer(player2.name))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findFullPlayer(player2.name)))}>{player2.name}</span></th>
               </tr>
             </thead>
             <tbody>

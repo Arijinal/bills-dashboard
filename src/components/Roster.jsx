@@ -5,6 +5,7 @@ import { usePlayerDossier } from '../contexts/PlayerDossierContext';
 import OrbitalDepthChart from './OrbitalDepthChart';
 import { playClickSound } from '../utils/sound';
 
+import { onKeyboardActivate } from '../utils/a11y';
 const positionGroups = ['ALL', 'QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'ST'];
 
 const posMap = {
@@ -120,7 +121,7 @@ export default function Roster() {
                         className="player-name-link"
                         onClick={() => openDossier(p)}
                         style={{ fontWeight: 600 }}
-                      >
+                       role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(p))}>
                         {p.name}
                       </span>
                     </td>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FaTwitter, FaInstagram, FaHeart, FaRetweet, FaComment } from 'react-icons/fa';
 import { usePlayerDossier } from '../contexts/PlayerDossierContext';
 
+import { onKeyboardActivate } from '../utils/a11y';
 const fmt = (n) => {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
@@ -41,7 +42,7 @@ export default function SocialFeed() {
                 <span>{post.avatar}</span>
               </div>
               <div className="social-user-info">
-                <span className="social-player-name player-name-link" onClick={() => openDossier(findPlayer(post.player))}>
+                <span className="social-player-name player-name-link" onClick={() => openDossier(findPlayer(post.player))} role="button" tabIndex={0} onKeyDown={onKeyboardActivate(() => openDossier(findPlayer(post.player)))}>
                   {post.player}
                   {post.verified && <span className="verified-check">&#10003;</span>}
                 </span>

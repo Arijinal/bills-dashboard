@@ -116,6 +116,24 @@
   outline-offset: 2px;
 }
 
+/* Button reset — neutralize browser button defaults so a <button>
+   can carry stat-clickable / card classes and look identical to a div.
+   Use on every clickable card to keep keyboard + screen-reader semantics
+   without redesigning the visual layer. */
+.button-reset {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+}
+.button-reset:focus { outline: none; }
+
 /* Animated dashed underline — alive headers */
 @keyframes lineSlide {
   0% { background-position: 0 0; }

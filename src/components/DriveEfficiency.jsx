@@ -93,7 +93,7 @@ export default function DriveEfficiency() {
 
       {/* Red Zone Gauge — clickable */}
       <div className="grid-3 mb-2">
-        <div className="card text-center stat-clickable" onClick={() => openInsight('Red Zone Efficiency')}>
+        <button type="button" className="card text-center stat-clickable button-reset" onClick={() => openInsight('Red Zone Efficiency')} aria-label="Red Zone Efficiency — tap for analysis">
           <div className="card-title">Red Zone Efficiency</div>
           <div className="rz-gauge">
             <svg viewBox="0 0 120 80" className="gauge-svg">
@@ -110,19 +110,19 @@ export default function DriveEfficiency() {
             </svg>
           </div>
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
-        <div className="card text-center stat-clickable" onClick={() => openInsight('Red Zone TDs')}>
+        </button>
+        <button type="button" className="card text-center stat-clickable button-reset" onClick={() => openInsight('Red Zone TDs')} aria-label="Red Zone TDs — tap for analysis">
           <div className="card-title">Red Zone TDs</div>
           <div className="stat-value gold" style={{ fontSize: '3.5rem' }}>{rz.touchdowns}</div>
           <div className="stat-label">OF {rz.attempts} ATTEMPTS</div>
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
-        <div className="card text-center stat-clickable" onClick={() => openInsight('Red Zone FGs')}>
+        </button>
+        <button type="button" className="card text-center stat-clickable button-reset" onClick={() => openInsight('Red Zone FGs')} aria-label="Red Zone FGs — tap for analysis">
           <div className="card-title">Red Zone FGs</div>
           <div className="stat-value" style={{ fontSize: '3.5rem' }}>{rz.fieldGoals}</div>
           <div className="stat-label">FIELD GOALS IN RZ</div>
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
       </div>
 
       <div className="grid-2">

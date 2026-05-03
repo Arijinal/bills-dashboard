@@ -526,14 +526,16 @@ export default function TeamStats() {
       {/* Rankings */}
       <div className="grid-4 mb-2">
         {rankings.map((r, i) => (
-          <motion.div
+          <motion.button
+            type="button"
             key={i}
-            className="card stat-clickable"
+            className="card stat-clickable button-reset"
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
             onClick={() => openInsight(r.label)}
+            aria-label={`${r.label} ranking — tap for analysis`}
           >
             <div className="hud-corners" />
             <div className="card-title">{r.label}</div>
@@ -545,26 +547,26 @@ export default function TeamStats() {
               <div className="rank-bar-fill" style={{ width: `${((r.total - r.rank + 1) / r.total) * 100}%`, background: r.color }} />
             </div>
             <span className="click-hint">TAP FOR ANALYSIS</span>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
       <div className="grid-2">
         {/* Points Trend */}
-        <div className="card stat-clickable" onClick={() => openInsight('Points Trend')}>
+        <button type="button" className="card stat-clickable button-reset" onClick={() => openInsight('Points Trend')} aria-label="Points Trend — tap for analysis">
           <div className="hud-corners" />
           <div className="card-title">Points Scored vs Allowed — Weekly</div>
           <Chart options={pointsTrend.options} series={pointsTrend.series} type="line" height={320} />
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
 
         {/* Offense Split */}
-        <div className="card stat-clickable" onClick={() => openInsight('Offensive Split')}>
+        <button type="button" className="card stat-clickable button-reset" onClick={() => openInsight('Offensive Split')} aria-label="Offensive Split — tap for analysis">
           <div className="hud-corners" />
           <div className="card-title">Offensive Yards Split</div>
           <Chart options={splitChart.options} series={splitChart.series} type="donut" height={320} />
           <span className="click-hint">TAP FOR ANALYSIS</span>
-        </div>
+        </button>
       </div>
 
       {/* Offense vs Defense Stats */}
@@ -577,18 +579,20 @@ export default function TeamStats() {
           <div className="card-title">Offense</div>
           <div className="stat-row-grid">
             {offenseStats.map((s, i) => (
-              <div
+              <button
+                type="button"
                 key={i}
-                className="stat-row stat-row-clickable"
+                className="stat-row stat-row-clickable button-reset"
                 data-stat-id={s.statId}
                 onClick={() => openInsight(s.l)}
                 onMouseEnter={() => setHoveredStat(s.statId)}
                 onMouseLeave={() => setHoveredStat(null)}
+                aria-label={`${s.l} — tap for analysis`}
               >
                 <span className="stat-row-label">{s.l}</span>
                 <span className="stat-row-value">{s.v}</span>
                 <span className="stat-row-arrow">&#8250;</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -597,18 +601,20 @@ export default function TeamStats() {
           <div className="card-title">Defense</div>
           <div className="stat-row-grid">
             {defenseStats.map((s, i) => (
-              <div
+              <button
+                type="button"
                 key={i}
-                className="stat-row stat-row-clickable"
+                className="stat-row stat-row-clickable button-reset"
                 data-stat-id={s.statId}
                 onClick={() => openInsight(s.l)}
                 onMouseEnter={() => setHoveredStat(s.statId)}
                 onMouseLeave={() => setHoveredStat(null)}
+                aria-label={`${s.l} — tap for analysis`}
               >
                 <span className="stat-row-label">{s.l}</span>
                 <span className="stat-row-value">{s.v}</span>
                 <span className="stat-row-arrow">&#8250;</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>

@@ -68,9 +68,13 @@ function PollCard({ poll, index, userVote, onVote }) {
           const isUserPick = hasVoted && userVote === i;
 
           return (
-            <div
+            <button
+              type="button"
               key={i}
               onClick={() => !hasVoted && poll.active && onVote(poll.id, i)}
+              disabled={hasVoted || !poll.active}
+              aria-label={`Vote: ${opt.label}${hasVoted ? ` (${pct.toFixed(1)}%)` : ''}`}
+              aria-pressed={isUserPick}
               style={{
                 position: 'relative',
                 padding: '0.625rem 0.75rem',
@@ -78,6 +82,11 @@ function PollCard({ poll, index, userVote, onVote }) {
                 cursor: !hasVoted && poll.active ? 'pointer' : 'default',
                 border: '1px solid',
                 borderColor: isUserPick ? 'var(--bills-blue-bright)' : 'var(--border-default)',
+                background: 'transparent',
+                color: 'inherit',
+                font: 'inherit',
+                textAlign: 'inherit',
+                width: '100%',
                 overflow: 'hidden',
                 transition: 'border-color 0.2s',
               }}
@@ -140,7 +149,7 @@ function PollCard({ poll, index, userVote, onVote }) {
                   </div>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
