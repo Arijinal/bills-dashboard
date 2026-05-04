@@ -16,7 +16,11 @@ import { motion, AnimatePresence } from 'framer-motion';
  *     verdict?,                  // "ELITE" / "BELOW THE LINE" / etc.
  *     breakdown?: [{ label, value, note? }],
  *     impact?: string,           // 1-2 sentence narrative
- *     uncleJrTake?: string,      // italic quote
+ *     uncleJrTake?: string,      // italic quote (gut/porch voice)
+ *     dwayneTake?: string,       // optional second italic quote — Dwayne
+ *                                 // (Junior's nephew, tape-room voice). Use
+ *                                 // when a stat begs for film-room context
+ *                                 // alongside Junior's gut take.
  *   }
  */
 
@@ -227,6 +231,33 @@ export default function StatDetailModal({ open, onClose, stat }) {
                   lineHeight: 1.6,
                   color: 'var(--text-primary)',
                 }}>"{stat.uncleJrTake}"</p>
+              </div>
+            )}
+
+            {/* Dwayne's tape-room take */}
+            {stat.dwayneTake && (
+              <div style={{
+                marginTop: '0.875rem',
+                paddingTop: '0.875rem',
+                borderTop: `1px dashed ${accent}80`,
+              }}>
+                <div style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.5rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.22em',
+                  color: 'var(--text-secondary)',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.375rem',
+                }}>Dwayne · Tape Room</div>
+                <p style={{
+                  margin: 0,
+                  fontFamily: '"Shippori Mincho", Georgia, serif',
+                  fontStyle: 'italic',
+                  fontSize: '0.8125rem',
+                  lineHeight: 1.6,
+                  color: 'var(--text-data)',
+                }}>"{stat.dwayneTake}"</p>
               </div>
             )}
           </motion.div>

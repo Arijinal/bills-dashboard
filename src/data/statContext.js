@@ -10,6 +10,9 @@
  *   breakdown    array of { label, value, color?, note? }
  *   impact       1-2 sentence narrative on how this stat shaped the result
  *   uncleJrTake  italic 1-line voice quote (always ends or implies a question)
+ *   dwayneTake   optional Dwayne (Junior's nephew, tape-room voice) — used when
+ *                a stat begs for X's-and-O's / film-room breakdown alongside
+ *                Junior's gut take. Renders as a second italic block.
  */
 
 export const statContext = {
@@ -119,7 +122,7 @@ export const statContext = {
       { label: 'TAKEAWAYS', value: '24', note: 'Tied 5th — opportunistic' },
     ],
     impact: 'Coverage on lockdown, pressure rate in the basement. The defense forced 24 takeaways but couldn\'t generate a four-man rush in the playoff game when it mattered most.',
-    uncleJrTake: "27th in pass rush win rate. TWENTY. SEVENTH. That's how Bo Nix walked 85 yards in OT. I've been preaching on the front seven for the LONGEST.",
+    uncleJrTake: "27th in pass rush win rate. TWENTY. SEVENTH. That's how Bo Nix walked 85 yards in OT — I've been preachin' on the front seven for the LONGEST, son.",
   },
   'war-room:dvoa': {
     label: 'DVOA',
@@ -168,6 +171,7 @@ export const statContext = {
     ],
     impact: 'A passing-grade in the high 80s puts us in the championship-contender tier. The story isn\'t the regular-season number — it\'s the 5 turnovers in Denver that don\'t show up here.',
     uncleJrTake: "88.1 don't lie about the regular season. The kid was top 4. But ratings don't play in OT, son — execution does.",
+    dwayneTake: "Big-time-throw rate 6.1% says it on the tape — Allen's makin' more elite-window throws than anybody but Burrow. Where it shows up: those middle-of-the-field shots to Coleman. Where it bites us: the playoff sample is small enough that two bad ones swing the whole rep.",
   },
   'analytics:rushing': {
     label: 'RUSHING (OFFENSE PFF)',
@@ -183,6 +187,7 @@ export const statContext = {
     ],
     impact: 'Cook carrying a marginal run game. Stuffed-rate of 21.4% is a structural issue with the interior O-line, not the back. When Cook gets to the second level he eats — when he doesn\'t, we\'re running into a wall.',
     uncleJrTake: "Cook's earnin' 3.1 after contact and the line's giving him 2.4 before. That ain't a back problem — that's an interior-line problem.",
+    dwayneTake: "Roll the Steelers tape, son. Inside zone right, our left guard's gettin' walked back by Heyward 8 yards deep. Cook's hittin' a closed crease on damn near every middle zone — when they bounce him outside, that's where the 14.8% breakaway lives.",
   },
   'analytics:receiving': {
     label: 'RECEIVING (OFFENSE PFF)',
@@ -198,6 +203,7 @@ export const statContext = {
     ],
     impact: 'Skyler Bell\'s rookie year saved this room. The 1.94 YPRR average masks Bell at 3.13 (Puka territory) and Coleman at 1.6 still developing. With D.J. Moore now in the room, this grade should jump 4-6 points in 2026.',
     uncleJrTake: "Bell put up Puka-Nacua-territory numbers as a ROOKIE. Once D.J. Moore reunites with Brady? This room's gonna eat.",
+    dwayneTake: "Bell's separation tape is the real story, son — 3.13 YPRR ain't an accident. He's runnin' option routes off slot leverage like he's been in the league five years. With Moore takin' over the X, Bell slides to slot full-time and that release game becomes nightmare matchups.",
   },
   'analytics:passBlocking': {
     label: 'PASS BLOCKING (OFFENSE PFF)',
@@ -212,7 +218,8 @@ export const statContext = {
       { label: 'TIME TO PRESSURE', value: '2.42s', note: '25th — leaks fast' },
     ],
     impact: 'The single biggest reason we lost in OT to Denver. 14 pressures allowed in that game directly created the strip-sack and the tipped-INT. Allen took 34 sacks the regular season AND was league MVP-caliber — imagine if the line gave him 2 more seconds.',
-    uncleJrTake: "72.3 in pass pro is a top-22 number. The kid's gettin' hit a lot. Big Baller Beane spent a fourth on Iggy and a sixth on a center — riddle me this, where's the FIRST-ROUND tackle??",
+    uncleJrTake: "72.3 in pass pro is a bottom-third number. The kid's gettin' hit way too much. Big Baller Beane spent a fourth on Iggy and a sixth on a center — the FIRST-ROUND tackle is what's still missing on this roster.",
+    dwayneTake: "Pull up the Houston tape, son — clean three-step drops and Allen's still gettin' hands in his face on stunts. T-E twist, our right guard's lookin' at the wrong rusher half the time. Communication breakdown, not just talent.",
   },
   'analytics:runBlocking': {
     label: 'RUN BLOCKING (OFFENSE PFF)',
@@ -227,7 +234,8 @@ export const statContext = {
       { label: 'PFF RUN BLOCK GRADE', value: '68.9', note: '27th in NFL' },
     ],
     impact: 'Worst grade on the offense. Power-run success rate of 54% on short-yardage is a finishing-quarter problem. This is why Cook\'s YBC is 2.4 and why we couldn\'t close in Denver.',
-    uncleJrTake: "27th in run blocking. TWENTY. SEVENTH. We can't close out a playoff game in the 4th quarter if we can't run it on third-and-1, son.",
+    uncleJrTake: "27th in run blocking. The line ain't movin' people on third-and-1 — that's how you give a divisional game back in the 4th quarter, son.",
+    dwayneTake: "Power-run tape from the Pats game tells you exactly where it breaks — right A-gap, our center's losin' leverage on the nose tackle and the LB's runnin' through unblocked. 54% power-run success ain't a scheme thing, it's a leverage thing in the trenches.",
   },
   'analytics:passRush': {
     label: 'PASS RUSH (DEFENSE PFF)',
@@ -242,7 +250,8 @@ export const statContext = {
       { label: 'POSTSEASON SACKS', value: '0', note: 'Zero on Bo Nix in OT' },
     ],
     impact: 'Highest grade on the defense, lowest pass-rush-win-rate in the AFC. Coverage forces incompletions which boost the unit grade — but in January when coverage breaks down, you need a four-man rush, and we don\'t have one. This is THE Bradley Chubb signing reason.',
-    uncleJrTake: "82.7 looks pretty till you see the 27th in pass rush win rate. That's why I been preachin' on the front seven for the LONGEST. Riddle me this — why we paying Chubbs $29M guaranteed?? THIS is why.",
+    uncleJrTake: "82.7 looks pretty till the box score. Schemed pressure in November, no juice in OT — Chubbs gettin' $29M guaranteed is the line item that fixes it.",
+    dwayneTake: "Look at the all-22, son — Rousseau's winnin' on counters and stunts. One-on-one wins on a vertical pass set? Almost zero against good tackles. That's the unlock metric, not the sack column.",
   },
   'analytics:coverage': {
     label: 'COVERAGE (DEFENSE PFF)',
@@ -258,6 +267,7 @@ export const statContext = {
     ],
     impact: 'The defensive crown jewel. Top-5 in every coverage metric. The reason we were the #1 pass defense by yards/game. Christian Benford got snubbed from the Pro Bowl despite leading the league in passer rating allowed in coverage.',
     uncleJrTake: "Benford's a Pro Bowl snub and that's a CRIME against humanity. SEVENTEEN POINT NINE passer rating allowed. The kid's a problem.",
+    dwayneTake: "Benford's eye discipline on the all-22 is what you teach in clinics — he's never lookin' in the backfield on three-step concepts, just the WR's hips. That's why his ball production is up; he's playin' the route, not the QB. Coachable trait.",
   },
   'analytics:runDefense': {
     label: 'RUN DEFENSE (DEFENSE PFF)',
@@ -379,7 +389,7 @@ export const statContext = {
       { label: '3RD-AND-LONG (8+)', value: '32.6%', note: '3rd — Allen wizardry' },
     ],
     impact: 'Top-3 on 3rd-and-long is Allen-specific magic. Top-15 on 3rd-and-short ties back to the run-blocking grade. The kid bails us out with his legs and his arm; the line doesn\'t bail us out with a 2-yard push.',
-    uncleJrTake: "Madden cheat-code on the hard ones, can't get a yard on the easy ones. Same diagnosis as everywhere else.",
+    uncleJrTake: "Top-3 on third-and-long, middle of the pack on third-and-short. The kid bails us out when it's a passin' down; the line buries us when it's a runnin' down.",
   },
   'efficiency:offPressureRate': {
     label: 'OFFENSE PRESSURE RATE ALLOWED',
@@ -394,7 +404,7 @@ export const statContext = {
       { label: 'CLEAN-POCKET %', value: '61.4%', note: '24th — Allen miracle factor' },
     ],
     impact: 'The single load-bearing flaw on this offense. We\'re top-6 in EPA per play DESPITE being 26th in pressure rate allowed because Allen is a magic-time scrambler. Imagine what this offense looks like with even average protection.',
-    uncleJrTake: "26th in pressure allowed and the kid's still MVP-tier. Get him a real left tackle and we hit Madden numbers.",
+    uncleJrTake: "26th in pressure allowed and the kid's still MVP-tier. Get him a real left tackle and this offense crosses into a different stratosphere, son.",
   },
   'efficiency:offBlitzPickup': {
     label: 'OFFENSE BLITZ PICKUP RATE',
@@ -456,7 +466,7 @@ export const statContext = {
       { label: 'EARLY-DOWN STOPS', value: '52.4%', note: '8th — sets up obvious passing' },
     ],
     impact: 'Top-5 in keeping opponents off-schedule. The split tells the story: 3rd in pass success, 20th in run success. Same defensive personality every week — locked down through the air, leaky on the ground.',
-    uncleJrTake: "Pass-D top 3, run-D 20th. SAME diagnosis I been preachin'. Front. Seven.",
+    uncleJrTake: "Pass-D top 3, run-D 20th. Same eleven men, two different units. Coverage carries us; gap discipline gives us up.",
   },
   'efficiency:defExplosiveRate': {
     label: 'DEFENSE EXPLOSIVE PLAY RATE ALLOWED',
@@ -501,7 +511,7 @@ export const statContext = {
       { label: 'PRESSURE ON 3RD', value: '34.2%', note: '17th — needs Chubbs' },
     ],
     impact: 'Top-10 overall, top-5 on 3rd-and-long (coverage). Bottom of the league on 3rd-and-short, which is the run-fit issue. Same diagnosis: pass D elite, run D average.',
-    uncleJrTake: "5th on 3rd-and-long, 20th on 3rd-and-short. SAME story. Front seven.",
+    uncleJrTake: "5th on 3rd-and-long, 20th on 3rd-and-short. Coverage holds when they gotta throw it; we leak when they jam it down our throat.",
   },
   'efficiency:defPressureRate': {
     label: 'DEFENSE PRESSURE RATE',
@@ -516,7 +526,7 @@ export const statContext = {
       { label: 'PRESSURE → SACK %', value: '15.4%', note: '14th — finishing' },
     ],
     impact: 'The number that lies. We rank 11th in pressure rate but 27TH in pass rush win rate — meaning we generate pressure mostly through scheme/blitz, not by winning one-on-one. In playoff games when offenses adjust, this falls apart.',
-    uncleJrTake: "11th sounds nice till you see 27th in PRWR. Schemed pressure is borrowed pressure. Win one-on-one or go home in January.",
+    uncleJrTake: "Pressure rate 11th, win rate 27th. Math don't add up till you realize one's borrowed and one's earned. We borrowed all year — January don't take loans.",
   },
   'efficiency:defBlitzRate': {
     label: 'DEFENSE BLITZ RATE',
@@ -578,7 +588,7 @@ export const statContext = {
       { label: 'ST DVOA', value: '+3.9%', note: '6th' },
     ],
     impact: 'DVOA is opponent-adjusted, situation-aware efficiency. +18.4% is consensus top-five-team math. The wins were earned, not stolen — but composite rankings don\'t play playoff games.',
-    uncleJrTake: "Top 5 in DVOA, top 6 in EPA, top 7 in SRS. We been a top-tier regular-season team for SIX YEARS straight. Riddle me this — what's the one thing missin'?",
+    uncleJrTake: "Top 5 in DVOA, top 6 in EPA, top 7 in SRS. Same regular-season story for SIX years runnin'. Y'all keep waitin' on the AFC trophy — Pop's been waitin' a lot longer than y'all.",
   },
   'efficiency:pythagorean': {
     label: 'PYTHAGOREAN WINS',
@@ -593,7 +603,7 @@ export const statContext = {
       { label: 'CLOSE GAME RECORD', value: '6-2', note: 'Slightly above expected' },
     ],
     impact: 'Pythagorean wins translate scoring margin into expected wins. We posted 11.4 expected and won 12. Within rounding — no luck factor to regress next year. This team is exactly as good as the record says.',
-    uncleJrTake: "Pythagorean nailed us at 11.4. We won 12. No smoke, no mirrors. Now if I could just get this team to play in JANUARY the way they play in NOVEMBER…",
+    uncleJrTake: "Pythagorean had us at 11.4 — we landed at 12. No smoke, no mirrors. Twelve wins is the ceiling till we figure out playoff football.",
   },
   'efficiency:wpa': {
     label: 'WINS OVER EXPECTED (WPA)',
