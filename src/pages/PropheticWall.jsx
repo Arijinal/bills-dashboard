@@ -1,9 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { JUNIOR_SEED, PAINT_BY_ID, PAINT_STYLES, pickPaint, pickRotation, pickPosition } from '../data/wallSeed';
+import {
+  JUNIOR_SEED,
+  PAINT_BY_ID,
+  PAINT_STYLES,
+  pickPaint,
+  pickRotation,
+  pickPosition,
+  loadFanPredictions,
+  saveFanPredictions,
+} from '../data/wallSeed';
 
-const STORAGE_KEY = 'billsPropheticWall.v1';
 const PER_PAGE = 10;
 const MAX_PRED_CHARS = 280;
 const MAX_SIG_CHARS = 24;
@@ -11,27 +19,6 @@ const TAG_WIDTH = 300;
 
 const mono = { fontFamily: 'var(--font-mono)' };
 const sans = { fontFamily: 'var(--font-sans)' };
-
-/* ---------- localStorage helpers ---------- */
-
-function loadFanPredictions() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveFanPredictions(list) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    /* quota exceeded — silent */
-  }
-}
 
 /* ---------- Tag component (each prediction on the wall) ---------- */
 

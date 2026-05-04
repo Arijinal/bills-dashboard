@@ -20,6 +20,7 @@ export const PAINT_STYLES = [
 ];
 
 export const PAINT_BY_ID = Object.fromEntries(PAINT_STYLES.map(p => [p.id, p]));
+export const PAINT_IDS = new Set(PAINT_STYLES.map(p => p.id));
 
 /** Random helpers for fan submissions — kept deterministic per submission via seed */
 export function pickPaint() {
@@ -38,6 +39,76 @@ export function pickPosition() {
     topPct: 18 + Math.random() * 64, // 18–82% vertical center
     leftPct: 20 + Math.random() * 60, // 20–80% horizontal center
   };
+}
+
+/**
+ * Schema guard for a wall prediction. Returns true if `p` has the minimum
+ * shape `GraffitiTag` and `PredictionModal` need to render without crashing.
+ *
+ * Used by `loadFanPredictions` to drop corrupt entries from older
+ * localStorage versions instead of letting them blow up the whole wall.
+ */
+export function isValidPrediction(p) {
+  if (!p || typeof p !== 'object') return false;
+  if (typeof p.id !== 'string' || !p.id) return false;
+  if (typeof p.author !== 'string' || !p.author) return false;
+  if (typeof p.prediction !== 'string' || !p.prediction) return false;
+  if (typeof p.score !== 'string') return false;
+  if (typeof p.topPct !== 'number' || !Number.isFinite(p.topPct)) return false;
+  if (typeof p.leftPct !== 'number' || !Number.isFinite(p.leftPct)) return false;
+  if (typeof p.rotation !== 'number' || !Number.isFinite(p.rotation)) return false;
+  if (typeof p.paintId !== 'string' || !PAINT_IDS.has(p.paintId)) return false;
+  return true;
+}
+
+/**
+ * Coerce/clamp a prediction into safe bounds. Use after `isValidPrediction`
+ * passes — this fixes ranges (e.g. a tag stored with `topPct: 999` from an
+ * old build) without rejecting the whole entry.
+ */
+export function sanitizePrediction(p) {
+  return {
+    ...p,
+    topPct: Math.max(2, Math.min(98, p.topPct)),
+    leftPct: Math.max(2, Math.min(98, p.leftPct)),
+    rotation: Math.max(-360, Math.min(360, p.rotation)),
+    prediction: p.prediction.slice(0, 1000),
+    author: p.author.slice(0, 64),
+    signature: typeof p.signature === 'string' ? p.signature.slice(0, 64) : p.author.slice(0, 64),
+  };
+}
+
+export const FAN_PREDICTIONS_STORAGE_KEY = 'billsPropheticWall.v1';
+
+/**
+ * Read fan predictions from localStorage. Drops corrupt entries from older
+ * versions instead of letting them crash the wall, and clamps any out-of-range
+ * positions back inside the safe interior.
+ *
+ * Accepts an optional `storage` arg so tests can pass a stub when jsdom's
+ * localStorage misbehaves. Defaults to `globalThis.localStorage`.
+ */
+export function loadFanPredictions(storage = globalThis.localStorage) {
+  if (!storage) return [];
+  try {
+    const raw = storage.getItem(FAN_PREDICTIONS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidPrediction).map(sanitizePrediction);
+  } catch {
+    return [];
+  }
+}
+
+/** Companion writer — kept here so callers can swap `storage` symmetrically. */
+export function saveFanPredictions(list, storage = globalThis.localStorage) {
+  if (!storage) return;
+  try {
+    storage.setItem(FAN_PREDICTIONS_STORAGE_KEY, JSON.stringify(list));
+  } catch {
+    /* quota exceeded — silent */
+  }
 }
 
 export const JUNIOR_SEED = {

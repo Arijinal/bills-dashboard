@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -19,5 +20,16 @@ export default defineConfig({
         },
       },
     },
+  },
+  test: {
+    environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        // Non-opaque origin required for jsdom to expose localStorage.
+        url: 'http://localhost:3001/',
+      },
+    },
+    include: ['src/**/*.test.{js,jsx}'],
+    globals: false,
   },
 })
