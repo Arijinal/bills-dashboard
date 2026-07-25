@@ -76,13 +76,10 @@ export default function ChapterTabs() {
     return () => window.removeEventListener('keydown', onKey);
   }, [overflowOpen]);
 
-  // Instant teleport to the section — fast, no overshoot, no missed section.
+  // Delegate to the orchestrator's retry + settle-lock jump — it waits for
+  // lazy chunks to mount and holds the pin while the layout shifts.
   const handleClick = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const top =
-      el.getBoundingClientRect().top + window.scrollY - TAB_BAR_HEIGHT;
-    window.scrollTo({ top, behavior: 'instant' });
+    scrollToSection(id);
     setOverflowOpen(false);
   };
 

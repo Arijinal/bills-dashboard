@@ -17,6 +17,11 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 const ScrollContext = createContext(null);
 
+// Height of the fixed ChapterTabs bar — keep in sync with
+// TAB_BAR_HEIGHT in ChapterTabs.jsx. Jumps land the section top
+// directly beneath the bar instead of underneath it.
+const NAV_OFFSET = 48;
+
 export function ScrollOrchestratorProvider({ children, sectionIds }) {
   const [activeSection, setActiveSection] = useState(sectionIds[0]);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -85,8 +90,75 @@ export function ScrollOrchestratorProvider({ children, sectionIds }) {
   }, [sectionIds.join(',')]);
 
   const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Chapter jump with retry + settle-lock.
+    //
+    // Two constraints make a one-shot scroll land wrong here:
+    //   1. Sections are lazy-loaded — the target id may not be mounted yet
+    //      when the user clicks (early after page load), so a plain lookup
+    //      is a silent no-op.
+    //   2. Chunks that mount ABOVE the target after the jump expand from
+    //      their 50vh Suspense fallback and shift the document under the
+    //      scroll position (native scroll anchoring can't compensate —
+    //      the scenes are full of absolute/transformed elements).
+    //
+    // So: retry until the section exists, jump instantly (overriding the
+    // global CSS scroll-behavior: smooth), then re-pin the section top on
+    // every frame until the layout has been stable for ~STABLE_FRAMES,
+    // handing control back to the user the moment they scroll themselves.
+    const RETRY_WINDOW = 4000; // ms to wait for the target chunk to mount
+    const SETTLE_WINDOW = 2500; // ms max to hold the pin after first jump
+    const STABLE_FRAMES = 18; // ~300ms of no layout movement = settled
+
+    const start = performance.now();
+    let settleStart = null;
+    let stableCount = 0;
+    let cancelled = false;
+
+    const onUserScroll = () => cancel();
+    const onKey = (e) => {
+      if (
+        ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(
+          e.key
+        )
+      )
+        cancel();
+    };
+    function cancel() {
+      cancelled = true;
+      window.removeEventListener('wheel', onUserScroll);
+      window.removeEventListener('touchstart', onUserScroll);
+      window.removeEventListener('keydown', onKey);
+    }
+    window.addEventListener('wheel', onUserScroll, { passive: true });
+    window.addEventListener('touchstart', onUserScroll, { passive: true });
+    window.addEventListener('keydown', onKey);
+
+    const step = (now) => {
+      if (cancelled) return;
+      const el = document.getElementById(id);
+      if (!el) {
+        if (now - start < RETRY_WINDOW) requestAnimationFrame(step);
+        else cancel();
+        return;
+      }
+      if (settleStart === null) settleStart = now;
+      const target = Math.max(
+        0,
+        Math.round(el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET)
+      );
+      if (Math.abs(window.scrollY - target) > 2) {
+        window.scrollTo({ top: target, behavior: 'instant' });
+        stableCount = 0;
+      } else {
+        stableCount += 1;
+      }
+      if (stableCount >= STABLE_FRAMES || now - settleStart > SETTLE_WINDOW) {
+        cancel();
+        return;
+      }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   };
 
   return (

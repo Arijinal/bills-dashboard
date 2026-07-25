@@ -142,11 +142,8 @@ function MiniBar({ label, value, color = 'var(--bills-blue-bright)', sublabel, o
 
 // --- StatPanel — oscilloscope readout, clickable -----------------------
 function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue-bright)', onClick, terminal = false }) {
-  const Wrapper = onClick ? 'button' : 'div';
   return (
-    <Wrapper
-      type={onClick ? 'button' : undefined}
-      onClick={onClick}
+    <div
       className={`crt-host ${onClick ? 'stat-clickable' : ''}`}
       style={{
         padding: '0.875rem 1.125rem',
@@ -158,11 +155,19 @@ function StatPanel({ label, value, sublabel, coachKey, color = 'var(--bills-blue
         maxWidth: 280,
         textAlign: 'left',
       }}>
+      {onClick && (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={`${label} — view breakdown`}
+          className="stat-hit-overlay"
+        />
+      )}
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.625rem', letterSpacing: '0.18em', color, fontWeight: 600 }}>{label}</div>
       <div className={terminal ? 'terminal-blink' : ''} style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1, textShadow: `0 0 16px ${color}50`, marginTop: 6 }}>{value}</div>
       {sublabel && <div style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginTop: 4 }}>{sublabel}</div>}
-      {coachKey && <div style={{ marginTop: 6 }} onClick={(e) => e.stopPropagation()}><CoachInsight coachKey={coachKey} compact /></div>}
-    </Wrapper>
+      {coachKey && <div style={{ marginTop: 6, position: 'relative', zIndex: 2 }} onClick={(e) => e.stopPropagation()}><CoachInsight coachKey={coachKey} compact /></div>}
+    </div>
   );
 }
 

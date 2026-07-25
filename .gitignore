@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-command-center/
 .DS_Store
 *.local
 .completion
