@@ -16,13 +16,19 @@
 //   • Deep field (y=0-70 → routes go UP visually)
 
 // ─── Off-season Gauntlet — chapter-wide milestones ──────
+// Schedule anchors verified vs the 2026 NFL schedule release (see
+// seasonClock.js): the SEASON opener is Sept 13 AT Houston (1 PM, CBS,
+// indoors) — Dwayne's tape-room call. The new Highmark Stadium's first
+// game is the Sept 17 home opener vs Detroit (TNF) — that one is
+// Tammy's night.
 export const offseasonGauntlet = [
-  { id: 'draft',     date: 'Apr 23-25, 2026',  label: 'DRAFT DAY',         narrator: 'uncleJr' },
-  { id: 'minicamp',  date: 'May 9-11, 2026',   label: 'ROOKIE MINI-CAMP',  narrator: 'uncleJr' },
-  { id: 'otas',      date: 'May 28 – Jun 6',   label: 'OTAs',              narrator: 'uncleJr' },
-  { id: 'camp',      date: 'Jul 23, 2026',     label: 'TRAINING CAMP OPENS', narrator: 'uncleJr' },
-  { id: 'preseason', date: 'Aug 8-22, 2026',   label: 'PRESEASON GAMES',   narrator: 'uncleJr' },
-  { id: 'opener',    date: 'Sept 13, 2026',    label: 'INAUGURAL OPENER',  narrator: 'tammy' },
+  { id: 'draft',      date: 'Apr 23-25, 2026',  label: 'DRAFT DAY',         narrator: 'uncleJr' },
+  { id: 'minicamp',   date: 'May 9-11, 2026',   label: 'ROOKIE MINI-CAMP',  narrator: 'uncleJr' },
+  { id: 'otas',       date: 'May 28 – Jun 6',   label: 'OTAs',              narrator: 'uncleJr' },
+  { id: 'camp',       date: 'Jul 23, 2026',     label: 'TRAINING CAMP OPENS', narrator: 'uncleJr' },
+  { id: 'preseason',  date: 'Aug 8-22, 2026',   label: 'PRESEASON GAMES',   narrator: 'uncleJr' },
+  { id: 'opener',     date: 'Sept 13, 2026',    label: 'SEASON OPENER · AT HOUSTON', narrator: 'dwayne' },
+  { id: 'homeOpener', date: 'Sept 17, 2026',    label: 'NEW STADIUM FIRST GAME · DETROIT', narrator: 'tammy' },
 ];
 
 // ─── Per-rookie Trial Cards ──────────────────────────────
@@ -106,7 +112,7 @@ export const rookieTrials = [
       otas: 'Hand-usage drills with the OL vets. Rousseau will press him on technique — that\'s the rite of passage on this defense.',
       camp: 'First live contact — can he hold the edge against Dion Dawkins on the run game? If yes, he\'s the Week-1 sub-package rusher.',
       preseason: 'Wants 1-2 sacks across the 3 games. Game 2 (joint practice with Pittsburgh) is the test that matters.',
-      opener: 'Sub-package rusher Week 1 against TBD opponent. 18-22 snaps in his Bills debut. Tammy will be calling 72°F sunny — no excuses.',
+      opener: 'Sub-package rusher Week 1 at Houston. 18-22 snaps in his Bills debut — indoors under the NRG roof, no weather to hide behind.',
     },
   },
 
@@ -188,7 +194,7 @@ export const rookieTrials = [
       otas: '1-on-1s vs Khalil Shakir. Shakir\'s slot quickness will test Igbinosun\'s hip-flip. That\'s the moment we\'ll know if he\'s a 3-CB or a starter-in-waiting.',
       camp: 'Live red-zone reps. Press at the goal line is where the NFL game gets decided. Show no panic.',
       preseason: '1 PBU per game. He\'s a 6\'2" 189 corner with reach — he should be deflecting passes other CBs can\'t reach.',
-      opener: 'Outside CB in nickel rotation. Tammy says 72°F, 8 mph wind — easy throw conditions. Igbinosun has to make at least one play that justifies why he was picked.',
+      opener: 'Outside CB in nickel rotation. A dome opener means easy throw conditions — Igbinosun has to make at least one play that justifies why he was picked.',
     },
   },
 
@@ -354,7 +360,7 @@ export const rookieTrials = [
       otas: 'Special teams return work. He\'s the punt returner Day 1 — has to show the catch is clean.',
       camp: 'Live tackling. Can he hold the rock against NFL DBs at full speed?',
       preseason: 'Wants 1 punt return TD across the 3 games. The kind of moment that locks in the gadget role.',
-      opener: 'Active Week 1, returns punts, gets 8-12 snaps in 3-WR sets. Tammy\'s 8 mph wind is perfect for catching punts cleanly.',
+      opener: 'Active Week 1, returns punts, gets 8-12 snaps in 3-WR sets. Zero wind under the Houston roof — clean-catch conditions, no excuse on a muff.',
     },
   },
 
@@ -437,7 +443,7 @@ export const rookieTrials = [
       otas: '7v7 read-and-react vs Cook on swing routes. Cook is the best coverage RB test he\'ll see — outside Hill in November.',
       camp: 'First live contact in run-game reps vs the Bills OL. Hold the point of attack at A-gap. The rite of passage.',
       preseason: 'Wants 12+ tackles across 3 games + 1 TFL. The kind of stat line that earns Week-1 starter snaps.',
-      opener: 'Three-down WILL LB Week 1. The 4.47 means he doesn\'t come off the field in passing situations. Tammy\'s 72°F day means no excuse for a missed gap fit.',
+      opener: 'Three-down WILL LB Week 1. The 4.47 means he doesn\'t come off the field in passing situations — and a climate-controlled debut means no excuse for a missed gap fit.',
     },
   },
 
@@ -520,7 +526,7 @@ export const rookieTrials = [
       otas: 'Dime package work. He\'s the 6th DB by August or he\'s a special-teams-only guy.',
       camp: 'Punt coverage gunner reps. The fastest path to active-roster Week 1 is being the best gunner in camp.',
       preseason: 'Wants 1 INT + 8 tackles across the 3 games. Show that Round-5 safety MOLD potential.',
-      opener: 'Active Week 1, 25-30 ST snaps, 4-6 dime snaps. Tammy\'s clear day means no excuses on coverage.',
+      opener: 'Active Week 1, 25-30 ST snaps, 4-6 dime snaps. Fast indoor track at NRG — no excuses on coverage speed.',
     },
   },
 
@@ -603,7 +609,7 @@ export const rookieTrials = [
       otas: 'Pass-rush 1-on-1s vs Connor McGovern\'s replacement. Win the rep, secure the rotation.',
       camp: 'Live run-game reps. Can a 290-pound 3-tech anchor against a double-team? That\'s the question.',
       preseason: 'Wants 2+ pressures per game. The 4.75 forty has to translate to QB hits.',
-      opener: 'Active Week 1, sub-package rotation, 18-22 snaps. Tammy\'s 8-mph wind doesn\'t matter for D-line — pads-on-pads, every snap.',
+      opener: 'Active Week 1, sub-package rotation, 18-22 snaps. Dome or blizzard, D-line don\'t care — pads-on-pads, every snap.',
     },
   },
 
@@ -686,7 +692,7 @@ export const rookieTrials = [
       otas: 'Press technique vs Coleman/Palmer. The 4.32 doesn\'t matter if he can\'t redirect.',
       camp: 'Live gunner work in punt drills. The gunner battle is between Pride and whoever else gets reps. Win it.',
       preseason: 'Wants 4+ tackles on coverage units across the 3 games. ST stat lines are how 7th-round CBs make rosters.',
-      opener: 'Active Week 1 as the gunner. Tammy\'s calm conditions = no excuses for the punt unit. Pride pins the returner inside the 10.',
+      opener: 'Active Week 1 as the gunner. Still air under the roof = no excuses for the punt unit. Pride pins the returner inside the 10.',
     },
   },
 
@@ -764,7 +770,7 @@ export const rookieTrials = [
       otas: 'Directional drills. Can he pin inside-20 on demand?',
       camp: 'Live punt situations. Whoever wins the FIRST live punt battle in pads sets the tone.',
       preseason: 'Game 3 is THE test. Whoever has the better net average + inside-20 rate wins the job.',
-      opener: 'If he wins the camp battle, Tammy\'s clear day = no wind excuses. Show the directional control on a real Sunday.',
+      opener: 'If he wins the camp battle, a windless dome debut = no excuses. Show the directional control on a real Sunday.',
     },
   },
 

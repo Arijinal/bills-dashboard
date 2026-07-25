@@ -99,8 +99,8 @@ function GauntletTimeline({ activeMilestone }) {
 
         {offseasonGauntlet.map((m, i) => {
           const active = activeMilestone === m.id;
-          const isOpener = m.id === 'opener';
-          const dotColor = isOpener ? '#C60C30' : active ? '#E8B23C' : 'var(--bills-blue-bright)';
+          const isHomeOpener = m.id === 'homeOpener';
+          const dotColor = isHomeOpener ? '#C60C30' : active ? '#E8B23C' : 'var(--bills-blue-bright)';
           return (
             <div key={m.id} style={{
               display: 'flex',
@@ -133,14 +133,14 @@ function GauntletTimeline({ activeMilestone }) {
                   letterSpacing: '0.04em',
                   textShadow: active ? '0 0 12px rgba(232,178,60,0.5)' : 'none',
                 }}>{m.label}</div>
-                {isOpener && (
+                {isHomeOpener && (
                   <div style={{
                     fontFamily: "'Shippori Mincho', serif",
                     fontStyle: 'italic',
                     fontSize: '0.6875rem',
                     color: '#A8D0FF',
                     marginTop: 2,
-                  }}>— Tammy's day</div>
+                  }}>— Tammy's night</div>
                 )}
               </div>
             </div>
@@ -663,7 +663,6 @@ function GauntletTab({ stakes }) {
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '0.625rem', marginBottom: 4 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                 <div style={{ fontFamily: "'Dela Gothic One', sans-serif", fontSize: '0.875rem', color: '#fff', letterSpacing: '0.04em' }}>{milestone?.label}</div>
-                {isOpener && <div style={{ fontFamily: "'Shippori Mincho', serif", fontStyle: 'italic', fontSize: '0.75rem', color: '#A8D0FF' }}>— Tammy's day</div>}
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.625rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>{milestone?.date}</div>
             </div>
@@ -827,6 +826,11 @@ function TrialCard({ pick, trial, onBack }) {
 //  ROSTER VIEW — default state (no rookie selected)
 // ─────────────────────────────────────────────────────────
 function RosterView({ picks, onSelect }) {
+  // Computed from data so the label can never go stale again
+  // (it was hardcoded "1 OF 10" while all ten trials were complete).
+  const liveTrialCount = picks.filter(
+    (p) => getTrialForPick(p.name)?.status === 'complete'
+  ).length;
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -891,7 +895,7 @@ function RosterView({ picks, onSelect }) {
               fontSize: '0.5625rem',
               color: 'var(--text-muted)',
               letterSpacing: '0.1em',
-            }}>10 PICKS · 1 OF 10 TRIALS LIVE</div>
+            }}>{`10 PICKS · ${liveTrialCount} OF 10 TRIALS LIVE`}</div>
           </div>
           <div style={{
             display: 'grid',

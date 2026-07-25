@@ -4,3 +4,4 @@ dist-command-center/
 .DS_Store
 *.local
 .completion
+.claude/scratchpad.md

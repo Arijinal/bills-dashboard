@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CoachInsight from '../CoachInsight';
 import DailyBriefCard from '../DailyBriefCard';
+import SeasonPulse from '../SeasonPulse';
 import { teamInfo } from '../../data/mockData';
 
 /**
@@ -238,7 +239,7 @@ export default function ArrivalScene() {
             textShadow: '0 2px 8px rgba(0,0,0,0.9)',
           }}
         >
-          Pull up a chair, son. 2025-26 the way Uncle Jr. saw it — front porch, black-and-white Zenith, tape don't lie.
+          Pull up a chair, son. The 2025-26 tape, the road back, and a new house openin' under Thursday-night lights. Tape don't lie.
         </motion.div>
       </div>
 
@@ -247,7 +248,7 @@ export default function ArrivalScene() {
         <>
           <div style={{ position: 'absolute', top: '46%', left: '5%', zIndex: 11 }}>
             <StatPanel
-              label="REGULAR SEASON"
+              label="'25 REGULAR SEASON"
               value={teamInfo.record}
               sublabel="Conference 8-4 · Division 4-2"
               coachKey="record_12_5"
@@ -256,7 +257,7 @@ export default function ArrivalScene() {
           </div>
           <div style={{ position: 'absolute', top: '46%', right: '5%', zIndex: 11 }}>
             <StatPanel
-              label="POINTS FOR / AGAINST"
+              label="'25 POINTS FOR / AGAINST"
               value={`${teamInfo.pointsFor} / ${teamInfo.pointsAgainst}`}
               sublabel="28.3 PPG scored · 21.5 PPG allowed"
               coachKey="pf_pa"
@@ -265,7 +266,7 @@ export default function ArrivalScene() {
           </div>
           <div style={{ position: 'absolute', bottom: '20%', left: '7%', zIndex: 11 }}>
             <StatPanel
-              label="POINT DIFFERENTIAL"
+              label="'25 POINT DIFFERENTIAL"
               value="+116"
               sublabel="4th-best in the AFC"
               color="#10D060"
@@ -274,7 +275,7 @@ export default function ArrivalScene() {
           </div>
           <div style={{ position: 'absolute', bottom: '20%', right: '7%', zIndex: 11 }}>
             <StatPanel
-              label="POSTSEASON"
+              label="'25 POSTSEASON"
               value="DIVISIONAL"
               sublabel="OT loss at Denver, Jan 17"
               coachKey="divisional_loss"
@@ -298,41 +299,50 @@ export default function ArrivalScene() {
         </>
       )}
 
-      {/* BEGIN THE SAGA CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 1.0, ease }}
+      {/* SEASON PULSE + BEGIN THE SAGA CTA — stacked bottom block */}
+      <div
         style={{
           position: 'absolute',
-          bottom: '4%', left: 0, right: 0,
+          bottom: '3.5%', left: 0, right: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.75rem',
           textAlign: 'center',
           zIndex: 12,
+          padding: '0 1rem',
         }}
       >
-        <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
-          letterSpacing: '0.42em',
-          color: 'var(--bills-blue-bright)',
-          fontWeight: 600,
-          marginBottom: '0.625rem',
-          textShadow: '0 0 12px rgba(51,119,255,0.6)',
-        }}>
-          BEGIN THE SAGA
-        </div>
+        {phase >= 2 && <SeasonPulse delay={0.8} />}
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            display: 'inline-block',
-            color: 'var(--bills-blue-bright)',
-            fontSize: '1.5rem',
-          }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 1.0, ease }}
         >
-          ↓
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.75rem',
+            letterSpacing: '0.42em',
+            color: 'var(--bills-blue-bright)',
+            fontWeight: 600,
+            marginBottom: '0.375rem',
+            textShadow: '0 0 12px rgba(51,119,255,0.6)',
+          }}>
+            BEGIN THE SAGA
+          </div>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              display: 'inline-block',
+              color: 'var(--bills-blue-bright)',
+              fontSize: '1.5rem',
+            }}
+          >
+            ↓
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }

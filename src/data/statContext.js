@@ -94,9 +94,13 @@ export const statContext = {
   },
 
   // War Room — analytics command center
+  // NOTE (v3.24): headline value aligned to mockData/aiInsights (+0.085,
+  // the number the opening panel displays) — the modal previously said
+  // +0.142 while its own trigger panel said +0.085. Breakdown sub-values
+  // below are carry-overs pending the next fact-check round.
   'war-room:offEpa': {
     label: 'OFFENSE EPA / PLAY',
-    value: '+0.142',
+    value: '+0.085',
     sublabel: '6th in NFL · Top-tier dropback efficiency',
     verdict: 'TOP-TIER',
     color: '#5BE5A1',
@@ -106,7 +110,7 @@ export const statContext = {
       { label: 'EXPLOSIVE PLAY %', value: '14.2%', note: '5th in NFL' },
       { label: '3RD-DOWN EPA', value: '+0.31', note: 'Money down — third in NFL' },
     ],
-    impact: 'EPA per play is the cleanest single-number measure of offensive efficiency. +0.142 says we generated expected-points-added on roughly every snap. Translation: when this offense was on the field in the regular season, it was getting work done.',
+    impact: 'EPA per play is the cleanest single-number measure of offensive efficiency. +0.085 says we generated expected-points-added on roughly every snap. Translation: when this offense was on the field in the regular season, it was getting work done.',
     uncleJrTake: "EPA's the closest thing to a stat that don't lie. Top six in the league in REGULAR season — same offense scored 30 in a divisional and STILL went home. Tells you it ain't the offense, son.",
   },
   'war-room:defEpa': {

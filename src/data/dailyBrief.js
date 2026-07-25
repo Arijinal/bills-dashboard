@@ -18,9 +18,9 @@
  */
 
 export const dailyBrief = {
-  lastUpdated: '2026-05-01',
-  headline: "Shorts and helmets ain't football, son.",
+  lastUpdated: '2026-07-24',
+  headline: "Camp's open. The clock in my chest started tickin'.",
   paragraph:
-    "Y'all out here arguin' on X over Skyler Bell vs. Keon Coleman for WR1 'fore OTAs even open — pump them brakes, son. The only story that matters 'fore pads come on is whether Jim Leonhard's new 3-4 install holds up once Chubbs gets in the meetin' room. Watch the front seven. So riddle me this — y'all really think we ridin' down Delaware Avenue with a parade if this defense can't generate four-man pressure when it counts??",
+    "Y'all been countin' likes on X all summer — I been countin' somethin' else: fifty-one days till we walk into that dome in Houston and see the Texans again. Same team that walked one into our end zone and took the East tiebreaker off our table in Week 12 — now they get the kid with a full offseason of tape on 'em. And four days after that? Thursday night, lights on, first real snap inside the new house. Dwayne's already three legal pads deep on dome protections; Tammy's savin' her voice for the 17th. So riddle me this, Mafia — you want the revenge in Houston more, or that first home-cookin' touchdown under the new roof??",
   sources: [],
 };

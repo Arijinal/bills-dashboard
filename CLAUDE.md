@@ -43,7 +43,7 @@ Three canonical voices. **Three is the rule. No fourth.** Future content compoun
 
 **Bible:** `src/data/stormCaster.js`.
 
-**Owns:** The Storm chapter (renamed "Weather Don't Care"). Narrates the Sept 13 inaugural opener in the Proving Grounds gauntlet timeline.
+**Owns:** The Storm chapter (renamed "Weather Don't Care"). Narrates the Sept 17 home opener — the first game at the new Highmark Stadium (TNF vs Detroit) — in the Proving Grounds gauntlet timeline. (Schedule-verified v3.24: the Sept 13 SEASON opener is at Houston, indoors — that one is Dwayne's tape-room call, not a weather story.)
 
 ### Dwayne — tape / film-room / "son"
 
