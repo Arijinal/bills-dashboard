@@ -16,10 +16,30 @@ const VIEWPORT = { once: true, amount: 0.2 };
 function AnimatedCounter({ target, duration = 1600, formatter = (v) => v }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
+  const [forced, setForced] = useState(false);
   const [value, setValue] = useState(0);
+  const started = inView || forced;
+
+  // Fallback: the one-shot viewport check can be missed if layout is
+  // mid-shift during an instant chapter jump — without this the counter
+  // would sit at 0 forever. Poll cheaply until the element is actually
+  // on screen, then start.
+  useEffect(() => {
+    if (inView) return undefined;
+    const t = setInterval(() => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) {
+        setForced(true);
+        clearInterval(t);
+      }
+    }, 1200);
+    return () => clearInterval(t);
+  }, [inView]);
 
   useEffect(() => {
-    if (!inView) return;
+    if (!started) return undefined;
     let startTime = null;
     let raf = 0;
     const step = (t) => {
@@ -32,7 +52,7 @@ function AnimatedCounter({ target, duration = 1600, formatter = (v) => v }) {
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [inView, target, duration]);
+  }, [started, target, duration]);
 
   return <span ref={ref}>{formatter(value)}</span>;
 }

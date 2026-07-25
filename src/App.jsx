@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { ScrollOrchestratorProvider } from './components/ScrollOrchestrator';
 import QuestLog from './components/QuestLog';
 import ChapterTabs from './components/ChapterTabs';
@@ -50,9 +51,12 @@ const SECTION_IDS = [
   'chronicles', 'arena', 'prophecy', 'fellowship', 'universe'
 ];
 
+// Full-viewport fallback: every primary chapter is >=100vh, so a
+// matching placeholder halves the layout shift when chunks mount —
+// the root cause of scroll drift during chapter jumps.
 const SectionFallback = () => (
   <div style={{
-    minHeight: '50vh',
+    minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -67,6 +71,7 @@ const SectionFallback = () => (
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <ScrollOrchestratorProvider sectionIds={SECTION_IDS}>
       <ChapterTabs />
       <QuestLog />
@@ -201,5 +206,6 @@ export default function App() {
         </section>
       </main>
     </ScrollOrchestratorProvider>
+    </MotionConfig>
   );
 }
