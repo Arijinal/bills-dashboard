@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "vite build",
+  "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": "dist",
   "rewrites": [{ "source": "/((?!assets/|og-image.jpg).*)", "destination": "/index.html" }],
   "headers": [
@@ -11,7 +12,19 @@
       ]
     },
     {
-      "source": "/(.*\\.(png|jpg|mp4))",
+      "source": "/(.*).png",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/(.*).jpg",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/(.*).mp4",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]
