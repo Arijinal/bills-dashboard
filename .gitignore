@@ -5,3 +5,4 @@ dist-command-center/
 *.local
 .completion
 .claude/scratchpad.md
+.vercel
