@@ -648,7 +648,7 @@ export const fullRoster = [
       { season: '2024', team: 'BUF', gamesPlayed: 17, keyStats: '374 rush yds, 4 TD, 18 rec', rating: 0.60 }
     ],
     arcGauges: { speed: 78, power: 82, footballIQ: 68, accuracy: 55, clutch: 65, durability: 80 },
-    stats: { rushYards: 374, rushTDs: 4, receptions: 18, recYards: 134 }
+    stats: { rushYards: 275, rushTDs: 0, receptions: 18, recYards: 134 }
   },
   {
     id: 15, name: 'Ty Johnson', number: 25, position: 'RB', positionGroup: 'Offense',
