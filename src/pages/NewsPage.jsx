@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { RiFireLine, RiDraftLine, RiRunLine, RiTimeLine } from 'react-icons/ri';
+import { RiFireLine, RiDraftLine, RiTimeLine } from 'react-icons/ri';
 import { Panel, StatusDot, SectionHeader } from '../components/ui';
 import { news } from '../data/mockData';
+import { billsDraft2026 } from '../data/draftData';
 
 const fade = (i = 0) => ({
   initial: { opacity: 0, y: 8 },
@@ -18,6 +19,9 @@ const categoryColors = {
   Cap: { bg: 'rgba(234,179,8,0.15)', color: 'var(--signal-warning)' },
   Stadium: { bg: 'rgba(34,197,94,0.15)', color: 'var(--signal-positive)' },
   Trade: { bg: 'rgba(239,68,68,0.15)', color: 'var(--signal-negative)' },
+  Roster: { bg: 'rgba(239,68,68,0.15)', color: 'var(--signal-negative)' },
+  Preseason: { bg: 'rgba(59,130,246,0.15)', color: 'var(--bills-blue-bright)' },
+  Schedule: { bg: 'rgba(34,197,94,0.15)', color: 'var(--signal-positive)' },
 };
 
 export default function NewsPage() {
@@ -32,8 +36,8 @@ export default function NewsPage() {
       <motion.div {...fade(0)}>
         <SectionHeader
           title="News & Intel Feed"
-          subtitle="Breaking news, draft intelligence, and combine scouting reports"
-          context="Latest Bills news and analysis from across the league. Stories are ranked by recency and importance."
+          subtitle="Cut week, the 53, and the road to Houston"
+          context="Current Bills news. Historical items stay on the tape. The 53 is not posted until Sunday 6 p.m. ET."
         />
       </motion.div>
 
@@ -137,14 +141,13 @@ export default function NewsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.75rem' }}>
               <RiDraftLine style={{ color: 'var(--bills-blue-bright)', fontSize: '0.875rem' }} />
               <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)' }}>
-                Draft Intel
+                2026 Draft Class
               </span>
             </div>
-            {/* Bills Picks */}
             <div style={{ marginBottom: '0.75rem' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '0.5rem', ...mono, textTransform: 'uppercase' }}>Bills 2026 Picks</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '0.5rem', ...mono, textTransform: 'uppercase' }}>On the sheet</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-                {news.draft.billsPicks.map(p => (
+                {billsDraft2026.map(p => (
                   <div key={p.pick} style={{
                     ...mono, fontSize: '0.6875rem', fontWeight: 600,
                     padding: '0.25rem 0.5rem',
@@ -156,18 +159,17 @@ export default function NewsPage() {
                 ))}
               </div>
             </div>
-            {/* Mock Draft */}
-            <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '0.5rem', ...mono, textTransform: 'uppercase' }}>Mock Selections</div>
+            <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '0.5rem', ...mono, textTransform: 'uppercase' }}>The class — not a mock</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-              {news.draft.mockDraft.map(pick => (
+              {billsDraft2026.slice(0, 6).map(pick => (
                 <div key={pick.pick} style={{
                   padding: '0.625rem',
                   background: 'var(--bg-recessed)',
                   borderRadius: '2px',
-                  borderLeft: `3px solid ${pick.round === 1 ? 'var(--bills-blue-bright)' : pick.round === 2 ? 'var(--signal-positive)' : 'var(--signal-warning)'}`,
+                  borderLeft: `3px solid ${pick.round === 2 ? 'var(--bills-blue-bright)' : pick.round === 4 ? 'var(--signal-positive)' : 'var(--signal-warning)'}`,
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{pick.player}</span>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{pick.name}</span>
                     <span style={{ ...mono, fontSize: '0.625rem', color: 'var(--text-muted)' }}>R{pick.round} P{pick.pick}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
@@ -176,68 +178,28 @@ export default function NewsPage() {
                       padding: '0.0625rem 0.375rem',
                       background: 'rgba(0,51,141,0.15)', color: 'var(--bills-blue-bright)',
                       borderRadius: '2px',
-                    }}>{pick.pos}</span>
+                    }}>{pick.position}</span>
                     <span style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)' }}>{pick.school}</span>
                   </div>
-                  <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{pick.fit}</p>
+                  <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>{pick.expectedRole}</p>
                 </div>
               ))}
-            </div>
-
-            {/* Team Needs */}
-            <div style={{ marginTop: '0.75rem' }}>
-              <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', marginBottom: '0.375rem', ...mono, textTransform: 'uppercase' }}>Top Needs</div>
-              <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-                {news.combine.billsNeeds.map((need, i) => (
-                  <span key={need} style={{
-                    ...mono, fontSize: '0.625rem', fontWeight: 600,
-                    padding: '0.1875rem 0.5rem',
-                    background: i === 0 ? 'rgba(239,68,68,0.15)' : i <= 2 ? 'rgba(234,179,8,0.15)' : 'var(--bg-recessed)',
-                    color: i === 0 ? 'var(--signal-negative)' : i <= 2 ? 'var(--signal-warning)' : 'var(--text-data)',
-                    borderRadius: '2px',
-                  }}>{need}</span>
-                ))}
-              </div>
             </div>
           </Panel>
 
-          {/* Combine Watch */}
           <Panel>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.75rem' }}>
-              <RiRunLine style={{ color: 'var(--signal-positive)', fontSize: '0.875rem' }} />
+              <RiTimeLine style={{ color: 'var(--signal-warning)', fontSize: '0.875rem' }} />
               <span style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)' }}>
-                Combine Watch
+                The 53 clock
               </span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {news.combine.prospects.map(p => (
-                <div key={p.name} style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '0.5rem 0.5rem',
-                  borderBottom: '1px solid var(--border-divider)',
-                }}>
-                  <div>
-                    <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</div>
-                    <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center', marginTop: '0.125rem' }}>
-                      <span style={{
-                        ...mono, fontSize: '0.5625rem', fontWeight: 600,
-                        padding: '0.0625rem 0.375rem',
-                        background: 'rgba(0,51,141,0.15)', color: 'var(--bills-blue-bright)',
-                        borderRadius: '2px',
-                      }}>{p.pos}</span>
-                      <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)' }}>{p.school}</span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ ...mono, fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-data)' }}>{p.fortyYard}s</div>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.125rem' }}>
-                      <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', ...mono }}>VJ:{p.vertical}"</span>
-                      <span style={{ fontSize: '0.5625rem', color: 'var(--text-muted)', ...mono }}>BP:{p.bench}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+              Sunday, Aug. 30 · 6 p.m. ET
             </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+              Preseason is 3-0. The sheet is not posted. Null over a fake 53 — we wait for the league clock, then we talk chairs.
+            </p>
           </Panel>
         </motion.div>
       </div>

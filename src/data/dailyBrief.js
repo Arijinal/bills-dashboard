@@ -18,9 +18,13 @@
  */
 
 export const dailyBrief = {
-  lastUpdated: '2026-07-24',
-  headline: "Camp's open. The clock in my chest started tickin'.",
+  lastUpdated: '2026-08-28',
+  headline: "Preseason's in the books. Sunday they hand in 53 names.",
   paragraph:
-    "Y'all been countin' likes on X all summer — I been countin' somethin' else: fifty-one days till we walk into that dome in Houston and see the Texans again. Same team that walked one into our end zone and took the East tiebreaker off our table in Week 12 — now they get the kid with a full offseason of tape on 'em. And four days after that? Thursday night, lights on, first real snap inside the new house. Dwayne's already three legal pads deep on dome protections; Tammy's savin' her voice for the 17th. So riddle me this, Mafia — you want the revenge in Houston more, or that first home-cookin' touchdown under the new roof??",
-  sources: [],
+    "Y'all still talkin' camp? Camp's over, son. Thursday night they closed the summer 28-27 over Pittsburgh — Wheeler from the 2, two-point from Buechele to Pettis, three-and-oh and that don't go in the standings. Sunday six o'clock Eastern, Big Baller Beane has to hand Brandon's 53 to the league. Sixteen days after that we walk into that Houston dome and see the same team that took the East tiebreaker off our table in Week 12. Four days later Tammy's night — first real snap in the new house, Detroit, Thursday lights. So riddle me this, Mafia — you more nervous about who they send home Sunday, or whether the ones they keep are ready for Houston??",
+  sources: [
+    'https://www.espn.com/nfl/game/_/gameId/401873298/steelers-bills',
+    'https://www.buffalorumblings.com/buffalo-bills-roster/139078/buffalo-bills-roster-cuts-tracker-2026',
+    'https://www.usatoday.com/story/sports/nfl/2026/08/28/nfl-roster-cuts-tracker-53-man-roster/91497290007/',
+  ],
 };

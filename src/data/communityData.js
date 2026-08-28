@@ -156,7 +156,7 @@ export const gamedayInfo = {
   newStadium: {
     name: 'New Highmark Stadium',
     capacity: 62000,
-    openingDate: 'Summer 2026',
+    openingDate: 'First regular-season game: Thu Sept 17, 2026 vs Detroit (TNF)',
     cost: '$1.4B',
     features: [
       'Fully enclosed with partial roof coverage',

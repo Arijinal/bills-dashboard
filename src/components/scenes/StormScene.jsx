@@ -403,13 +403,13 @@ function WeatherCasterPanel({ forecast }) {
       }}>
         <ForecastPill
           label="TEMP"
-          value={`${f.temp}°F`}
-          sublabel={`Feels ${f.feelsLike}°`}
+          value={f.indoor ? 'DOME' : `${f.temp}°F`}
+          sublabel={f.indoor ? 'NRG Stadium' : `Feels ${f.feelsLike}°`}
           color="#A8D0FF"
         />
         <ForecastPill
           label="WIND"
-          value={`${f.wind} mph`}
+          value={f.indoor ? '—' : `${f.wind} mph`}
           sublabel={f.windDirection}
           color="#A8D0FF"
         />
@@ -421,7 +421,7 @@ function WeatherCasterPanel({ forecast }) {
         />
         <ForecastPill
           label="HUMID"
-          value={`${f.humidity}%`}
+          value={f.indoor ? '—' : `${f.humidity}%`}
           color="#A8D0FF"
         />
       </div>

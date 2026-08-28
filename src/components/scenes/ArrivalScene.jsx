@@ -239,7 +239,7 @@ export default function ArrivalScene() {
             textShadow: '0 2px 8px rgba(0,0,0,0.9)',
           }}
         >
-          Pull up a chair, son. The 2025-26 tape, the road back, and a new house openin' under Thursday-night lights. Tape don't lie.
+          Pull up a chair, son. Preseason's 3-0. Sunday they hand in 53 names. Sixteen days to Houston. Tape don't lie.
         </motion.div>
       </div>
 

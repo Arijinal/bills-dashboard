@@ -84,9 +84,9 @@ export const tammyKowalski = {
 // pick by upcoming-game venue/conditions.
 export const tammyForecasts = {
   seasonOpener2026: {
-    headline: 'Inaugural Sunday at the New Barn',
-    body: "Honey listen — first Sunday at the new house, and Mother Nature's bein' polite about it. Seventy-two at kickoff, light breeze WSW about eight, sunshine all the way. That's a Josh Allen day, dear — he'll air it out, and that breeze off the lake is gonna ride those throws right where they need to ride 'em. Bring a windbreaker for the fourth quarter, the lake gets opinions when the sun goes down. Now go bundle up — and go Bills.",
-    callout: '72°F · 8 mph WSW · CLEAR — A Josh Allen Day',
+    headline: "Houston's a dome, honey. I sit this one out.",
+    body: "Sweetheart, the season opener is Sept 13 in Houston — NRG Stadium, indoors, no lake, no wind, no gift. That's Dwayne's tape-room night, not mine. I'm savin' my voice for Thursday the 17th: first real snap in the new house, Detroit, prime time. THAT's when Mother Nature gets a vote. Sixteen days of dry football, then the barn opens. Now go bundle up anyway — and go Bills.",
+    callout: "SEPT 13 DOME · SEPT 17 TAMMY'S NIGHT",
   },
   fallbackCold: {
     headline: 'When the Lake Speaks',

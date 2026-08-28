@@ -26,7 +26,8 @@ export const offseasonGauntlet = [
   { id: 'minicamp',   date: 'May 9-11, 2026',   label: 'ROOKIE MINI-CAMP',  narrator: 'uncleJr' },
   { id: 'otas',       date: 'May 28 – Jun 6',   label: 'OTAs',              narrator: 'uncleJr' },
   { id: 'camp',       date: 'Jul 23, 2026',     label: 'TRAINING CAMP OPENS', narrator: 'uncleJr' },
-  { id: 'preseason',  date: 'Aug 8-22, 2026',   label: 'PRESEASON GAMES',   narrator: 'uncleJr' },
+  { id: 'preseason',  date: 'Aug 8-27, 2026',   label: 'PRESEASON GAMES · 3-0',   narrator: 'uncleJr' },
+  { id: 'the53',      date: 'Aug 30, 2026',     label: 'THE 53 · 6PM ET',    narrator: 'uncleJr' },
   { id: 'opener',     date: 'Sept 13, 2026',    label: 'SEASON OPENER · AT HOUSTON', narrator: 'dwayne' },
   { id: 'homeOpener', date: 'Sept 17, 2026',    label: 'NEW STADIUM FIRST GAME · DETROIT', narrator: 'tammy' },
 ];

@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // BUFFALO BILLS 2025-2026 SEASON — Current Data
-// Updated: February 25, 2026
+// Updated: August 28, 2026
 // ═══════════════════════════════════════════════════════
 
 export const teamInfo = {
@@ -16,11 +16,11 @@ export const teamInfo = {
   headCoach: 'Joe Brady',
   formerCoach: 'Sean McDermott (fired Jan 19, 2026)',
   stadium: 'Highmark Stadium',
-  newStadium: 'New Highmark Stadium opening Summer 2026',
+  newStadium: 'New Highmark Stadium — first regular-season game Thu Sept 17 vs Detroit (TNF)',
   nextGame: {
-    opponent: '2026 Season Opener — New Highmark Stadium',
+    opponent: 'Houston Texans',
     date: '2026-09-13',
-    location: 'New Highmark Stadium (Inaugural Season)'
+    location: 'NRG Stadium, Houston (indoor) · CBS 1:00 PM ET'
   }
 };
 
@@ -378,33 +378,37 @@ export const weatherImpact = {
 };
 
 // Next-game forecast — feeds the Storm scene weather caster panel.
-// Updates with the schedule; current entry is the 2026 season opener at
-// the inaugural New Highmark Stadium (Sept 13, 2026).
+// Season opener is AT Houston (NRG, indoor). Do not invent an outdoor
+// temperature. Tammy's weather night is Sept 17 vs Detroit at the new house.
 export const nextGameWeather = {
-  opponent: '2026 Season Opener',
+  opponent: 'Houston Texans',
   date: 'Sept 13, 2026',
   kickoff: '1:00 PM ET',
-  venue: 'New Highmark Stadium (Inaugural)',
+  venue: 'NRG Stadium — Houston (indoor)',
   forecast: {
-    temp: 72,
-    feelsLike: 70,
-    wind: 8,
-    windDirection: 'WSW',
-    precip: 'Clear',
-    humidity: 55,
-    conditions: 'Sunny / Light Breeze',
+    indoor: true,
+    temp: null,
+    feelsLike: null,
+    wind: null,
+    windDirection: 'INDOOR',
+    precip: 'Roof',
+    humidity: null,
+    conditions: 'Dome — weather is not the story',
   },
-  outlook: 'Mild for an opener — low wind, no rain. Allen gets to throw it deep without the lake sending it sideways.',
+  outlook: 'Season opener is in a dome. Tammy sits this one out. Dwayne\'s tape-room call — Houston already has a full offseason of film on the kid. The lake don\'t travel to Texas.',
 };
 
 export const news = {
   current: [
-    { id: 1, title: 'Joe Brady Named Head Coach After McDermott Firing', category: 'Coaching', date: 'Jan 27, 2026', excerpt: 'The Bills promoted OC Joe Brady to head coach on a 5-year deal, making him the youngest HC in the NFL at 36. Brady was chosen for continuity with Josh Allen and the offensive system.', hot: true },
-    { id: 2, title: 'Sean McDermott Fired After 9 Seasons', category: 'Coaching', date: 'Jan 19, 2026', excerpt: 'After a divisional round OT loss to Denver and 4 early playoff exits in 5 years, the Bills parted ways with McDermott. Brandon Beane promoted to President of Football Operations.', hot: true },
-    { id: 3, title: 'Jim Leonhard Hired as DC — Bills Switching to 3-4 Defense', category: 'Coaching', date: 'Feb 10, 2026', excerpt: 'New DC Jim Leonhard will install a 3-4 base defense, a major scheme change that will reshape the Bills\' roster needs heading into free agency and the draft.', hot: true },
+    { id: 10, title: '53-man roster due Sunday at 6 p.m. ET', category: 'Roster', date: 'Aug 28, 2026', excerpt: 'NFL clubs must be at 53 by Sunday, Aug. 30 at 6 p.m. ET — two days earlier than the old Tuesday cutdown. Buffalo is trimming a 91-man camp roster. The initial 53 is not posted yet. Do not treat any projection as the sheet.', hot: true },
+    { id: 11, title: 'Bills close preseason 3-0, rally past Steelers 28-27', category: 'Preseason', date: 'Aug 27, 2026', excerpt: 'Ian Wheeler scored from the 2 with 1:06 left and Shane Buechele hit Dante Pettis for the two-point conversion. Buffalo finished the summer unbeaten: Panthers 29-14, Browns 31-7, Steelers 28-27. Josh Allen sat the finale.', hot: true },
+    { id: 12, title: 'Skyler Bell debuts: 7 catches, 28-yard rushing TD', category: 'Player', date: 'Aug 27, 2026', excerpt: 'The fourth-round rookie, delayed by a groin injury through the first two preseason games, led Buffalo in receiving and rushing in the finale. Joe Brady: the moment was not too big. Roster math is still Sunday\'s job, not a projection.', hot: true },
+    { id: 13, title: 'Cuts begin: Bills release WR Mac Dalena', category: 'Roster', date: 'Aug 28, 2026', excerpt: 'Mac Dalena is the first named Bills cut on the public tracker. Additional moves are expected before Sunday\'s deadline. One name is not a 53.', hot: false },
+    { id: 14, title: 'Open on the road at Houston Sept 13; new house vs Detroit Sept 17', category: 'Schedule', date: 'Aug 28, 2026', excerpt: 'Season opener is at NRG Stadium, CBS, 1 p.m. ET — revenge for the 2025 Week 12 loss that cost Buffalo the AFC 5-seed tiebreaker. First regular-season game at the new Highmark is Thursday Night Football vs the Lions.', hot: true },
+    { id: 1, title: 'Joe Brady Named Head Coach After McDermott Firing', category: 'Coaching', date: 'Jan 27, 2026', excerpt: 'The Bills promoted OC Joe Brady to head coach on a 5-year deal, making him the youngest HC in the NFL at 36. Brady was chosen for continuity with Josh Allen and the offensive system.', hot: false },
+    { id: 2, title: 'Sean McDermott Fired After 9 Seasons', category: 'Coaching', date: 'Jan 19, 2026', excerpt: 'After a divisional round OT loss to Denver and 4 early playoff exits in 5 years, the Bills parted ways with McDermott. Brandon Beane promoted to President of Football Operations.', hot: false },
+    { id: 3, title: 'Jim Leonhard Hired as DC — Bills Switching to 3-4 Defense', category: 'Coaching', date: 'Feb 10, 2026', excerpt: 'New DC Jim Leonhard will install a 3-4 base defense, a major scheme change that will reshape the Bills\' roster needs heading into free agency and the draft.', hot: false },
     { id: 4, title: 'James Cook Wins 2025 NFL Rushing Title', category: 'Player', date: 'Jan 6, 2026', excerpt: 'James Cook led the NFL with 1,621 rushing yards on 309 carries — the first Bill to lead the league in rushing since O.J. Simpson in 1976. Cook also added 12 rushing TDs.', hot: false },
-    { id: 5, title: 'Bills $6.7M Over Salary Cap — Cuts Coming', category: 'Cap', date: 'Feb 20, 2026', excerpt: 'Buffalo enters 2026 free agency $6.7M over the $303.4M cap. Dawson Knox ($17.8M hit), Ed Oliver ($23.9M), and Taylor Rapp are prime cut/trade candidates. Free agency opens March 11.', hot: false },
-    { id: 6, title: 'New Highmark Stadium 75% Complete — Opening Summer 2026', category: 'Stadium', date: 'Feb 18, 2026', excerpt: 'The $1.4B new stadium is on track for its summer 2026 opening. The 62,000-seat venue will host its inaugural Bills game in September. Special inaugural season logo and jersey patch unveiled.', hot: true }
   ],
   combine: {
     prospects: [

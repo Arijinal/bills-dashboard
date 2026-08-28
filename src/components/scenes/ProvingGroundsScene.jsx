@@ -10,7 +10,7 @@ import { tammyKowalski } from '../../data/stormCaster';
  * Three voices narrate this chapter:
  *   • Uncle Jr. carries the off-season gauntlet timeline
  *   • Dwayne (his nephew, the tape guy) calls the film-room breakdowns
- *   • Tammy Kowalski lives at the bottom of the timeline (Sept 13 opener)
+ *   • Tammy Kowalski lives at the bottom of the timeline (Sept 17 new-house opener)
  *
  * Default view: 10 rookie name plates flanking the Gauntlet timeline.
  * Click any rookie → the chapter transforms into their Trial Card with

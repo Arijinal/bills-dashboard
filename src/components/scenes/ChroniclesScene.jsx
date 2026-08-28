@@ -12,7 +12,7 @@ const VIEWPORT = { once: true, amount: 0.2 };
 
 function pickCoachKey(article) {
   const t = article.title.toLowerCase();
-  if (t.includes('cap') || t.includes('cuts')) return 'cap_space';
+  if (t.includes('cap') || t.includes('cuts') || t.includes('53')) return 'cap_space';
   if (t.includes('cook') || t.includes('rushing title')) return 'rush_tds';
   if (t.includes('coach') || t.includes('brady') || t.includes('mcdermott')) return 'sentiment_pos';
   if (t.includes('defense') || t.includes('leonhard') || t.includes('3-4')) return 'def_epa';

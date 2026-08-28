@@ -279,13 +279,12 @@ export default function WeatherPage() {
             </div>
             <div>
               <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Expected Temp</div>
-              <div style={{ ...mono, fontSize: '1.25rem', fontWeight: 700, color: 'var(--signal-positive)' }}>72{'°'}F</div>
+              <div style={{ ...mono, fontSize: '1.25rem', fontWeight: 700, color: 'var(--signal-positive)' }}>DOME</div>
             </div>
             <div>
               <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Forecast</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <RiSunLine style={{ fontSize: '1.25rem', color: 'var(--signal-positive)' }} />
-                <span style={{ ...mono, fontSize: '0.875rem', color: 'var(--text-data)' }}>Clear</span>
+                <span style={{ ...mono, fontSize: '0.875rem', color: 'var(--text-data)' }}>Indoor — NRG</span>
               </div>
             </div>
           </div>

@@ -39,7 +39,7 @@ const CONSTELLATIONS = [
     name: 'THE COLISEUM',
     pos: { x: 50, y: 72 },
     color: 'var(--signal-positive)',
-    description: 'New Highmark Stadium — opens Summer 2026.',
+    description: 'New Highmark Stadium — first regular-season game Sept 17 vs Detroit (TNF).',
     links: [
       { label: 'New Highmark Stadium', url: 'https://www.buffalobills.com/stadium/new-highmark-stadium' },
       { label: 'Visit Buffalo Niagara', url: 'https://www.visitbuffaloniagara.com/' },

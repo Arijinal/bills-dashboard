@@ -10,10 +10,14 @@
  *     game at the new Highmark Stadium
  *
  * Offseason phase dates mirror offseasonGauntlet in rookieTrials.js
- * (draft/minicamp/OTAs/camp/preseason). Null-over-fabrication: no
+ * (draft/minicamp/OTAs/camp/preseason/the 53). Null-over-fabrication: no
  * opponent, time, or venue claims beyond the verified anchors above.
  * Phase start/end bounds exist only to drive the done/live/upcoming
- * status pips — the camp phase is bounded by the preseason start.
+ * status pips.
+ *
+ * Preseason finale verified 2026-08-28: BUF 28-27 PIT, Aug 27 at the new
+ * Highmark (ESPN gameId 401873298). 53-man deadline: Sun Aug 30, 6 p.m. ET
+ * (NFL.com / USA Today / Buffalo Rumblings).
  */
 
 export const SEASON_OPENER = {
@@ -35,7 +39,9 @@ export const SEASON_PHASES = [
   { id: 'minicamp', label: 'MINI-CAMP', start: '2026-05-09', end: '2026-05-11' },
   { id: 'otas', label: 'OTAs', start: '2026-05-28', end: '2026-06-06' },
   { id: 'camp', label: 'CAMP', start: '2026-07-23', end: '2026-08-07' },
-  { id: 'preseason', label: 'PRESEASON', start: '2026-08-08', end: '2026-08-22' },
+  { id: 'preseason', label: 'PRESEASON', start: '2026-08-08', end: '2026-08-27' },
+  { id: 'the53', label: 'THE 53', start: '2026-08-28', end: '2026-08-30' },
+  { id: 'road', label: 'ROAD TO HOUSTON', start: '2026-08-31', end: '2026-09-12' },
   { id: 'kickoff', label: 'KICKOFF', start: '2026-09-13', end: '2026-09-13' },
 ];
 

@@ -7,7 +7,7 @@
 export const officialLinks = [
   { name: 'Buffalo Bills Official', url: 'https://www.buffalobills.com/', category: 'official', description: 'Official team website — news, schedule, roster, tickets' },
   { name: 'Bills Shop', url: 'https://shop.buffalobills.com/', category: 'merch', description: 'Official merchandise and gear' },
-  { name: 'New Highmark Stadium', url: 'https://www.buffalobills.com/stadium/new-highmark-stadium', category: 'official', description: 'New stadium info — opening Summer 2026' },
+  { name: 'New Highmark Stadium', url: 'https://www.buffalobills.com/stadium/new-highmark-stadium', category: 'official', description: 'New stadium — first regular-season game Sept 17 vs Detroit (TNF)' },
   { name: 'Bills on NFL.com', url: 'https://www.nfl.com/teams/buffalo-bills/', category: 'official', description: 'NFL.com team page with stats and highlights' },
   { name: 'Bills Season Tickets', url: 'https://www.buffalobills.com/tickets/', category: 'tickets', description: 'Season tickets, single game, and waitlist info' },
   { name: 'Buffalo Bills Foundation', url: 'https://www.buffalobills.com/community/bills-foundation', category: 'community', description: 'Team charitable foundation and community programs' },
