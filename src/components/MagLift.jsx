@@ -56,11 +56,11 @@ export default function MagLift() {
     };
   }, []);
 
-  const activeStop = activeSection === 'armory'
+  const activeStop = scrollProgress > 0.82 || activeSection === 'armory'
     ? 'lot'
-    : activeSection === 'arrival' || activeSection === 'dispatch'
+    : scrollProgress < 0.16 || activeSection === 'arrival' || activeSection === 'dispatch'
       ? 'roof'
-      : scrollProgress < 0.38 ? 'roof' : scrollProgress < 0.78 ? 'mid' : 'lot';
+      : 'mid';
 
   const jump = (target) => {
     playClickSound();
