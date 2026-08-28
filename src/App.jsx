@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { ScrollOrchestratorProvider } from './components/ScrollOrchestrator';
 import QuestLog from './components/QuestLog';
+import MagLift from './components/MagLift';
 import ChapterTabs from './components/ChapterTabs';
 import ChapterDivider from './components/ChapterDivider';
 import TriptychIntro from './components/TriptychIntro';
@@ -44,11 +45,12 @@ const ArenaScene = lazy(() => import('./components/scenes/ArenaScene'));        
 const ProphecyScene = lazy(() => import('./components/scenes/ProphecyScene'));       // → SECTION 13
 const FellowshipScene = lazy(() => import('./components/scenes/FellowshipScene'));   // → SECTION 14
 const UniverseScene = lazy(() => import('./components/scenes/UniverseScene'));       // → SECTION 15
+const ArmoryScene = lazy(() => import('./components/scenes/ArmoryScene'));           // closer: merch coming soon
 
 const SECTION_IDS = [
   'arrival', 'dispatch', 'sunday-reckoning', 'franchise', 'war-room', 'four-kingdoms',
   'champions-duel', 'forge', 'proving-grounds', 'cost-of-war', 'storm',
-  'chronicles', 'arena', 'prophecy', 'fellowship', 'universe'
+  'chronicles', 'arena', 'prophecy', 'fellowship', 'universe', 'armory'
 ];
 
 // Full-viewport fallback: every primary chapter is >=100vh, so a
@@ -75,6 +77,7 @@ export default function App() {
     <ScrollOrchestratorProvider sectionIds={SECTION_IDS}>
       <ChapterTabs />
       <QuestLog />
+      <MagLift />
       <main style={{ position: 'relative', paddingTop: '48px' }}>
         <Suspense fallback={<SectionFallback />}><ArrivalScene /></Suspense>
         <ChapterDivider />
@@ -204,6 +207,8 @@ export default function App() {
         <section id="universe-detail" style={{ position: 'relative', padding: '4rem 2rem', background: 'var(--bg-base)' }}>
           <Suspense fallback={<SectionFallback />}><UniversePage /></Suspense>
         </section>
+        <ChapterDivider />
+        <Suspense fallback={<SectionFallback />}><ArmoryScene /></Suspense>
       </main>
     </ScrollOrchestratorProvider>
     </MotionConfig>

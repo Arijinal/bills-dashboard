@@ -38,6 +38,7 @@ const CHAPTERS = [
   { id: 'prophecy',         label: 'Crystal Ball',             chapter: 'XII' },
   { id: 'fellowship',       label: 'The Tailgate',             chapter: 'XIII' },
   { id: 'universe',         label: 'Out the Park',             chapter: 'XIV' },
+  { id: 'armory',           label: 'The Armory',               chapter: '·' },
 ];
 
 const GOLD = '#E8B23C';
@@ -63,7 +64,7 @@ export default function QuestLog() {
   const dotSize = isMobile ? 6 : 8;
   const lineWidth = 2;
   const lineHeightVh = 60; // 60% of viewport height
-  const rightOffset = isMobile ? 10 : 16;
+  const rightOffset = isMobile ? 10 : 78;
 
   return (
     <nav

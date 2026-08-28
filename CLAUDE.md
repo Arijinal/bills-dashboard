@@ -73,6 +73,7 @@ Junior's nephew. PFF subscriber. Runs a film-breakdown YouTube channel out of hi
 | XII | `prophecy` | Crystal Ball | PredictionsPage + **PropheticWall** + PollsPage (the Triptych) |
 | XIII | `fellowship` | The Tailgate | MafiaCorner |
 | XIV | `universe` | Out the Park | UniversePage |
+| · | `armory` | The Armory | merch closer, coming soon (unnumbered) |
 
 ## Build conventions
 
